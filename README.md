@@ -1,13 +1,13 @@
 <h1 align="center">Cucumblan</h1>
 
 <div align="center">
-   Cucumblan API Testing BDD 
+   Cucumblan BDD API Testing tool  
 </div>
 
 ## [License](#table-of-contents)
 -------
 
-Copyright 201 Virtualan Contributors (https://virtualan.io)  
+Copyright 2019 Virtualan Contributors (https://virtualan.io)  
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
