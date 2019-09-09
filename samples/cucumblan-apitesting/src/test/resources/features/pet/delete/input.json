@@ -1,0 +1,14 @@
+{
+	"url": "/pets/{petId}",
+	"output" :"{   \"category\": {     \"id\": 120,     \"name\": \"GoldFish-DELETE\"   },   \"id\": 120,   \"name\": \"GoldFish-DELETE\",   \"photoUrls\": [     \"/fish/\"   ],   \"status\": \"available\",   \"tags\": [     {       \"id\": 120,       \"name\": \"GoldFish-DELETE\"     }   ] }",
+	"httpStatusCode": "200",
+	"method": "DELETE",
+	"availableParams": [
+		{
+			"key": "petId",
+			"value": "120",
+			"type": "java.lang.Long"
+		}
+	],
+	"headerParams": []
+}

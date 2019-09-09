@@ -1,0 +1,7 @@
+{
+	"url": "/pets",
+	"httpStatusCode": "201",
+	"input": "INVALID_INPUT",
+	"output": "ERROR",
+	"method": "POST"
+}

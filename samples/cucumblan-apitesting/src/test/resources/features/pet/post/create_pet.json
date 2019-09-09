@@ -1,0 +1,18 @@
+{
+	"category": {
+		"id": {{ id }},
+		"name": "Fish-POST"
+	},
+	"id": {{ id }},
+	"name": "{{ name }}",
+	"photoUrls": [
+		"/fish/"
+	],
+	"status": "available",
+	"tags": [
+    {
+      "id": {{ id }},
+      "name": "Fish-POST"
+    }
+  ]
+}

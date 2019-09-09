@@ -1,0 +1,7 @@
+{
+	"url": "/pets",
+	"httpStatusCode": "201",
+	"input" :"{   \"category\": {     \"id\": 100,     \"name\": \"Fish-POST\"   },   \"id\": 100,   \"name\": \"GoldFish-POST\",   \"photoUrls\": [     \"/fish/\"   ],   \"status\": \"available\",   \"tags\": [     {       \"id\": 100,       \"name\": \"Fish-POST\"     }   ] }",
+	"output" :"{   \"category\": {     \"id\": 100,     \"name\": \"Fish-POST\"   },   \"id\": 100,   \"name\": \"GoldFish-POST\",   \"photoUrls\": [     \"/fish/\"   ],   \"status\": \"available\",   \"tags\": [     {       \"id\": 100,       \"name\": \"Fish-POST\"     }   ] }",
+	"method": "POST"
+}
