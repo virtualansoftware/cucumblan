@@ -1,0 +1,18 @@
+{
+	"category": {
+		"id": 130,
+		"name": "Fish-PUT"
+	},
+	"id": 130,
+	"name": "GoldFish-PUT",
+	"photoUrls": [
+		"/fish/"
+	],
+	"status": "available",
+	"tags": [
+    {
+      "id": 130,
+      "name": "Fish-PUT"
+    }
+  ]
+}

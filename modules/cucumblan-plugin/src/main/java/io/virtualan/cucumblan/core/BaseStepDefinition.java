@@ -9,20 +9,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.junit.Before;
+
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.MustacheFactory;
 
-import cucumber.api.DataTable;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-
-import io.virtualan.cucumblan.*;
 import io.virtualan.cucumblan.util.ScenarioContext;
 import io.virtualan.cucumblan.util.StepDefinitionHelper;
 
@@ -37,7 +36,7 @@ public class BaseStepDefinition {
 	private Response response;
 	private ValidatableResponse json;
 	private String jsonBody;
-	private int port = 80;
+	private int port = 8080;
 	private RequestSpecification request = given().port(port);
 
 	private static final MustacheFactory mf = new DefaultMustacheFactory();
@@ -50,7 +49,7 @@ public class BaseStepDefinition {
 	public void setUp() throws Exception {
 		try {
 			resourceEndPointProps.load(this.getClass().getClassLoader().getResourceAsStream("endpoints.properties"));
-			port = Integer.parseInt(resourceEndPointProps.getProperty("PORT", "80"));
+			port = Integer.parseInt(resourceEndPointProps.getProperty("PORT", "8080"));
 			request = request.port(port);
 		} catch (Exception e) {
 			LOGGER.warning(e.getMessage());
@@ -132,8 +131,8 @@ public class BaseStepDefinition {
 	@And("^Verify (.*) includes following in the response$")
 	public void verfiyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
-			System.out.println(v + " : " + json.extract().body().jsonPath().getString(k));
-			assertEquals(v, json.extract().body().jsonPath().getString(k));
+			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
+			assertEquals(v, json.extract().body().jsonPath().getString((String) k));
 		});
 	}
 }

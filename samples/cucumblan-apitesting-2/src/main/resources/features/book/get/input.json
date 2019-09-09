@@ -1,0 +1,14 @@
+{
+	"url": "/pets/{petId}",
+	"output" :"{   \"category\": {     \"id\": 110,     \"name\": \"GoldFish-GET\"   },   \"id\": 110,   \"name\": \"GoldFish-GET\",   \"photoUrls\": [     \"/fish/\"   ],   \"status\": \"available\",   \"tags\": [     {       \"id\": 110,       \"name\": \"GoldFish-GET\"     }   ] }",
+	"httpStatusCode": "200",
+	"method": "GET",
+	"availableParams": [
+		{
+			"key": "petId",
+			"value": "110",
+			"type": "java.lang.Long"
+		}
+	],
+	"headerParams": []
+}
