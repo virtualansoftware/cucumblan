@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.MustacheFactory;
 
@@ -31,7 +29,6 @@ public class BaseStepDefinition {
 	private final static Logger LOGGER = Logger.getLogger(BaseStepDefinition.class.getName());
 
 	private Properties resourceEndPointProps = new Properties();
-	private ScenarioContext scenarioContext = new ScenarioContext();
 
 	private Response response;
 	private ValidatableResponse json;
@@ -45,57 +42,56 @@ public class BaseStepDefinition {
 		return mf;
 	}
 
-	@Before
-	public void setUp() throws Exception {
-		try {
-			resourceEndPointProps.load(this.getClass().getClassLoader().getResourceAsStream("endpoints.properties"));
-			port = Integer.parseInt(resourceEndPointProps.getProperty("PORT", "8080"));
-			request = request.port(port);
-		} catch (Exception e) {
-			LOGGER.warning(e.getMessage());
-		}
+	
+	@Given("^(.*) with an (.*) of (.*)")
+	public void readRequestByPathParam(String dummy, String identifier, String value) {
+		request = request.pathParam(identifier, StepDefinitionHelper.getActualValue(value));
 	}
 
+	@Given("^(.*) without an identifier")
+	public void readRequestByPathParam(String dummy) {
+		request = given().port(port);
+	}
+
+	
+	@Given("^(.*) with an query param (.*) of (.*)")
+	public void readRequestByQueryParam(String dummy, String identifier, String value) {
+		request = request.queryParam(identifier, StepDefinitionHelper.getActualValue(value));
+	}
+
+	
+	
 	@Given("^Provided all the feature level parameters and endpoints$")
 	public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
-		scenarioContext.setContext(globalParams);
+		ScenarioContext.setContext(globalParams);
 	}
 
 	@Then("^Verify all the feature level parameters are present")
 	public void validateGlobalParam() {
-		assertTrue("Valid Global Parameters are present ", scenarioContext.hasContextValues());
+		assertTrue("Valid Global Parameters are present ", ScenarioContext.hasContextValues());
 	}
 
 	@Given("^Store the (.*) value of the key as (.*)")
 	public void loadAsGlobalParam(String responseKey, String key) {
-		scenarioContext.setContext(key, json.extract().body().jsonPath().getString(responseKey));
+		ScenarioContext.setContext(key, json.extract().body().jsonPath().getString(responseKey));
 	}
 
-	@Given("^(.*) with an (.*) of (.*)")
-	public void readRequestByPathParam(String dummy, String identifier, String value) {
-		request = request.pathParam(identifier, StepDefinitionHelper.getActualValue(scenarioContext, value));
-	}
-
-	@And("^(.*) with an query param (.*) of (.*)")
-	public void readRequestByQueryParam(String dummy, String identifier, String value) {
-		request = request.queryParam(identifier, StepDefinitionHelper.getActualValue(scenarioContext, value));
-	}
-
+	
 	@Given("^Populate (.*) with given input$")
 	public void loadRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
-		jsonBody = StepDefinitionHelper.buildInputRequest(scenarioContext, parameterMap);
+		jsonBody = StepDefinitionHelper.buildInputRequest(parameterMap);
 		request = request.contentType("application/json").body(jsonBody);
 	}
 
 	@Given("^Create (.*) with given input$")
 	public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
-		jsonBody = StepDefinitionHelper.buildInputRequest(scenarioContext, parameterMap);
+		jsonBody = StepDefinitionHelper.buildInputRequest(parameterMap);
 		request = request.contentType("application/json").body(jsonBody);
 	}
 
 	@Given("^Update (.*) with given input$")
 	public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
-		jsonBody = StepDefinitionHelper.buildInputRequest(scenarioContext, parameterMap);
+		jsonBody = StepDefinitionHelper.buildInputRequest( parameterMap);
 		request = request.contentType("application/json").body(jsonBody);
 	}
 
@@ -125,7 +121,8 @@ public class BaseStepDefinition {
 
 	@Then("^Verify the status code is (\\d+)")
 	public void verifyStatusCode(int statusCode) {
-		json = response.then().statusCode(statusCode);
+		json = response.then().log().ifValidationFails().statusCode(statusCode);
+		LOGGER.info(ScenarioContext.getContext().toString());
 	}
 
 	@And("^Verify (.*) includes following in the response$")
@@ -135,4 +132,3 @@ public class BaseStepDefinition {
 			assertEquals(v, json.extract().body().jsonPath().getString((String) k));
 		});
 	}
-}
