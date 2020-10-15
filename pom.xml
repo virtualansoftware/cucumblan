@@ -55,7 +55,7 @@
 		<outputDirectory>target/classes</outputDirectory>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 	</build>
-		<!-- Samples -->
+	<!-- Samples -->
 	<profiles>
 		<profile>
 			<id>samples</id>
@@ -72,7 +72,7 @@
 	</profiles>
 	<modules>
 		<module>modules/cucumblan-api</module>
-  </modules>
+	</modules>
 	<repositories>
 		<repository>
 			<id>sonatype-snapshots</id>
