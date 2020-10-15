@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.virtualan</groupId>
 	<artifactId>cucumblan-api</artifactId>
 	<packaging>jar</packaging>
 	<name>cucumblan-api</name>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<properties>
 		<cucumber.version>6.7.0</cucumber.version>
 		<junit.version>4.13.1</junit.version>
@@ -25,13 +23,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<scm>
-		<connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git
-		</developerConnection>
-		<url>https://github.com/virtualansoftware/cucumblan.git</url>
-		<tag>v1.0.0</tag>
-	</scm>
 	<developers>
 		<!-- original author of the project -->
 		<developer>
@@ -90,11 +81,11 @@
 			<artifactId>json</artifactId>
 			<version>20190722</version>
 		</dependency>
-    <dependency>
-      <groupId>io.swagger.parser.v3</groupId>
-      <artifactId>swagger-parser-v3</artifactId>
-      <version>2.0.22</version>
-    </dependency>
+		<dependency>
+			<groupId>io.swagger.parser.v3</groupId>
+			<artifactId>swagger-parser-v3</artifactId>
+			<version>2.0.22</version>
+		</dependency>
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
