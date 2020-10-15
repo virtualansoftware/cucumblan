@@ -4,7 +4,7 @@
 	<artifactId>cucumblan-api</artifactId>
 	<packaging>jar</packaging>
 	<name>cucumblan-api</name>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<properties>
 		<cucumber.version>6.7.0</cucumber.version>
 		<junit.version>4.13.1</junit.version>
@@ -25,7 +25,7 @@
 	</licenses>
 	<scm>
 		<connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git
+		<developerConnection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git
 		</developerConnection>
 		<url>https://github.com/virtualansoftware/cucumblan.git</url>
 		<tag>v1.0.0</tag>
