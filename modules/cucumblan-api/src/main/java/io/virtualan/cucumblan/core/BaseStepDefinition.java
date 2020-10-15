@@ -69,6 +69,17 @@ public class BaseStepDefinition {
 		assertTrue("Valid Global Parameters are present ", ScenarioContext.hasContextValues());
 	}
 
+
+	@Given("^Add the (.*) value of the key as (.*)")
+	public void addVariable(String responseValue, String key) {
+		ScenarioContext.setContext(key, responseValue);
+	}
+
+	@Given("^Modify the (.*) value of the key as (.*)")
+	public void modifyVariable(String responseValue, String key) {
+		ScenarioContext.setContext(key, responseValue);
+	}
+
 	@Given("^Store the (.*) value of the key as (.*)")
 	public void loadAsGlobalParam(String responseKey, String key) {
 		ScenarioContext.setContext(key, json.extract().body().jsonPath().getString(responseKey));
@@ -144,7 +155,7 @@ public class BaseStepDefinition {
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
 			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
-			assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+			assertEquals(StepDefinitionHelper.getActualValue(v.toString()), json.extract().body().jsonPath().getString((String) k));
 		});
 	}
 

@@ -32,6 +32,7 @@ Feature: Test Pet API
     Then Verify the status code is 201
     And Verify across response includes following in the response
       | mockStatus.code | Mock created successfully |
+    And Add the 100 value of the key as petId_post
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
     Given Create Pet Mock data for the with given input
       | url             | /pets       |
@@ -58,7 +59,7 @@ Feature: Test Pet API
     When a user post accept application/json in pets resource on pet
     Then Verify the status code is 201
     And Verify across response includes following in the response
-      | id		    | 100        	   |
+      | id		    | [petId_post]     |
       | name		| GoldFish-POST    |
 
   Scenario: Setup a mock service for  Pet with READ API

@@ -9,7 +9,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<properties>
 		<cucumber.version>6.7.0</cucumber.version>
-		<junit.version>4.13</junit.version>
+		<junit.version>4.13.1</junit.version>
 	</properties>
 	<developers>
 		<!-- original author of the project -->
