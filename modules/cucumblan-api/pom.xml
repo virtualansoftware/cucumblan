@@ -4,7 +4,7 @@
 	<artifactId>cucumblan-api</artifactId>
 	<packaging>jar</packaging>
 	<name>cucumblan-api</name>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<properties>
 		<cucumber.version>6.7.0</cucumber.version>
 		<junit.version>4.13.1</junit.version>
