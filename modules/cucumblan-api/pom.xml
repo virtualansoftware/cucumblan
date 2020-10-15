@@ -6,7 +6,7 @@
 	<artifactId>cucumblan-api</artifactId>
 	<packaging>jar</packaging>
 	<name>cucumblan-api</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<properties>
 		<cucumber.version>6.7.0</cucumber.version>
 		<junit.version>4.13.1</junit.version>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>io.virtualan</groupId>
 			<artifactId>mapson</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
