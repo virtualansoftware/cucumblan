@@ -4,17 +4,15 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.Mapson;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Logger;
+import java.util.Map;import
+java.util.logging.Logger;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
@@ -37,8 +35,13 @@ public class BaseStepDefinition {
 	private String jsonBody;
 	private RequestSpecification request = given();
 	static  {
-		OpenAPIParser.loader();
-		EndpointConfiguration.getInstance().loadEndpoints();
+		try {
+			OpenAPIParser.loader();
+			EndpointConfiguration.getInstance().loadEndpoints();
+		} catch (ParserError parserError) {
+			LOGGER.warning("Unable to start the process - see if conf folder and endpoints are generated");
+			System.exit(1);
+		}
 	}
 
 	@Given("^(.*) with an path param (.*) of (.*)")
