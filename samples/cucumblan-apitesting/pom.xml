@@ -8,7 +8,7 @@
 	<name>cucumblan-apitesting</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<properties>
-		<cucumblan.version>1.0.0-SNAPSHOT</cucumblan.version>
+		<cucumblan.version>0.0.1-SNAPSHOT</cucumblan.version>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -180,6 +180,12 @@
 		<groupId>io.virtualan</groupId>
 		<artifactId>virtualization</artifactId>
 		<version>${virtualan.version}</version>
+		<exclusions>
+			<exclusion>
+				<groupId>io.virtualan</groupId>
+				<artifactId>mapson</artifactId>
+			</exclusion>
+		</exclusions>
 	</dependency>
 
 	<!-- HyperSQL DB -->
