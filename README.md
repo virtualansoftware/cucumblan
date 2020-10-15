@@ -4,6 +4,10 @@
    Cucumblan BDD API Testing tool  
 </div>
 
+Cucumblan is a test automation framework that supports Behavior Driven Development (BDD), allowing users to create feature using predefined step definition with low code. It works based on the Gherkin Domain Specific Language (DSL). This simple but powerful api and ui framework while keeping it comprehensible to even non-technical(product owner, business analyst and domain experts) users.
+
+
+
 ## [License](#table-of-contents)
 -------
 
