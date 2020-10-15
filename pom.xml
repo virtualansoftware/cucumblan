@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -10,22 +9,14 @@
 	<artifactId>cucumblan-project</artifactId>
 	<packaging>pom</packaging>
 	<name>cucumblan-project</name>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
-		<connection>scm:git:ssh://git@github.com:virtualansoftware/cucumbalan.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumbalan.git</developerConnection>
-		<url>https://github.com/virtualansoftware/cucumbalan.git</url>
+		<connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
+		<url>https://github.com/virtualansoftware/cucumblan.git</url>
 		<tag>v1.0.0</tag>
 	</scm>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 	<developers>
 		<developer>
 			<id>elans3</id>
@@ -33,6 +24,10 @@
 			<email>elan.thangamani@virtualan.io</email>
 		</developer>
 	</developers>
+	<issueManagement>
+		<system>github</system>
+		<url>https://github.com/virtualansoftware/virtualan/issues</url>
+	</issueManagement>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -50,13 +45,8 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<outputDirectory>target/classes</outputDirectory>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-	</build>
-	<!-- Samples -->
 	<profiles>
+		<!-- Samples -->
 		<profile>
 			<id>samples</id>
 			<activation>
@@ -82,7 +72,4 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	<properties>
-		<maven-plugin-version>1.0.0</maven-plugin-version>
-	</properties>
 </project>
