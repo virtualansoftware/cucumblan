@@ -180,6 +180,12 @@
 		<groupId>io.virtualan</groupId>
 		<artifactId>virtualization</artifactId>
 		<version>${virtualan.version}</version>
+		<exclusions>
+			<exclusion>
+				<groupId>io.virtualan</groupId>
+				<artifactId>mapson</artifactId>
+			</exclusion>
+		</exclusions>
 	</dependency>
 
 	<!-- HyperSQL DB -->

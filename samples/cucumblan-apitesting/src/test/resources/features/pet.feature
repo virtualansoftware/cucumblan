@@ -33,6 +33,7 @@ Feature: Test Pet API
     And Verify across response includes following in the response
       | mockStatus.code | Mock created successfully |
     And Add the 100 value of the key as petId_post
+    And Store the id value of the key as petId_post_mock
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
     Given Create Pet Mock data for the with given input
       | url             | /pets       |
@@ -48,14 +49,14 @@ Feature: Test Pet API
       | code | This Mock request already Present, Change the input Data!!! |
   Scenario: User calls service to CREATE and Create Pet
     Given Create a pet with given input
-      | category.id		            | i~100 		|
-      | category.name 	            | Fish-POST     |
-      | id							| i~100			|
-      | name 					 	| GoldFish-POST |
-      |photoUrls[0]			        | /fish/ 		|
-      |	status					    |available	    |
-      |tags[0].id				    | i~100         |
-      |tags[0].name			        | Fish-POST	    |
+      | category.id		            | i~[petId_post] 	|
+      | category.name 	            | Fish-POST         |
+      | id							| i~[petId_post]    |
+      | name 					 	| GoldFish-POST     |
+      |photoUrls[0]			        | /fish/ 		    |
+      |	status					    |available	        |
+      |tags[0].id				    | i~[petId_post]    |
+      |tags[0].name			        | Fish-POST	        |
     When a user post accept application/json in pets resource on pet
     Then Verify the status code is 201
     And Verify across response includes following in the response
