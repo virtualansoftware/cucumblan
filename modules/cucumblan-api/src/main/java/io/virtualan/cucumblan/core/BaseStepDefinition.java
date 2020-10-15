@@ -4,17 +4,15 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.Mapson;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Logger;
+import java.util.Map;import
+java.util.logging.Logger;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
@@ -37,8 +35,13 @@ public class BaseStepDefinition {
 	private String jsonBody;
 	private RequestSpecification request = given();
 	static  {
-		OpenAPIParser.loader();
-		EndpointConfiguration.getInstance().loadEndpoints();
+		try {
+			OpenAPIParser.loader();
+			EndpointConfiguration.getInstance().loadEndpoints();
+		} catch (ParserError parserError) {
+			LOGGER.warning("Unable to start the process - see if conf folder and endpoints are generated");
+			System.exit(1);
+		}
 	}
 
 	@Given("^(.*) with an path param (.*) of (.*)")
@@ -64,6 +67,17 @@ public class BaseStepDefinition {
 	@Then("^Verify all the feature level parameters are present")
 	public void validateGlobalParam() {
 		assertTrue("Valid Global Parameters are present ", ScenarioContext.hasContextValues());
+	}
+
+
+	@Given("^Add the (.*) value of the key as (.*)")
+	public void addVariable(String responseValue, String key) {
+		ScenarioContext.setContext(key, responseValue);
+	}
+
+	@Given("^Modify the (.*) value of the key as (.*)")
+	public void modifyVariable(String responseValue, String key) {
+		ScenarioContext.setContext(key, responseValue);
 	}
 
 	@Given("^Store the (.*) value of the key as (.*)")
@@ -141,7 +155,7 @@ public class BaseStepDefinition {
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
 			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
-			assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+			assertEquals(StepDefinitionHelper.getActualValue(v.toString()), json.extract().body().jsonPath().getString((String) k));
 		});
 	}
 
