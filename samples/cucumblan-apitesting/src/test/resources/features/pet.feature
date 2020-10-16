@@ -5,7 +5,7 @@ Feature: Test Pet API
     Then Verify the status code is 500
     And Verify across response includes following in the response
       | code      | MISSING_MOCK_DATA                                   |
-      | message		| Mock response was not added for the given parameter |
+      | message   | Mock response was not added for the given parameter |
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
     Given Create Pet Mock data for the with given input
       |url              | /pets         |
@@ -21,13 +21,13 @@ Feature: Test Pet API
       | code			|Check input Json for the "Mock Request Body", Correct the input/Json!!!     |
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
     Given Create Pet Mock data for the with given input
-      | url             | /pets       |
-      | type            | Response    |
-      | resource        | pets        |
-      | httpStatusCode | 201          |
-      | input          | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] } |
-      | output         | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] }|
-      | method         | POST         |
+      | url             | /pets        |
+      | type            | Response     |
+      | resource        | pets         |
+      | httpStatusCode  |  201         |
+      | input           | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] } |
+      | output          | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] }|
+      | method          | POST         |
     When a user post accept application/json in virtualservices resource on virtualan
     Then Verify the status code is 201
     And Verify across response includes following in the response
@@ -60,8 +60,8 @@ Feature: Test Pet API
     When a user post accept application/json in pets resource on pet
     Then Verify the status code is 201
     And Verify across response includes following in the response
-      | id      | [petId_post]     |
-      | name		| GoldFish-POST    |
+      | id      | [petId_post]  |
+      | name    | GoldFish-POST |
 
   Scenario: Setup a mock service for  Pet with READ API
     Given Create Pet Mock data for the with given input
@@ -83,7 +83,7 @@ Feature: Test Pet API
     Then Verify the status code is 200
     And Verify across response includes following in the response
       | id    | 110           |
-      | name	| GoldFish-GET  |
+      | name  | GoldFish-GET  |
   Scenario: Setup a mock service for Pet with DELETE API
     Given Create Pet Mock data for the with given input
       | url                     | /pets/{petId} |
@@ -104,7 +104,7 @@ Feature: Test Pet API
     Then Verify the status code is 200
     And Verify across response includes following in the response
       | id    | 120             |
-      | name	| GoldFish-DELETE |
+      | name  | GoldFish-DELETE |
 
   Scenario: Setup a mock service for  Pet with PUT API
     Given Create PUT Pet Mock data for the with given input
@@ -136,5 +136,5 @@ Feature: Test Pet API
     Then Verify the status code is 200
     And Verify across response includes following in the response
       | id    | 130          |
-      | name	| GoldFish-PUT |
+      | name  | GoldFish-PUT |
 
