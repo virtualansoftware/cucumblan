@@ -6,7 +6,6 @@
 	<name>cucumblan-api</name>
 	<version>1.0.1-SNAPSHOT</version>
 	<properties>
-		<maven.javadoc.skip>false</maven.javadoc.skip>
 		<cucumber.version>6.7.0</cucumber.version>
 		<junit.version>4.13.1</junit.version>
 	</properties>
@@ -66,17 +65,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<outputDirectory>${project.build.directory}/javadoc</outputDirectory>
-					<reportOutputDirectory>${project.reporting.outputDirectory}/javadoc</reportOutputDirectory>
-				</configuration>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
-						<phase>site</phase>
 						<goals>
-							<goal>aggregate</goal>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
