@@ -17,11 +17,21 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * The type Open api parser.
+ *
+ * @author Elan Thangamani
+ */
 public class OpenAPIParser {
 
 
   private final static Logger LOGGER = Logger.getLogger(OpenAPIParser.class.getName());
 
+  /**
+   * Loader.
+   *
+   * @throws ParserError the parser error
+   */
   public static void loader() throws ParserError {
     Map<String,String> properties = ApplicationConfiguration.getProperties();
       for(Map.Entry<String, String> property : properties.entrySet()) {
@@ -32,6 +42,13 @@ public class OpenAPIParser {
       }
   }
 
+  /**
+   * Init.
+   *
+   * @param system the system
+   * @param url    the url
+   * @throws ParserError the parser error
+   */
   public static void init(String system, String url) throws ParserError {
     try {
       if (!new File("conf/endpoint." + system + ".properties").exists()) {

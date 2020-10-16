@@ -9,10 +9,21 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 
+/**
+ * The type Step definition helper.
+ *
+ * @author Elan Thangamani
+ */
 public class StepDefinitionHelper {
 
 
-	public static Object getActualValue( String value) {
+  /**
+   * Gets actual value.
+   *
+   * @param value the value
+   * @return the actual value
+   */
+  public static Object getActualValue( String value) {
 		String returnValue = value;
 		if (value.contains("[") && value.contains("]")) {
 			String key = value.substring(value.indexOf("[") + 1, value.lastIndexOf("]"));
@@ -36,14 +47,29 @@ public class StepDefinitionHelper {
 		return returnValue;
 	}
 
-	public static String getActualResource(String resourceKey, String system) {
+  /**
+   * Gets actual resource.
+   *
+   * @param resourceKey the resource key
+   * @param system      the system
+   * @return the actual resource
+   */
+  public static String getActualResource(String resourceKey, String system) {
 		Properties props = EndpointConfiguration.getInstance().getProperty(system);
 		String url = ApplicationConfiguration.getProperty("service.api."+system)
 				+ (props.getProperty(resourceKey) != null ? props.getProperty(resourceKey) : resourceKey);
 		 return url;
 	}
 
-	public static String buildJsonString(String fileName, String jsonInput) throws Exception {
+  /**
+   * Build json string string.
+   *
+   * @param fileName  the file name
+   * @param jsonInput the json input
+   * @return the string
+   * @throws Exception the exception
+   */
+  public static String buildJsonString(String fileName, String jsonInput) throws Exception {
 		try {
 			JSONTokener tokener = new JSONTokener(jsonInput);
 			JSONObject object = new JSONObject(tokener);
