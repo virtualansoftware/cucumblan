@@ -69,7 +69,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<executions>
+				<version>3.2.0</version>
+        <executions>
 					<execution>
 						<id>attach-sources</id>
 						<goals>
@@ -78,25 +79,19 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<outputDirectory>${project.build.directory}/javadoc</outputDirectory>
-					<reportOutputDirectory>${project.reporting.outputDirectory}/javadoc</reportOutputDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<phase>site</phase>
-						<goals>
-							<goal>aggregate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 			      <plugin>
 			        <groupId>org.apache.maven.plugins</groupId>
 			        <artifactId>maven-gpg-plugin</artifactId>
