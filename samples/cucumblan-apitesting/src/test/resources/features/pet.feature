@@ -8,13 +8,13 @@ Feature: Test Pet API
       | message		| Mock response was not added for the given parameter |
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
     Given Create Pet Mock data for the with given input
-      |url 				      | 	/pets			      |
-      | type            | Response          |
-      | resource        | pets              |
-      |httpStatusCode	  |	201				        |
-      |input 			      | INVALID_INPUT 	  |
-      |output			      | ERROR 			      |
-      |method			      | POST 				      |
+      |url              | /pets         |
+      | type            | Response      |
+      | resource        | pets          |
+      |httpStatusCode   |	201           |
+      |input            | INVALID_INPUT |
+      |output           | ERROR         |
+      |method           | POST          |
     When a user post accept application/json in virtualservices resource on virtualan
     Then Verify the status code is 400
     And Verify across response includes following in the response
@@ -124,14 +124,14 @@ Feature: Test Pet API
   Scenario: User calls service to PUT and Create Pet
     Given pet with an path param petId of 130
     And Update with mock data with given input
-      | category.id		            | i~130 		    |
-      | category.name	            | Fish-PUT      |
-      | id						          	| i~130			    |
-      | name 					 	          | GoldFish-PUT  |
-      | photoUrls[0]			        | /fish/ 		    |
-      |	status					          |available	    |
-      |tags[0].id				          | i~130         |
-      |tags[0].name			          | Fish-PUT	    |
+      | category.id       | i~130         |
+      | category.name	    | Fish-PUT      |
+      | id                | i~130         |
+      | name              | GoldFish-PUT  |
+      | photoUrls[0]      | /fish/        |
+      |	status            |available      |
+      |tags[0].id         | i~130         |
+      |tags[0].name       | Fish-PUT      |
     When a user update application/json in pets_petId resource on pet
     Then Verify the status code is 200
     And Verify across response includes following in the response
