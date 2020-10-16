@@ -46,6 +46,9 @@
 		</license>
 	</licenses>
 
+	<modules>
+		<module>modules/cucumblan-api</module>
+	</modules>
 	<profiles>
 		<!-- Samples -->
 		<profile>
@@ -60,11 +63,9 @@
 				<module>samples/cucumblan-apitesting</module>
 			</modules>
 		</profile>
-	</profiles>
-	<modules>
-		<module>modules/cucumblan-api</module>
-	</modules>
-	<build>
+		<profile>
+			<id>release</id>
+			<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -118,6 +119,9 @@
 			</plugin>
 		</plugins>
 	</build>
+		</profile>
+	</profiles>
+
 	<repositories>
 		<repository>
 			<id>sonatype-snapshots</id>
