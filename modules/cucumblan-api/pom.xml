@@ -8,7 +8,7 @@
   <name>cucumblan-api</name>
   <version>1.0.1-SNAPSHOT</version>
   <properties>
-    <mapson.version>1.1.0</mapson.verson>
+    <mapson.version>1.1.0</mapson.version>
     <cucumber.version>6.7.0</cucumber.version>
     <junit.version>4.13.1</junit.version>
   </properties>
