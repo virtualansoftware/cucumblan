@@ -9,7 +9,9 @@ import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.mapson.Mapson;
+import io.virtualan.util.Helper;
 import java.io.IOException;
 import java.util.Map;import
 java.util.logging.Logger;
@@ -111,7 +113,7 @@ public class BaseStepDefinition {
    */
   @Given("^Add the (.*) value of the key as (.*)")
 	public void addVariable(String responseValue, String key) {
-		ScenarioContext.setContext(key, responseValue);
+		ScenarioContext.setContext(key, Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
 	}
 
   /**
@@ -120,9 +122,48 @@ public class BaseStepDefinition {
    * @param responseValue the response value
    * @param key           the key
    */
-  @Given("^Modify the (.*) value of the key as (.*)")
-	public void modifyVariable(String responseValue, String key) {
-		ScenarioContext.setContext(key, responseValue);
+  @Given("^evaluate the (.*) decimal value of the key as (.*)")
+	public void modifyDecimalVariable(String responseValue, String key) throws IOException {
+		ScenarioContext.setContext(key, ExcelAndMathHelper.evaluateWithVariables(Double.class,
+							responseValue, ScenarioContext.getContext()).toString());
+	}
+
+
+
+	/**
+	 * Modify variable.
+	 *
+	 * @param responseValue the response value
+	 * @param key           the key
+	 */
+	@Given("^evaluate the (.*) integer value of the key as (.*)")
+	public void modifyIntVariable(String responseValue, String key) throws IOException {
+		ScenarioContext.setContext(key, ExcelAndMathHelper.evaluateWithVariables(Integer.class,
+				responseValue, ScenarioContext.getContext()).toString());
+	}
+
+	/**
+	 * Modify variable.
+	 *
+	 * @param responseValue the response value
+	 * @param key           the key
+	 */
+	@Given("^evaluate the (.*) boolean value of the key as (.*)")
+	public void modifyBooleanVariable(String responseValue, String key) throws IOException {
+		ScenarioContext.setContext(key, ExcelAndMathHelper.evaluateWithVariables(Boolean.class,
+				responseValue, ScenarioContext.getContext()).toString());
+	}
+
+
+	/**
+	 * Modify variable.
+	 *
+	 * @param responseValue the response value
+	 * @param key           the key
+	 */
+	@Given("^Modify the (.*) value of the key as (.*)")
+	public void modifyStringVariable(String responseValue, String key) throws IOException {
+		ScenarioContext.setContext(key, Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
 	}
 
   /**
