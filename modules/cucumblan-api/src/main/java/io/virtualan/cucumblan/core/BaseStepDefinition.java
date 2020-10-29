@@ -4,6 +4,8 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import io.restassured.RestAssured;
+import io.restassured.config.SSLConfig;
 import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
@@ -25,6 +27,7 @@ import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
+import org.apache.xmlbeans.impl.util.Base64;
 
 
 /**
@@ -51,6 +54,7 @@ public class BaseStepDefinition {
 		}
 	}
 
+
   /**
    * Read request by path param.
    *
@@ -60,10 +64,45 @@ public class BaseStepDefinition {
    */
   @Given("^(.*) with an path param (.*) of (.*)")
 	public void readRequestByPathParam(String dummy, String identifier, String value) {
-		request = request.pathParam(identifier, StepDefinitionHelper.getActualValue(value));
+		request = given().pathParam(identifier, StepDefinitionHelper.getActualValue(value));
 	}
 
-  /**
+	/**
+	 * Read request by path param.
+	 *
+	 * @param identifier the identifier
+	 * @param value      the value
+	 */
+	@Given("^enable cert for (.*) of (.*)")
+	public void cert( String identifier, String value) {
+		RestAssured.authentication  = RestAssured.certificate(identifier, value);
+	}
+
+
+	/**
+	 * Read request by path param.
+	 *
+	 * @param username the identifier
+	 * @param password      the value
+	 */
+	@Given("^basic authentication with (.*) and (.*)")
+	public void auth( String username, String password) {
+		byte[] authBasic = Base64.encode(String.format("%s:%s", username, password).getBytes());
+		request.header("Authorization", String.format("Basic %s", new String(authBasic)));
+	}
+
+	/**
+	 * Read request by path param.
+	 *
+	 * @param auth the identifier
+	 * @param token the value
+	 */
+	@Given("^(.*) auth with (.*) token$")
+	public void bearer(String auth, String token) {
+		request.header("Authorization", String.format("%s %s", auth, Helper.getActualValueForAll(token, ScenarioContext.getContext())));
+	}
+
+	/**
    * Read request by path param.
    *
    * @param dummy the dummy
@@ -95,7 +134,6 @@ public class BaseStepDefinition {
 	 */
 	@Given("add (.*) with given header params$")
 	public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap) throws Exception {
-		request = request.contentType("application/json");
 		for(Map.Entry<String, String> params : parameterMap.entrySet()) {
 			request = request.header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
 		}
@@ -110,7 +148,7 @@ public class BaseStepDefinition {
 	 */
 	@Given("^(.*) with an query param (.*) of (.*)")
 	public void readRequestByQueryParam(String dummy, String identifier, String value) {
-		request = request.queryParam(identifier, StepDefinitionHelper.getActualValue(value));
+		request = given().queryParam(identifier, StepDefinitionHelper.getActualValue(value));
 	}
 
   /**
@@ -288,7 +326,9 @@ public class BaseStepDefinition {
    */
   @When("^(.+) post accept (.*) in (.*) resource on (.*)")
 	public void createRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().accept(acceptContentType)
+		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().
+				log().all()
+				.accept(acceptContentType)
 				.post(StepDefinitionHelper.getActualResource(resource, system));
 	}
 
@@ -302,7 +342,8 @@ public class BaseStepDefinition {
    */
   @When("^(.*) get (.*) in (.*) resource on (.*)")
 	public void readRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().accept(acceptContentType)
+		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+				.log().all().accept(acceptContentType)
 				.get(StepDefinitionHelper.getActualResource(resource, system));
 	}
 
@@ -316,7 +357,8 @@ public class BaseStepDefinition {
    */
   @When("^(.*) update (.*) in (.*) resource on (.*)")
 	public void modifyRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().accept(acceptContentType)
+		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+				.log().all().accept(acceptContentType)
 				.put(StepDefinitionHelper.getActualResource( resource, system));
 	}
 
@@ -330,7 +372,8 @@ public class BaseStepDefinition {
    */
   @When("^(.*) patch (.*) in (.*) resource on (.*)")
 	public void patchRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().accept(acceptContentType)
+		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+				.log().all().accept(acceptContentType)
 				.patch(StepDefinitionHelper.getActualResource( resource, system));
 	}
 
@@ -344,7 +387,8 @@ public class BaseStepDefinition {
    */
   @When("^(.*) delete (.*) in (.*) resource on (.*)")
 	public void deleteById(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().accept(acceptContentType)
+		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+				.log().all().accept(acceptContentType)
 				.delete(StepDefinitionHelper.getActualResource(resource, system));
 	}
 
@@ -371,7 +415,7 @@ public class BaseStepDefinition {
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
 			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
-			assertEquals(StepDefinitionHelper.getActualValue(v.toString()), json.extract().body().jsonPath().getString((String) k));
+			assertEquals(v, json.extract().body().jsonPath().getString((String) k));
 		});
 	}
 
