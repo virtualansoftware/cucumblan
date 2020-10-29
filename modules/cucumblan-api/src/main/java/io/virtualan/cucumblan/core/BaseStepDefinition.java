@@ -74,13 +74,41 @@ public class BaseStepDefinition {
 	}
 
   /**
-   * Read request by query param.
+   * Read request by header param.
    *
    * @param dummy      the dummy
    * @param identifier the identifier
    * @param value      the value
    */
-  @Given("^(.*) with an query param (.*) of (.*)")
+  @Given("^(.*) with an header param (.*) of (.*)")
+	public void readRequestByHeaderParam(String dummy, String identifier, String value) {
+		request = request.header(identifier, StepDefinitionHelper.getActualValue(value));
+	}
+
+
+	/**
+	 * Read request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("add (.*) with given header params$")
+	public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap) throws Exception {
+		request = request.contentType("application/json");
+		for(Map.Entry<String, String> params : parameterMap.entrySet()) {
+			request = request.header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+		}
+	}
+
+	/**
+	 * Read request by query param.
+	 *
+	 * @param dummy      the dummy
+	 * @param identifier the identifier
+	 * @param value      the value
+	 */
+	@Given("^(.*) with an query param (.*) of (.*)")
 	public void readRequestByQueryParam(String dummy, String identifier, String value) {
 		request = request.queryParam(identifier, StepDefinitionHelper.getActualValue(value));
 	}
@@ -177,6 +205,22 @@ public class BaseStepDefinition {
 		ScenarioContext.setContext(key, json.extract().body().jsonPath().getString(responseKey));
 	}
 
+
+	/**
+	 * Read request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("^add (.*) with given path params$")
+	public void readPathParamsRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
+		request = request.contentType("application/json");
+		for(Map.Entry<String, String> params : parameterMap.entrySet()) {
+			request = request.pathParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+		}
+	}
+
   /**
    * Read request.
    *
@@ -184,7 +228,8 @@ public class BaseStepDefinition {
    * @param parameterMap the parameter map
    * @throws Exception the exception
    */
-  @Given("^Read (.*) with given input$")
+
+	@Given("add (.*) with given query params$")
   public void readRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     request = request.contentType("application/json");
     for(Map.Entry<String, String> params : parameterMap.entrySet()) {
@@ -284,7 +329,7 @@ public class BaseStepDefinition {
    * @param system            the system
    */
   @When("^(.*) patch (.*) in (.*) resource on (.*)")
-	public void pathchRequest(String dummyString, String acceptContentType, String resource, String system) {
+	public void patchRequest(String dummyString, String acceptContentType, String resource, String system) {
 		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().accept(acceptContentType)
 				.patch(StepDefinitionHelper.getActualResource( resource, system));
 	}
