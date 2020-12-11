@@ -9,12 +9,13 @@
 	<artifactId>cucumblan-project</artifactId>
 	<packaging>pom</packaging>
 	<name>cucumblan-project</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
 		<connection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
 		<url>https://github.com/virtualansoftware/cucumblan.git</url>
+		<tag>cucumblan-project-1.0.0</tag>
 	</scm>
 	<developers>
 		<developer>
@@ -44,6 +45,10 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<modules>
+		<module>modules/cucumblan-api</module>
+	</modules>
 	<profiles>
 		<!-- Samples -->
 		<profile>
@@ -58,10 +63,65 @@
 				<module>samples/cucumblan-apitesting</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+        <executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+			      <plugin>
+			        <groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-gpg-plugin</artifactId>
+			        <version>1.4</version>
+			        <executions>
+			          <execution>
+			            <id>sign-artifacts</id>
+			            <phase>verify</phase>
+			            <goals>
+			              <goal>sign</goal>
+			            </goals>
+			          </execution>
+			        </executions>
+			      </plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<localCheckout>true</localCheckout>
+					<pushChanges>false</pushChanges>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+		</profile>
 	</profiles>
-	<modules>
-		<module>modules/cucumblan-api</module>
-	</modules>
+
 	<repositories>
 		<repository>
 			<id>sonatype-snapshots</id>

@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * The type Endpoint configuration.
+ *
+ * @author Elan Thangamani
+ */
 public class EndpointConfiguration {
 
 	private EndpointConfiguration(){
@@ -19,7 +24,12 @@ public class EndpointConfiguration {
 
 	private static EndpointConfiguration endpointConfiguration = null;
 
-	public static EndpointConfiguration getInstance() {
+  /**
+   * Gets instance.
+   *
+   * @return the instance
+   */
+  public static EndpointConfiguration getInstance() {
 		if (endpointConfiguration == null) {
 			endpointConfiguration  = new EndpointConfiguration();
 		}
@@ -28,7 +38,10 @@ public class EndpointConfiguration {
 
 	private static Map<String, Properties> propertiesMap = new HashMap<String, Properties>();
 
-	public  void loadEndpoints() {
+  /**
+   * Load endpoints.
+   */
+  public  void loadEndpoints() {
 		File directory = new File("conf/");
 		String[] myFiles = directory.list(new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
@@ -45,8 +58,14 @@ public class EndpointConfiguration {
 			}
 		}
 	}
-	
-	public Properties getProperty(String keyName) {
+
+  /**
+   * Gets property.
+   *
+   * @param keyName the key name
+   * @return the property
+   */
+  public Properties getProperty(String keyName) {
 		return propertiesMap.get(keyName);
 	}
 	
