@@ -415,7 +415,10 @@ public class BaseStepDefinition {
   @And("^Verify (.*) includes following in the response$")
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
-			if(!ExcludeConfiguration.isExists((String)k)){
+
+			if(v.toString().startsWith("[") && v.toString().endsWith("]") ){
+				assertEquals(StepDefinitionHelper.getActualValue(v.toString()), json.extract().body().jsonPath().getString((String) k));
+			} else if(!ExcludeConfiguration.isExists((String)k)){
 				LOGGER.info(v + " : " + json.extract().body().jsonPath().getString((String) k));
 				if (v.toString().startsWith("i~")) {
 					assertEquals(Integer.parseInt(v.toString().substring(2)),
