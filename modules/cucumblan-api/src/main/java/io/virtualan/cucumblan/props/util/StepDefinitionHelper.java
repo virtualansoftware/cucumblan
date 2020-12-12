@@ -18,7 +18,6 @@ import org.json.JSONTokener;
 public class StepDefinitionHelper {
 	private final static Logger LOGGER = Logger.getLogger(StepDefinitionHelper.class.getName());
 
-
   /**
    * Gets actual value.
    *
