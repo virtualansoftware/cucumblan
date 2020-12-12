@@ -10,6 +10,7 @@ import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
+import io.virtualan.cucumblan.props.ExcludeConfiguration;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.mapson.Mapson;
@@ -50,7 +51,7 @@ public class BaseStepDefinition {
 			EndpointConfiguration.getInstance().loadEndpoints();
 		} catch (ParserError parserError) {
 			LOGGER.warning("Unable to start the process - see if conf folder and endpoints are generated");
-			System.exit(1);
+			System.exit(-1);
 		}
 	}
 
@@ -414,19 +415,26 @@ public class BaseStepDefinition {
   @And("^Verify (.*) includes following in the response$")
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
-			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
-			if(v.toString().startsWith("i~")) {
-				assertEquals(Integer.parseInt(v.toString().substring(2)),
-						json.extract().body().jsonPath().getInt((String) k));
-			} else if(v.toString().startsWith("b~")) {
-				assertEquals(Boolean.parseBoolean(v.toString().substring(2)), json.extract().body().jsonPath().getBoolean((String) k));
-			} else if(v.toString().startsWith("d~")) {
-				assertEquals(Double.parseDouble(v.toString().substring(2)),
-						json.extract().body().jsonPath().getDouble((String) k));
-			} else if(v.toString().startsWith("l~")) {
-				assertEquals(Long.parseLong(v.toString().substring(2)), json.extract().body().jsonPath().getLong((String) k));
-			} else {
-				assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+
+			if(v.toString().startsWith("[") && v.toString().endsWith("]") ){
+				assertEquals(StepDefinitionHelper.getActualValue(v.toString()), json.extract().body().jsonPath().getString((String) k));
+			} else if(!ExcludeConfiguration.isExists((String)k)){
+				LOGGER.info(v + " : " + json.extract().body().jsonPath().getString((String) k));
+				if (v.toString().startsWith("i~")) {
+					assertEquals(Integer.parseInt(v.toString().substring(2)),
+							json.extract().body().jsonPath().getInt((String) k));
+				} else if (v.toString().startsWith("b~")) {
+					assertEquals(Boolean.parseBoolean(v.toString().substring(2)),
+							json.extract().body().jsonPath().getBoolean((String) k));
+				} else if (v.toString().startsWith("d~")) {
+					assertEquals(Double.parseDouble(v.toString().substring(2)),
+							json.extract().body().jsonPath().getDouble((String) k));
+				} else if (v.toString().startsWith("l~")) {
+					assertEquals(Long.parseLong(v.toString().substring(2)),
+							json.extract().body().jsonPath().getLong((String) k));
+				} else {
+					assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+				}
 			}
 		});
 	}
