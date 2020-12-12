@@ -4,6 +4,7 @@ import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import java.util.Properties;
 
+import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -15,6 +16,7 @@ import org.json.JSONTokener;
  * @author Elan Thangamani
  */
 public class StepDefinitionHelper {
+	private final static Logger LOGGER = Logger.getLogger(StepDefinitionHelper.class.getName());
 
 
   /**
@@ -47,6 +49,28 @@ public class StepDefinitionHelper {
 		return returnValue;
 	}
 
+	/**
+	 * Gets actual resource.
+	 *
+	 * @param resourceKey the resource key
+	 * @param system      the system
+	 * @return the actual resource
+	 */
+	public static String getHostName(String resourceKey, String system) {
+		Properties props = EndpointConfiguration.getInstance().getProperty(system);
+		if (ApplicationConfiguration.getProperty("service.api." + system) == null) {
+			if( ApplicationConfiguration.getProperty("service.api") != null){
+				String url = ApplicationConfiguration.getProperty("service.api");
+				return url;
+			} else {
+				LOGGER.severe("service.api : configuration is missing.. Unable to proceed");
+				System.exit(-1);
+			}
+		}
+		String url = ApplicationConfiguration.getProperty("service.api." + system);
+		return url;
+	}
+
   /**
    * Gets actual resource.
    *
@@ -56,9 +80,19 @@ public class StepDefinitionHelper {
    */
   public static String getActualResource(String resourceKey, String system) {
 		Properties props = EndpointConfiguration.getInstance().getProperty(system);
-		String url = ApplicationConfiguration.getProperty("service.api."+system)
-				+ (props.getProperty(resourceKey) != null ? props.getProperty(resourceKey) : resourceKey);
-		 return url;
+		if (ApplicationConfiguration.getProperty("service.api." + system) == null ) {
+			if( ApplicationConfiguration.getProperty("service.api") != null){
+			String url = ApplicationConfiguration.getProperty("service.api")
+				+(props != null && props.getProperty(resourceKey) != null ? props.getProperty(resourceKey) : resourceKey);
+				return url;
+			} else {
+				LOGGER.severe("service.api : configuration is missing.. Unable to proceed");
+				System.exit(-1);
+			}
+		}
+		String url = ApplicationConfiguration.getProperty("service.api." + system)
+					+ (props != null && props.getProperty(resourceKey) != null ? props.getProperty(resourceKey) : resourceKey);
+		return url;
 	}
 
   /**

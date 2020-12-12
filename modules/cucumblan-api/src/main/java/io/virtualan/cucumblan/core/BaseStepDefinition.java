@@ -107,7 +107,7 @@ public class BaseStepDefinition {
    *
    * @param dummy the dummy
    */
-  @Given("^(.*) without an identifier")
+  @Given("^(.*) perform a api action")
 	public void readRequestByPathParam(String dummy) {
 		request = given();
 	}
@@ -324,9 +324,9 @@ public class BaseStepDefinition {
    * @param resource          the resource
    * @param system            the system
    */
-  @When("^(.+) post accept (.*) in (.*) resource on (.*)")
+	@When("^(.*) post (.*) in (.*) resource on (.*)")
 	public void createRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when().
+		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when().
 				log().all()
 				.accept(acceptContentType)
 				.post(StepDefinitionHelper.getActualResource(resource, system));
@@ -342,7 +342,7 @@ public class BaseStepDefinition {
    */
   @When("^(.*) get (.*) in (.*) resource on (.*)")
 	public void readRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.get(StepDefinitionHelper.getActualResource(resource, system));
 	}
@@ -355,9 +355,9 @@ public class BaseStepDefinition {
    * @param resource          the resource
    * @param system            the system
    */
-  @When("^(.*) update (.*) in (.*) resource on (.*)")
+  @When("^(.*) put (.*) in (.*) resource on (.*)")
 	public void modifyRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.put(StepDefinitionHelper.getActualResource( resource, system));
 	}
@@ -372,7 +372,7 @@ public class BaseStepDefinition {
    */
   @When("^(.*) patch (.*) in (.*) resource on (.*)")
 	public void patchRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.patch(StepDefinitionHelper.getActualResource( resource, system));
 	}
@@ -387,7 +387,7 @@ public class BaseStepDefinition {
    */
   @When("^(.*) delete (.*) in (.*) resource on (.*)")
 	public void deleteById(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(ApplicationConfiguration.getProperty("service.api."+system)).when()
+		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.delete(StepDefinitionHelper.getActualResource(resource, system));
 	}
@@ -415,7 +415,19 @@ public class BaseStepDefinition {
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
 			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
-			assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+			if(v.toString().startsWith("i~")) {
+				assertEquals(Integer.parseInt(v.toString().substring(2)),
+						json.extract().body().jsonPath().getInt((String) k));
+			} else if(v.toString().startsWith("b~")) {
+				assertEquals(Boolean.parseBoolean(v.toString().substring(2)), json.extract().body().jsonPath().getBoolean((String) k));
+			} else if(v.toString().startsWith("d~")) {
+				assertEquals(Double.parseDouble(v.toString().substring(2)),
+						json.extract().body().jsonPath().getDouble((String) k));
+			} else if(v.toString().startsWith("l~")) {
+				assertEquals(Long.parseLong(v.toString().substring(2)), json.extract().body().jsonPath().getLong((String) k));
+			} else {
+				assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+			}
 		});
 	}
 
