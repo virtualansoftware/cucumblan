@@ -14,6 +14,7 @@ import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 import
@@ -28,6 +29,7 @@ import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
+import org.apache.groovy.json.internal.IO;
 import org.apache.xmlbeans.impl.util.Base64;
 
 
@@ -171,8 +173,13 @@ public class BaseStepDefinition {
 	@Given("^Provided all the feature level parameters from file$")
 	public void loadGlobalParamFromFile() throws IOException {
 		Properties properties = new Properties();
-		properties.load(ApplicationConfiguration.class.getClassLoader().getResourceAsStream("cucumblan-env.properties"));
-		ScenarioContext.setContext((Map)properties);
+		InputStream stream = ApplicationConfiguration.class.getClassLoader().getResourceAsStream("cucumblan-env.properties");
+		if(stream != null) {
+			properties.load(stream);
+			ScenarioContext.setContext((Map) properties);
+		} else {
+			LOGGER.warning("cucumblan-env.properties is not configured. Need to add if default data loaded");
+		}
 	}
 
   /**
