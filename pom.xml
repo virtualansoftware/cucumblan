@@ -15,7 +15,7 @@
 	  <connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
 	  <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
 	  <url>https://github.com/virtualansoftware/cucumblan.git</url>
-	   <tag>v1.3.0</tag>
+	   <tag>0.0.1</tag>
 	</scm> 
 	<developers>
 		<developer>
