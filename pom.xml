@@ -13,7 +13,7 @@
 	<url>https://virtualan.io</url>
 	<scm>
 	  <connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
-	  <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
+	  <developerConnection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</developerConnection>
 	  <url>https://github.com/virtualansoftware/cucumblan.git</url>
 	   <tag>0.0.1</tag>
 	</scm> 
