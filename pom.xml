@@ -12,9 +12,9 @@
 	<version>1.0.1-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
-	  <connection>scm:git:ssh://git@github.com:virtualansoftware/cucumbalan.git</connection>
-	  <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumbalan.git</developerConnection>
-	  <url>https://github.com/virtualansoftware/cucumbalan.git</url>
+	  <connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
+	  <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
+	  <url>https://github.com/virtualansoftware/cucumblan.git</url>
 	   <tag>v1.3.0</tag>
 	</scm> 
 	<developers>
