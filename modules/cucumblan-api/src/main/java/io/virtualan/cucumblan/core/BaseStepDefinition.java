@@ -58,14 +58,14 @@ public class BaseStepDefinition {
 	}
 
 
-  /**
-   * Read request by path param.
-   *
-   * @param dummy      the dummy
-   * @param identifier the identifier
-   * @param value      the value
-   */
-  @Given("^(.*) with an path param (.*) of (.*)")
+	/**
+	 * Read request by path param.
+	 *
+	 * @param dummy      the dummy
+	 * @param identifier the identifier
+	 * @param value      the value
+	 */
+	@Given("^(.*) with an path param (.*) of (.*)")
 	public void readRequestByPathParam(String dummy, String identifier, String value) {
 		request = given().pathParam(identifier, StepDefinitionHelper.getActualValue(value));
 	}
@@ -86,7 +86,7 @@ public class BaseStepDefinition {
 	 * Read request by path param.
 	 *
 	 * @param username the identifier
-	 * @param password      the value
+	 * @param password the value
 	 */
 	@Given("^basic authentication with (.*) and (.*)")
 	public void auth( String username, String password) {
@@ -97,7 +97,7 @@ public class BaseStepDefinition {
 	/**
 	 * Read request by path param.
 	 *
-	 * @param auth the identifier
+	 * @param auth  the identifier
 	 * @param token the value
 	 */
 	@Given("^(.*) auth with (.*) token$")
@@ -106,23 +106,23 @@ public class BaseStepDefinition {
 	}
 
 	/**
-   * Read request by path param.
-   *
-   * @param dummy the dummy
-   */
-  @Given("^(.*) perform a api action")
+	 * Read request by path param.
+	 *
+	 * @param dummy the dummy
+	 */
+	@Given("^(.*) perform a api action")
 	public void readRequestByPathParam(String dummy) {
 		request = given();
 	}
 
-  /**
-   * Read request by header param.
-   *
-   * @param dummy      the dummy
-   * @param identifier the identifier
-   * @param value      the value
-   */
-  @Given("^(.*) with an header param (.*) of (.*)")
+	/**
+	 * Read request by header param.
+	 *
+	 * @param dummy      the dummy
+	 * @param identifier the identifier
+	 * @param value      the value
+	 */
+	@Given("^(.*) with an header param (.*) of (.*)")
 	public void readRequestByHeaderParam(String dummy, String identifier, String value) {
 		request = request.header(identifier, StepDefinitionHelper.getActualValue(value));
 	}
@@ -154,13 +154,13 @@ public class BaseStepDefinition {
 		request = given().queryParam(identifier, StepDefinitionHelper.getActualValue(value));
 	}
 
-  /**
-   * Load global param.
-   *
-   * @param globalParams the global params
-   * @throws IOException the io exception
-   */
-  @Given("^Provided all the feature level parameters$")
+	/**
+	 * Load global param.
+	 *
+	 * @param globalParams the global params
+	 * @throws IOException the io exception
+	 */
+	@Given("^Provided all the feature level parameters$")
 	public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
 		ScenarioContext.setContext(globalParams);
 	}
@@ -182,39 +182,38 @@ public class BaseStepDefinition {
 		}
 	}
 
-  /**
-   * Validate global param.
-   */
-  @Then("^Verify all the feature level parameters exists")
+	/**
+	 * Validate global param.
+	 */
+	@Then("^Verify all the feature level parameters exists")
 	public void validateGlobalParam() {
 		assertTrue("Valid Global Parameters are present ", ScenarioContext.hasContextValues());
 	}
 
 
-  /**
-   * Add variable.
-   *
-   * @param responseValue the response value
-   * @param key           the key
-   */
-  @Given("^Add the (.*) value of the key as (.*)")
+	/**
+	 * Add variable.
+	 *
+	 * @param responseValue the response value
+	 * @param key           the key
+	 */
+	@Given("^Add the (.*) value of the key as (.*)")
 	public void addVariable(String responseValue, String key) {
 		ScenarioContext.setContext(key, Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
 	}
 
-  /**
-   * Modify variable.
-   *
-   * @param responseValue the response value
-   * @param key           the key
+	/**
+	 * Modify variable.
+	 *
+	 * @param responseValue the response value
+	 * @param key           the key
 	 * @throws IOException the io exception
 	 */
-  @Given("^evaluate the (.*) decimal value of the key as (.*)")
+	@Given("^evaluate the (.*) decimal value of the key as (.*)")
 	public void modifyDecimalVariable(String responseValue, String key) throws IOException {
 		ScenarioContext.setContext(key, ExcelAndMathHelper.evaluateWithVariables(Double.class,
 							responseValue, ScenarioContext.getContext()).toString());
 	}
-
 
 
 	/**
@@ -256,13 +255,13 @@ public class BaseStepDefinition {
 		ScenarioContext.setContext(key, Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
 	}
 
-  /**
-   * Load as global param.
-   *
-   * @param responseKey the response key
-   * @param key         the key
-   */
-  @Given("^Store the (.*) value of the key as (.*)")
+	/**
+	 * Load as global param.
+	 *
+	 * @param responseKey the response key
+	 * @param key         the key
+	 */
+	@Given("^Store the (.*) value of the key as (.*)")
 	public void loadAsGlobalParam(String responseKey, String key) {
 		ScenarioContext.setContext(key, json.extract().body().jsonPath().getString(responseKey));
 	}
@@ -283,14 +282,13 @@ public class BaseStepDefinition {
 		}
 	}
 
-  /**
-   * Read request.
-   *
-   * @param nameIgnore   the name ignore
-   * @param parameterMap the parameter map
-   * @throws Exception the exception
-   */
-
+	/**
+	 * Read request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
 	@Given("add (.*) with given query params$")
   public void readRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     request = request.contentType("application/json");
@@ -299,14 +297,14 @@ public class BaseStepDefinition {
     }
   }
 
-  /**
-   * Load request.
-   *
-   * @param nameIgnore   the name ignore
-   * @param parameterMap the parameter map
-   * @throws Exception the exception
-   */
-  @Given("^Populate (.*) with given input$")
+	/**
+	 * Load request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("^Populate (.*) with given input$")
 	public void loadRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
 		request = request.contentType("application/json");
     for(Map.Entry<String, String> params : parameterMap.entrySet()) {
@@ -314,40 +312,52 @@ public class BaseStepDefinition {
     }
 	}
 
-  /**
-   * Create request.
-   *
-   * @param nameIgnore   the name ignore
-   * @param parameterMap the parameter map
-   * @throws Exception the exception
-   */
-  @Given("^Create (.*) with given input$")
+	/**
+	 * Create request.
+	 *
+	 * @param body        the body
+	 * @param contentType the content type
+	 * @throws Exception the exception
+	 */
+	@Given("^add (.*) data with (.*) given input$")
+	public void createRequest(String body, String contentType) throws Exception {
+		request = request.contentType(contentType).body(body);
+	}
+
+	/**
+	 * Create request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("^Create (.*) with given input$")
 	public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
 		jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
 		request = request.contentType("application/json").body(jsonBody);
 	}
 
-  /**
-   * Update request.
-   *
-   * @param nameIgnore   the name ignore
-   * @param parameterMap the parameter map
-   * @throws Exception the exception
-   */
-  @Given("^Update (.*) with given input$")
+	/**
+	 * Update request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("^Update (.*) with given input$")
 	public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
 		jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
 		request = request.contentType("application/json").body(jsonBody);
 	}
 
-  /**
-   * Create request.
-   *
-   * @param dummyString       the dummy string
-   * @param acceptContentType the accept content type
-   * @param resource          the resource
-   * @param system            the system
-   */
+	/**
+	 * Create request.
+	 *
+	 * @param dummyString       the dummy string
+	 * @param acceptContentType the accept content type
+	 * @param resource          the resource
+	 * @param system            the system
+	 */
 	@When("^(.*) post (.*) in (.*) resource on (.*)")
 	public void createRequest(String dummyString, String acceptContentType, String resource, String system) {
 		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when().
@@ -356,60 +366,60 @@ public class BaseStepDefinition {
 				.post(StepDefinitionHelper.getActualResource(resource, system));
 	}
 
-  /**
-   * Read request.
-   *
-   * @param dummyString       the dummy string
-   * @param acceptContentType the accept content type
-   * @param resource          the resource
-   * @param system            the system
-   */
-  @When("^(.*) get (.*) in (.*) resource on (.*)")
+	/**
+	 * Read request.
+	 *
+	 * @param dummyString       the dummy string
+	 * @param acceptContentType the accept content type
+	 * @param resource          the resource
+	 * @param system            the system
+	 */
+	@When("^(.*) get (.*) in (.*) resource on (.*)")
 	public void readRequest(String dummyString, String acceptContentType, String resource, String system) {
 		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.get(StepDefinitionHelper.getActualResource(resource, system));
 	}
 
-  /**
-   * Modify request.
-   *
-   * @param dummyString       the dummy string
-   * @param acceptContentType the accept content type
-   * @param resource          the resource
-   * @param system            the system
-   */
-  @When("^(.*) put (.*) in (.*) resource on (.*)")
+	/**
+	 * Modify request.
+	 *
+	 * @param dummyString       the dummy string
+	 * @param acceptContentType the accept content type
+	 * @param resource          the resource
+	 * @param system            the system
+	 */
+	@When("^(.*) put (.*) in (.*) resource on (.*)")
 	public void modifyRequest(String dummyString, String acceptContentType, String resource, String system) {
 		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.put(StepDefinitionHelper.getActualResource( resource, system));
 	}
 
-  /**
-   * Pathch request.
-   *
-   * @param dummyString       the dummy string
-   * @param acceptContentType the accept content type
-   * @param resource          the resource
-   * @param system            the system
-   */
-  @When("^(.*) patch (.*) in (.*) resource on (.*)")
+	/**
+	 * Pathch request.
+	 *
+	 * @param dummyString       the dummy string
+	 * @param acceptContentType the accept content type
+	 * @param resource          the resource
+	 * @param system            the system
+	 */
+	@When("^(.*) patch (.*) in (.*) resource on (.*)")
 	public void patchRequest(String dummyString, String acceptContentType, String resource, String system) {
 		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
 				.patch(StepDefinitionHelper.getActualResource( resource, system));
 	}
 
-  /**
-   * Delete by id.
-   *
-   * @param dummyString       the dummy string
-   * @param acceptContentType the accept content type
-   * @param resource          the resource
-   * @param system            the system
-   */
-  @When("^(.*) delete (.*) in (.*) resource on (.*)")
+	/**
+	 * Delete by id.
+	 *
+	 * @param dummyString       the dummy string
+	 * @param acceptContentType the accept content type
+	 * @param resource          the resource
+	 * @param system            the system
+	 */
+	@When("^(.*) delete (.*) in (.*) resource on (.*)")
 	public void deleteById(String dummyString, String acceptContentType, String resource, String system) {
 		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
 				.log().all().accept(acceptContentType)
@@ -417,26 +427,26 @@ public class BaseStepDefinition {
 	}
 
 
-  /**
-   * Verify status code.
-   *
-   * @param statusCode the status code
-   */
-  @Then("^Verify the status code is (\\d+)")
+	/**
+	 * Verify status code.
+	 *
+	 * @param statusCode the status code
+	 */
+	@Then("^Verify the status code is (\\d+)")
 	public void verifyStatusCode(int statusCode) {
 		json = response.then().log().ifValidationFails().statusCode(statusCode);
 		LOGGER.info(ScenarioContext.getContext().toString());
 	 	 LOGGER.info(json.extract().body().asString());
 	}
 
-  /**
-   * Verify response.
-   *
-   * @param dummyString the dummy string
-   * @param data        the data
-   * @throws Throwable the throwable
-   */
-  @And("^Verify-all (.*) includes following in the response$")
+	/**
+	 * Verify response.
+	 *
+	 * @param dummyString the dummy string
+	 * @param data        the data
+	 * @throws Throwable the throwable
+	 */
+	@And("^Verify-all (.*) includes following in the response$")
 	public void verifyResponseMapson(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
 			if(!ExcludeConfiguration.shouldSkip((String)k)){
@@ -454,6 +464,20 @@ public class BaseStepDefinition {
 			}
 		});
 	}
+
+
+	/**
+	 * Mock single response.
+	 *
+	 * @param resource the resource
+	 * @param context  the context
+	 * @throws Throwable the throwable
+	 */
+	@And("^Verify (.*) response with (.*) includes in the response$")
+	public void mockSingleResponse(String resource, String context) throws Throwable {
+		assertEquals(context, json.extract().body().asString());
+	}
+
 
 	/**
 	 * Verify response.
