@@ -1,13 +1,9 @@
 package io.virtualan.cucumblan.props;
 
 import com.google.common.io.CharStreams;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.io.Charsets;
@@ -25,7 +21,7 @@ public class ExcludeConfiguration {
     try {
       excludes = CharStreams.toString(new InputStreamReader(
           ExcludeConfiguration.class.getClassLoader().getResourceAsStream("compare_exclude.list"), Charsets.UTF_8));
-      excludeList = Stream.of(excludes).collect(Collectors.toList());
+      excludeList = Stream.of(excludes.split(",")).collect(Collectors.toList());
     } catch (Exception e) {
 
     }
@@ -36,8 +32,8 @@ public class ExcludeConfiguration {
    * @param keyName the key name
    * @return the property
    */
-  public static boolean isExists(String keyName) {
-    return excludeList.contains(keyName) || excludes != null && excludes.contains(keyName);
+  public static boolean shouldSkip(String keyName) {
+    return excludeList.contains(keyName) || excludes != null && excludeList.stream().anyMatch( x -> keyName.contains(x));
   }
 
 }

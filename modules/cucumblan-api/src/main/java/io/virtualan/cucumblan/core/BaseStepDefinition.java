@@ -1,8 +1,7 @@
 package io.virtualan.cucumblan.core;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import io.restassured.RestAssured;
 import io.restassured.config.SSLConfig;
@@ -16,7 +15,9 @@ import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
 import java.io.IOException;
-import java.util.Map;import
+import java.util.Map;
+import java.util.Properties;
+import
 java.util.logging.Logger;
 
 import io.cucumber.datatable.DataTable;
@@ -88,7 +89,7 @@ public class BaseStepDefinition {
 	 */
 	@Given("^basic authentication with (.*) and (.*)")
 	public void auth( String username, String password) {
-		byte[] authBasic = Base64.encode(String.format("%s:%s", username, password).getBytes());
+		byte[] authBasic = Base64.encode(String.format("%s:%s", StepDefinitionHelper.getActualValue(username), StepDefinitionHelper.getActualValue(password)).getBytes());
 		request.header("Authorization", String.format("Basic %s", new String(authBasic)));
 	}
 
@@ -161,6 +162,18 @@ public class BaseStepDefinition {
   @Given("^Provided all the feature level parameters$")
 	public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
 		ScenarioContext.setContext(globalParams);
+	}
+
+	/**
+	 * Load global param.
+	 *
+	 * @throws IOException the io exception
+	 */
+	@Given("^Provided all the feature level parameters from file$")
+	public void loadGlobalParamFromFile() throws IOException {
+		Properties properties = new Properties();
+		properties.load(ApplicationConfiguration.class.getClassLoader().getResourceAsStream("cucumblan-env.properties"));
+		ScenarioContext.setContext((Map)properties);
 	}
 
   /**
@@ -403,6 +416,7 @@ public class BaseStepDefinition {
 	public void verifyStatusCode(int statusCode) {
 		json = response.then().log().ifValidationFails().statusCode(statusCode);
 		LOGGER.info(ScenarioContext.getContext().toString());
+	 	 LOGGER.info(json.extract().body().asString());
 	}
 
   /**
@@ -415,25 +429,17 @@ public class BaseStepDefinition {
   @And("^Verify (.*) includes following in the response$")
 	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
-
-			if(v.toString().startsWith("[") && v.toString().endsWith("]") ){
-				assertEquals(StepDefinitionHelper.getActualValue(v.toString()), json.extract().body().jsonPath().getString((String) k));
-			} else if(!ExcludeConfiguration.isExists((String)k)){
-				LOGGER.info(v + " : " + json.extract().body().jsonPath().getString((String) k));
-				if (v.toString().startsWith("i~")) {
-					assertEquals(Integer.parseInt(v.toString().substring(2)),
-							json.extract().body().jsonPath().getInt((String) k));
-				} else if (v.toString().startsWith("b~")) {
-					assertEquals(Boolean.parseBoolean(v.toString().substring(2)),
-							json.extract().body().jsonPath().getBoolean((String) k));
-				} else if (v.toString().startsWith("d~")) {
-					assertEquals(Double.parseDouble(v.toString().substring(2)),
-							json.extract().body().jsonPath().getDouble((String) k));
-				} else if (v.toString().startsWith("l~")) {
-					assertEquals(Long.parseLong(v.toString().substring(2)),
-							json.extract().body().jsonPath().getLong((String) k));
-				} else {
-					assertEquals(v, json.extract().body().jsonPath().getString((String) k));
+			if(!ExcludeConfiguration.shouldSkip((String)k)){
+				Map<String, String>  mapson = Mapson.buildMAPsonFromJson(json.extract().body().asString());
+				if(v == null ) {
+					if(mapson.get(k) == null){
+					assertNull(mapson.get(k));
+					} else {
+						assertEquals(" ", mapson.get(k));
+					}
+				}  else {
+					LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
+					assertEquals(v, mapson.get(k));
 				}
 			}
 		});
