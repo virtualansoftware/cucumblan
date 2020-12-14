@@ -9,7 +9,7 @@
 	<artifactId>cucumblan-project</artifactId>
 	<packaging>pom</packaging>
 	<name>cucumblan-project</name>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
 	  <connection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</connection>
@@ -134,20 +134,20 @@
           </execution>
         </executions>
       </plugin>
-			      <plugin>
-			        <groupId>org.apache.maven.plugins</groupId>
-			        <artifactId>maven-gpg-plugin</artifactId>
-			        <version>1.4</version>
-			        <executions>
-			          <execution>
-			            <id>sign-artifacts</id>
-			            <phase>verify</phase>
-			            <goals>
-			              <goal>sign</goal>
-			            </goals>
-			          </execution>
-			        </executions>
-			      </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
