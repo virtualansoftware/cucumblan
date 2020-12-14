@@ -207,7 +207,8 @@ public class BaseStepDefinition {
    *
    * @param responseValue the response value
    * @param key           the key
-   */
+	 * @throws IOException the io exception
+	 */
   @Given("^evaluate the (.*) decimal value of the key as (.*)")
 	public void modifyDecimalVariable(String responseValue, String key) throws IOException {
 		ScenarioContext.setContext(key, ExcelAndMathHelper.evaluateWithVariables(Double.class,
