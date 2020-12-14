@@ -132,7 +132,7 @@
 							<projectName>Virtualan-OpenApi-Rest</projectName>
 							<skip>false</skip>
 							<outputDirectory>${project.build.directory}</outputDirectory>
-							<inputDirectory>${project.build.directory}/jsonReports</inputDirectory>
+							<inputDirectory>${project.build.directory}</inputDirectory>
 							<jsonFiles>
 								<param>**/*.json</param>
 							</jsonFiles>
