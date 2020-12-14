@@ -221,6 +221,7 @@ public class BaseStepDefinition {
 	 *
 	 * @param responseValue the response value
 	 * @param key           the key
+	 * @throws IOException the io exception
 	 */
 	@Given("^evaluate the (.*) integer value of the key as (.*)")
 	public void modifyIntVariable(String responseValue, String key) throws IOException {
@@ -233,6 +234,7 @@ public class BaseStepDefinition {
 	 *
 	 * @param responseValue the response value
 	 * @param key           the key
+	 * @throws IOException the io exception
 	 */
 	@Given("^evaluate the (.*) boolean value of the key as (.*)")
 	public void modifyBooleanVariable(String responseValue, String key) throws IOException {
@@ -246,6 +248,7 @@ public class BaseStepDefinition {
 	 *
 	 * @param responseValue the response value
 	 * @param key           the key
+	 * @throws IOException the io exception
 	 */
 	@Given("^Modify the (.*) value of the key as (.*)")
 	public void modifyStringVariable(String responseValue, String key) throws IOException {
