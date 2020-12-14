@@ -4,7 +4,6 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.*;
 
 import io.restassured.RestAssured;
-import io.restassured.config.SSLConfig;
 import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
@@ -426,8 +425,8 @@ public class BaseStepDefinition {
    * @param data        the data
    * @throws Throwable the throwable
    */
-  @And("^Verify (.*) includes following in the response$")
-	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
+  @And("^Verify-all (.*) includes following in the response$")
+	public void verifyResponseMapson(String dummyString, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
 			if(!ExcludeConfiguration.shouldSkip((String)k)){
 				Map<String, String>  mapson = Mapson.buildMAPsonFromJson(json.extract().body().asString());
@@ -445,4 +444,18 @@ public class BaseStepDefinition {
 		});
 	}
 
+	/**
+	 * Verify response.
+	 *
+	 * @param dummyString the dummy string
+	 * @param data        the data
+	 * @throws Throwable the throwable
+	 */
+	@And("^Verify (.*) includes following in the response$")
+	public void verifyResponse(String dummyString, DataTable data) throws Throwable {
+		data.asMap(String.class, String.class).forEach((k, v) -> {
+			System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
+			assertEquals(StepDefinitionHelper.getActualValue((String) v), json.extract().body().jsonPath().getString((String) k));
+		});
+	}
 }
