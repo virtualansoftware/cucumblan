@@ -446,10 +446,10 @@ public class BaseStepDefinition {
 	 * @param data        the data
 	 * @throws Throwable the throwable
 	 */
-	@And("^Verify-all (.*) includes following in the response$")
-	public void verifyResponseMapson(String dummyString, DataTable data) throws Throwable {
+	@And("^Verify-all (.*) api includes following in the response$")
+	public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
 		data.asMap(String.class, String.class).forEach((k, v) -> {
-			if(!ExcludeConfiguration.shouldSkip((String)k)){
+			if(!ExcludeConfiguration.shouldSkip(resource, (String)k)){
 				Map<String, String>  mapson = Mapson.buildMAPsonFromJson(json.extract().body().asString());
 				if(v == null ) {
 					if(mapson.get(k) == null){
