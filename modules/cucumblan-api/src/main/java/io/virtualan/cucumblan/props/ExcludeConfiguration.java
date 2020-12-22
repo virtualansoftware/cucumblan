@@ -13,8 +13,18 @@ import java.util.stream.Stream;
  * @author Elan Thangamani
  */
 public class ExcludeConfiguration {
+
+  /**
+   * The Exclude properties.
+   */
   static Properties excludeProperties = new Properties();
+  /**
+   * The Exclude list.
+   */
   static List<String> excludeList = new ArrayList<>();
+  /**
+   * The Excludes.
+   */
   static String excludes = null;
   private final static Logger LOGGER = Logger.getLogger(ExcludeConfiguration.class.getName());
 
@@ -43,7 +53,8 @@ public class ExcludeConfiguration {
   /**
    * Gets property.
    *
-   * @param keyName the key name
+   * @param resource the resource
+   * @param keyName  the key name
    * @return the property
    */
   public static boolean shouldSkip(String resource,String keyName) {

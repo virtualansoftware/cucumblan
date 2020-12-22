@@ -442,8 +442,8 @@ public class BaseStepDefinition {
 	/**
 	 * Verify response.
 	 *
-	 * @param dummyString the dummy string
-	 * @param data        the data
+	 * @param resource the resource
+	 * @param data     the data
 	 * @throws Throwable the throwable
 	 */
 	@And("^Verify-all (.*) api includes following in the response$")
