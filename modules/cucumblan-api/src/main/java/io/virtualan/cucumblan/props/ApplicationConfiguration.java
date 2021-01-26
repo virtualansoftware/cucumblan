@@ -1,5 +1,6 @@
 package io.virtualan.cucumblan.props;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
@@ -11,13 +12,21 @@ import java.util.Properties;
 public class ApplicationConfiguration {
   private static Properties properties = new Properties();
   static {
+    reload();
+  }
+
+  public static  void reload(){
     try {
-      properties.load(ApplicationConfiguration.class.getClassLoader().getResourceAsStream("cucumblan.properties"));
+      InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cucumblan.properties");
+      if(stream == null) {
+        stream = ApplicationConfiguration.class.getClassLoader().getResourceAsStream("cucumblan.properties");
+      }
+      properties.load(stream);
+
     } catch (Exception e) {
 
     }
   }
-
   /**
    * Gets properties.
    *
