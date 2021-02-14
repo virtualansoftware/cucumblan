@@ -315,6 +315,7 @@ public class BaseStepDefinition {
    * Read request.
    *
    * @param nameIgnore   the name ignore
+   * @param contentType  the content type
    * @param parameterMap the parameter map
    */
   @Given("add (.*) with contentType (.*) given query params$")
@@ -330,6 +331,7 @@ public class BaseStepDefinition {
    * Load request.
    *
    * @param nameIgnore   the name ignore
+   * @param contentType  the content type
    * @param parameterMap the parameter map
    * @throws Exception the exception
    */
@@ -375,6 +377,7 @@ public class BaseStepDefinition {
    *
    * @param fileBody    the body
    * @param contentType the content type
+   * @throws IOException the io exception
    */
   @Given("add (.*) data file with (.*) given input$")
   public void createFileRequest(String fileBody, String contentType) throws IOException {
@@ -393,6 +396,8 @@ public class BaseStepDefinition {
    *
    * @param fileBody    the body
    * @param contentType the content type
+   * @param input       the input
+   * @throws IOException the io exception
    */
   @Given("add (.*) data inline with (.*) given input$")
   public void createInlineRequest(String fileBody, String contentType, List<String> input) throws IOException {
@@ -412,7 +417,9 @@ public class BaseStepDefinition {
    * Create request.
    *
    * @param nameIgnore   the name ignore
+   * @param contentType  the content type
    * @param parameterMap the parameter map
+   * @throws Exception the exception
    */
   @Given("^Create (.*) with contentType (.*) given input$")
   public void createRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
@@ -452,6 +459,7 @@ public class BaseStepDefinition {
    * Update request.
    *
    * @param nameIgnore   the name ignore
+   * @param contentType  the content type
    * @param parameterMap the parameter map
    * @throws Exception the exception
    */
@@ -586,7 +594,8 @@ public class BaseStepDefinition {
   /**
    * Mock single response.
    *
-   * @param resource the resource
+   * @param resource  the resource
+   * @param xmlString the xml string
    * @throws Throwable the throwable
    */
   @And("^Verify (.*) response inline includes in the response$")
@@ -600,6 +609,7 @@ public class BaseStepDefinition {
    * Mock single response.
    *
    * @param resource the resource
+   * @param fileBody the file body
    * @throws Throwable the throwable
    */
   @And("^Verify (.*) response XML File (.*) includes in the response$")
