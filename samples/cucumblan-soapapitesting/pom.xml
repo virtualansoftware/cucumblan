@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.virtualan</groupId>
-	<artifactId>cucumblan-apitesting</artifactId>
+	<artifactId>cucumblan-soapapitesting</artifactId>
 	<packaging>jar</packaging>
-	<name>cucumblan-apitesting</name>
+	<name>cucumblan-soapapitesting</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<properties>
 		<cucumblan.version>1.0.4-SNAPSHOT</cucumblan.version>

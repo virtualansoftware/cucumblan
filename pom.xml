@@ -62,7 +62,6 @@
 	<modules>
 		<module>modules/cucumblan-api</module>
 		<module>modules/cucumblan-ui</module>
-		<module>samples/cucumblan-soapapitesting</module>
 	</modules>
 	<profiles>
 		<!-- Samples -->
@@ -77,6 +76,7 @@
 			<modules>
 				<module>samples/cucumblan-apitesting</module>
 				<module>samples/cucumblan-uitesting</module>
+				<module>samples/cucumblan-soapapitesting</module>
 			</modules>
 		</profile>
 		<profile>
