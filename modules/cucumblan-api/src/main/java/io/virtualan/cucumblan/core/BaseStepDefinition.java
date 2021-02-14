@@ -10,11 +10,15 @@ import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.cucumblan.props.util.XMLHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import
@@ -29,7 +33,7 @@ import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
-import org.apache.groovy.json.internal.IO;
+import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.impl.util.Base64;
 
 
@@ -41,7 +45,6 @@ import org.apache.xmlbeans.impl.util.Base64;
 public class BaseStepDefinition {
 
 	private final static Logger LOGGER = Logger.getLogger(BaseStepDefinition.class.getName());
-
 
 	private Response response;
 	private ValidatableResponse json;
@@ -282,20 +285,49 @@ public class BaseStepDefinition {
 		}
 	}
 
+
 	/**
 	 * Read request.
 	 *
 	 * @param nameIgnore   the name ignore
 	 * @param parameterMap the parameter map
-	 * @throws Exception the exception
 	 */
 	@Given("add (.*) with given query params$")
-  public void readRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
+  public void readRequest(String nameIgnore, Map<String, String> parameterMap)  {
     request = request.contentType("application/json");
     for(Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request.queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
     }
   }
+
+	/**
+	 * Read request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 */
+	@Given("add (.*) with contentType (.*) given query params$")
+	public void readRequest(String nameIgnore,String contentType, Map<String, String> parameterMap)  {
+		request = request.contentType(contentType);
+		for(Map.Entry<String, String> params : parameterMap.entrySet()) {
+			request = request.queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+		}
+	}
+
+	/**
+	 * Load request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("^Populate (.*) with contentType(.*) given input$")
+	public void loadRequest(String nameIgnore, String contentType,Map<String, String> parameterMap)  {
+		request = request.contentType(contentType);
+		for(Map.Entry<String, String> params : parameterMap.entrySet()) {
+			request = request.queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+		}
+	}
 
 	/**
 	 * Load request.
@@ -305,7 +337,7 @@ public class BaseStepDefinition {
 	 * @throws Exception the exception
 	 */
 	@Given("^Populate (.*) with given input$")
-	public void loadRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
+	public void loadRequest(String nameIgnore, Map<String, String> parameterMap)  {
 		request = request.contentType("application/json");
     for(Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request.queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -317,12 +349,49 @@ public class BaseStepDefinition {
 	 *
 	 * @param body        the body
 	 * @param contentType the content type
-	 * @throws Exception the exception
 	 */
 	@Given("^add (.*) data with (.*) given input$")
-	public void createRequest(String body, String contentType) throws Exception {
+	public void createRequest(String body, String contentType)  {
 		request = request.contentType(contentType).body(body);
 	}
+
+
+	/**
+	 * Create request.
+	 *
+	 * @param fileBody        the body
+	 * @param contentType the content type
+	 */
+	@Given("add (.*) data file with (.*) given input$")
+	public void createFileRequest(String fileBody, String contentType) throws IOException {
+		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileBody);
+		if(stream == null) {
+			stream = ApplicationConfiguration.class.getClassLoader().getResourceAsStream(fileBody);
+		}
+		if(stream!= null) {
+			String body = IOUtils.toString(stream, StandardCharsets.UTF_8.name());
+			Map<String, String>  mapHeader = new HashMap();
+		mapHeader.put("content-type", contentType);
+		request = request.headers(mapHeader).contentType(contentType).body(body);
+		}else {
+			LOGGER.warning("input file is missing "+ fileBody);
+		}
+	}
+
+
+
+	/**
+	 * Create request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 */
+	@Given("^Create (.*) with contentType (.*) given input$")
+	public void createRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) throws Exception {
+		jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
+		request = request.contentType(contentType).body(jsonBody);
+	}
+
 
 	/**
 	 * Create request.
@@ -351,6 +420,20 @@ public class BaseStepDefinition {
 	}
 
 	/**
+	 * Update request.
+	 *
+	 * @param nameIgnore   the name ignore
+	 * @param parameterMap the parameter map
+	 * @throws Exception the exception
+	 */
+	@Given("^Update (.*) with contentType (.*) given input$")
+	public void updateRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) throws Exception {
+		jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
+		request = request.contentType(contentType).body(jsonBody);
+	}
+
+
+	/**
 	 * Create request.
 	 *
 	 * @param dummyString       the dummy string
@@ -360,8 +443,8 @@ public class BaseStepDefinition {
 	 */
 	@When("^(.*) post (.*) in (.*) resource on (.*)")
 	public void createRequest(String dummyString, String acceptContentType, String resource, String system) {
-		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when().
-				log().all()
+		response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
+				.log().all()
 				.accept(acceptContentType)
 				.post(StepDefinitionHelper.getActualResource(resource, system));
 	}
@@ -465,6 +548,18 @@ public class BaseStepDefinition {
 		});
 	}
 
+	/**
+	 * Mock single response.
+	 *
+	 * @param resource the resource
+
+	 * @throws Throwable the throwable
+	 */
+	@And("^Verify (.*) response XML includes in the response$")
+	public void verifyXMLResponse(String resource, List<String> xmlString) throws Throwable {
+		XMLHelper.assertXMLEquals(xmlString.get(0), response.asString());
+	}
+
 
 	/**
 	 * Mock single response.
@@ -474,7 +569,7 @@ public class BaseStepDefinition {
 	 * @throws Throwable the throwable
 	 */
 	@And("^Verify (.*) response with (.*) includes in the response$")
-	public void mockSingleResponse(String resource, String context) throws Throwable {
+	public void verifySingleResponse(String resource, String context) throws Throwable {
 		assertEquals(context, json.extract().body().asString());
 	}
 
