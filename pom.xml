@@ -9,13 +9,13 @@
 	<artifactId>cucumblan-project</artifactId>
 	<packaging>pom</packaging>
 	<name>cucumblan-project</name>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.0.5</version>
 	<url>https://virtualan.io</url>
 	<scm>
 	  <connection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</connection>
 	  <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
 	  <url>https://github.com/virtualansoftware/cucumblan.git</url>
-	   <tag>HEAD</tag>
+	   <tag>v1.0.5</tag>
 	</scm>
 	<developers>
 		<developer>
