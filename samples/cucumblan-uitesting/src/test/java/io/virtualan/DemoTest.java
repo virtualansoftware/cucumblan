@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "classpath:features",
-    extraGlue = {"io.virtualan.core"},
+    glue = {"io.virtualan.cucumblan.core"},
     plugin = {"pretty",
         "json:target/cucumber-report.json"})
 
