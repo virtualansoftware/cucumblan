@@ -4,7 +4,7 @@
   <artifactId>cucumblan-api</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-api</name>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.5-SNAPSHOT</version>
   <properties>
     <mapson.version>1.1.1</mapson.version>
     <cucumber.version>6.7.0</cucumber.version>
@@ -137,7 +137,6 @@
       <artifactId>swagger-parser</artifactId>
       <version>1.0.51</version>
     </dependency>
-
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
@@ -167,6 +166,11 @@
       <groupId>io.virtualan</groupId>
       <artifactId>mapson</artifactId>
       <version>${mapson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.5</version>
     </dependency>
   </dependencies>
 

@@ -42,7 +42,8 @@ public class EndpointConfiguration {
    * Load endpoints.
    */
   public  void loadEndpoints() {
-		File directory = new File("conf/");
+
+  	File directory = new File("conf/");
 		String[] myFiles = directory.list(new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
 				return fileName.matches("endpoint.*.properties");

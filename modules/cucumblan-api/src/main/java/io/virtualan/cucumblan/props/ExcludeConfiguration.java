@@ -29,8 +29,16 @@ public class ExcludeConfiguration {
   private final static Logger LOGGER = Logger.getLogger(ExcludeConfiguration.class.getName());
 
   static {
+    reload();
+  }
+
+  public static  void reload() {
     try {
-      InputStream stream = ExcludeConfiguration.class.getClassLoader().getResourceAsStream("exclude-response.properties");
+      InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("exclude-response.properties");
+      if(stream == null) {
+        stream =  ExcludeConfiguration.class.getClassLoader().getResourceAsStream("exclude-response.properties");
+      }
+
       if(stream != null) {
         excludeProperties.load(stream);
       }else {
@@ -41,7 +49,7 @@ public class ExcludeConfiguration {
     }
   }
 
-  private static boolean findMatch(String actual) {
+    private static boolean findMatch(String actual) {
     for (Map.Entry entry : excludeProperties.entrySet()) {
       if (actual.matches(entry.getKey().toString())){
         return entry.getValue().toString().equalsIgnoreCase("IGNORE");
