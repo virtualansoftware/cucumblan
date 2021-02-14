@@ -1,6 +1,6 @@
 Feature: Test Pet API
   Scenario: Scenario test
-    Given add input.xml data file with text/xml;charset=utf-8 given input
+    Given add input.xml data file with text/xml given input
     When a user post application/json in /xml/tempconvert.asmx resource on xml
     Then Verify the status code is 200
     And Verify soap response XML includes in the response

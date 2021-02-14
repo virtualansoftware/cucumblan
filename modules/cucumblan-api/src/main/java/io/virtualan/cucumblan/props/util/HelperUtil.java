@@ -1,8 +1,10 @@
 package io.virtualan.cucumblan.props.util;
 
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,26 @@ import org.junit.Assert;
 @Slf4j
 public class HelperUtil {
 
+
+  private static  String convertStreamToString(InputStream is) throws IOException {
+    if (is != null) {
+      StringBuilder sb = new StringBuilder();
+      String line;
+
+      try {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        while ((line = reader.readLine()) != null) {
+          sb.append(line);
+        }
+      } finally {
+        is.close();
+      }
+      return sb.toString();
+    } else {
+      return null;
+    }
+  }
+
   public static String readFileAsString(String fileBody) {
     String body = null;
     InputStream stream = Thread.currentThread().getContextClassLoader()
@@ -23,7 +45,7 @@ public class HelperUtil {
     }
     if (stream != null) {
       try {
-        body = IOUtils.toString(stream, StandardCharsets.UTF_8.name());
+        body = convertStreamToString(stream);
       } catch (IOException e) {
       }
     }

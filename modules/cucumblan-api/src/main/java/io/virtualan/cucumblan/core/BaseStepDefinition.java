@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
 import org.junit.Assert;
 
@@ -142,8 +143,7 @@ public class BaseStepDefinition {
    * @throws Exception the exception
    */
   @Given("add (.*) with given header params$")
-  public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap)
-      throws Exception {
+  public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap) {
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request
           .header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -284,11 +284,10 @@ public class BaseStepDefinition {
    *
    * @param nameIgnore   the name ignore
    * @param parameterMap the parameter map
-   * @throws Exception the exception
    */
   @Given("^add (.*) with given path params$")
   public void readPathParamsRequest(String nameIgnore, Map<String, String> parameterMap)
-      throws Exception {
+       {
     request = request.contentType("application/json");
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request
@@ -386,6 +385,25 @@ public class BaseStepDefinition {
       request = request.headers(mapHeader).contentType(contentType).body(body);
     } else {
       Assert.assertTrue(fileBody +" input file is missing ", false);
+    }
+  }
+
+  /**
+   * Create request.
+   *
+   * @param fileBody    the body
+   * @param contentType the content type
+   */
+  @Given("add (.*) data inline with (.*) given input$")
+  public void createInlineRequest(String fileBody, String contentType, List<String> input) throws IOException {
+    if (input != null && !input.isEmpty()) {
+      Map<String, String> mapHeader = new HashMap();
+      mapHeader.put("content-type", contentType);
+      String listString = input.stream().map(Object::toString)
+          .collect(Collectors.joining());
+      request = request.headers(mapHeader).contentType(contentType).body(listString);
+    } else {
+      Assert.assertTrue(fileBody +" input inline is missing ", false);
     }
   }
 
@@ -571,9 +589,11 @@ public class BaseStepDefinition {
    * @param resource the resource
    * @throws Throwable the throwable
    */
-  @And("^Verify (.*) response XML includes in the response$")
-  public void verifyXMLResponse(String resource, List<String> xmlString) throws Throwable {
-    HelperUtil.assertXMLEquals(xmlString.get(0), response.asString());
+  @And("^Verify (.*) response inline includes in the response$")
+  public void verifyFileResponse(String resource, List<String> xmlString) throws Throwable {
+    String listString = xmlString.stream().map(Object::toString)
+        .collect(Collectors.joining());
+    HelperUtil.assertXMLEquals(listString, response.asString());
   }
 
   /**
@@ -583,11 +603,11 @@ public class BaseStepDefinition {
    * @throws Throwable the throwable
    */
   @And("^Verify (.*) response XML File (.*) includes in the response$")
-  public void verifyXMLResponse(String resource, String fileBody, List<String> xmlString)
+  public void verifyXMLResponse(String resource, String fileBody)
       throws Throwable {
     String body = HelperUtil.readFileAsString(fileBody);
     if (body != null) {
-      HelperUtil.assertXMLEquals(xmlString.get(0), response.asString());
+      HelperUtil.assertXMLEquals(body, response.asString());
     } else {
 			Assert.assertTrue(fileBody + "  file is missing :", false );
     }
