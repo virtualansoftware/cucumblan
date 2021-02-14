@@ -140,7 +140,6 @@ public class BaseStepDefinition {
    *
    * @param nameIgnore   the name ignore
    * @param parameterMap the parameter map
-   * @throws Exception the exception
    */
   @Given("add (.*) with given header params$")
   public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap) {
