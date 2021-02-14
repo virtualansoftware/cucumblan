@@ -22,7 +22,7 @@ package io.virtualan.cucumblan.ui.core;
 /**
  * The type Page element.
  * @author Elan Thangamani
- * /
+ **/
 public class PageElement {
 
   /**
