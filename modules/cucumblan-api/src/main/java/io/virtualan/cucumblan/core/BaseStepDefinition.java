@@ -332,7 +332,7 @@ public class BaseStepDefinition {
    * @param nameIgnore   the name ignore
    * @param contentType  the content type
    * @param parameterMap the parameter map
-   * @throws Exception the exception
+   *
    */
   @Given("^Populate (.*) with contentType(.*) given input$")
   public void loadRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
@@ -348,7 +348,6 @@ public class BaseStepDefinition {
    *
    * @param nameIgnore   the name ignore
    * @param parameterMap the parameter map
-   * @throws Exception the exception
    */
   @Given("^Populate (.*) with given input$")
   public void loadRequest(String nameIgnore, Map<String, String> parameterMap) {
@@ -646,7 +645,7 @@ public class BaseStepDefinition {
   @And("^Verify (.*) includes following in the response$")
   public void verifyResponse(String dummyString, DataTable data) throws Throwable {
     data.asMap(String.class, String.class).forEach((k, v) -> {
-      System.out.println(v + " : " + json.extract().body().jsonPath().getString((String) k));
+      LOGGER.info(v + " : " + json.extract().body().jsonPath().getString((String) k));
       assertEquals(StepDefinitionHelper.getActualValue((String) v),
           json.extract().body().jsonPath().getString((String) k));
     });
