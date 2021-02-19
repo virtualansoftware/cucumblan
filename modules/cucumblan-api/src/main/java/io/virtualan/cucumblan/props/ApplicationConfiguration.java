@@ -32,6 +32,36 @@ public class ApplicationConfiguration {
       log.warn("cucumblan.properties not found");
     }
   }
+
+  /**
+   * Gets properties.
+   *
+   */
+  public static void setProperty(String key, String value) {
+    properties.put(key, value);
+  }
+
+  /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static boolean getInline() {
+    return properties.getProperty("data-inline") != null ?
+        properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
+  }
+  /**
+   * Gets property.
+   *
+   * @param keyName the key name
+   * @return the property
+   */
+  public static boolean getBoolean(String keyName) {
+    return properties.getProperty(keyName) != null ?
+        properties.getProperty(keyName).equalsIgnoreCase("true") : false;
+  }
+
+
   /**
    * Gets properties.
    *

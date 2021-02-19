@@ -627,11 +627,12 @@ public class BaseStepDefinition {
       String jsonRequestActual = processing
           .postResponseProcessing(validatableResponse.extract().body().asString());
       String jsonRequestExpected = processing.postResponseProcessing(readXML);
+
       if (jsonRequestExpected != null && jsonRequestActual != null) {
         Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+        Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
         mapsonExpected.forEach((k, v) -> {
           if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-            Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
             if (v == null) {
               if (mapson.get(k) == null) {
                 assertNull(mapson.get(k));
@@ -672,9 +673,9 @@ public class BaseStepDefinition {
       String jsonRequestExpected = processing.postResponseProcessing(body);
       if (jsonRequestExpected != null && jsonRequestActual != null) {
         Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+        Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
         mapsonExpected.forEach((k, v) -> {
           if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-            Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
             if (v == null) {
               if (mapson.get(k) == null) {
                 assertNull(mapson.get(k));
