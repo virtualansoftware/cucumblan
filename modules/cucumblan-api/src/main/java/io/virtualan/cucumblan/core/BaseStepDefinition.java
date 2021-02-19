@@ -620,7 +620,8 @@ public class BaseStepDefinition {
   public void verifyFormatedMapson(String type, String resource, List<String> readData)
       throws Throwable {
     StandardProcessing processing = stdProcessorMap.get(type);
-    if (processing != null) {
+    if (processing != null &&  validatableResponse != null
+        && validatableResponse.extract().body().asString() != null) {
       String readXML = readData.stream().map(Object::toString)
           .collect(Collectors.joining());
       String jsonRequestActual = processing
@@ -664,7 +665,7 @@ public class BaseStepDefinition {
   public void verifyFormatedMapson(String type, String file, String resource)
       throws Throwable {
     StandardProcessing processing = stdProcessorMap.get(type);
-    if (processing != null) {
+    if (processing != null && validatableResponse != null && validatableResponse.extract().body().asString() != null) {
       String body = HelperUtil.readFileAsString(file);
       String jsonRequestActual = processing
           .postResponseProcessing(validatableResponse.extract().body().asString());
