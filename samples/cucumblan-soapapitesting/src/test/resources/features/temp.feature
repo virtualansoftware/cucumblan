@@ -9,3 +9,9 @@ Feature: virtualan.json - API Contract validation status
     When a user post application/json in /xml/tempconvert.asmx resource on xml
     Then Verify the status code is 200
     And Verify api response XML File response.xml includes in the response
+  Scenario: temp - POST api call
+    Given a user perform a api action
+    And add request with given header params
+      | Content-Type                   | text/xml                         |
+    And add input.xml data file with text/xml given input
+    And Verify-standard EDI-271 all 271_response_actual_sample.xml file xml api includes following in the response

@@ -42,6 +42,7 @@ import io.virtualan.cucumblan.props.util.HelperUtil;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
+import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
 import java.io.IOException;
@@ -50,10 +51,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
 import org.junit.Assert;
+import org.reflections.Reflections;
 
 
 /**
@@ -64,11 +67,13 @@ import org.junit.Assert;
 public class BaseStepDefinition {
 
   private final static Logger LOGGER = Logger.getLogger(BaseStepDefinition.class.getName());
+  private static Map<String, StandardProcessing> stdProcessorMap = new HashMap<>();
 
   static {
     try {
       OpenAPIParser.loader();
       EndpointConfiguration.getInstance().loadEndpoints();
+      loadStandardProcessors();
     } catch (ParserError parserError) {
       LOGGER
           .warning("Unable to start the process - see if conf folder and endpoints are generated");
@@ -77,9 +82,29 @@ public class BaseStepDefinition {
   }
 
   private Response response;
-  private ValidatableResponse json;
+  private ValidatableResponse validatableResponse;
   private String jsonBody;
   private RequestSpecification request = given();
+
+  /**
+   * Load action processors.
+   */
+  public static void loadStandardProcessors() {
+    Reflections reflections = new Reflections("io.virtualan.cucumblan.standard");
+    Set<Class<? extends StandardProcessing>> classes = reflections
+        .getSubTypesOf(StandardProcessing.class);
+    classes.stream().forEach(x -> {
+      StandardProcessing action = null;
+      try {
+        action = x.newInstance();
+        stdProcessorMap.put(action.getType(), action);
+      } catch (InstantiationException e) {
+        LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
+      } catch (IllegalAccessException e) {
+        LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
+      }
+    });
+  }
 
   /**
    * Read request by path param.
@@ -293,7 +318,8 @@ public class BaseStepDefinition {
    */
   @Given("^Store the (.*) value of the key as (.*)")
   public void loadAsGlobalParam(String responseKey, String key) {
-    ScenarioContext.setContext(key, json.extract().body().jsonPath().getString(responseKey));
+    ScenarioContext
+        .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
   }
 
 
@@ -304,8 +330,7 @@ public class BaseStepDefinition {
    * @param parameterMap the parameter map
    */
   @Given("^add (.*) with given path params$")
-  public void readPathParamsRequest(String nameIgnore, Map<String, String> parameterMap)
-       {
+  public void readPathParamsRequest(String nameIgnore, Map<String, String> parameterMap) {
     request = request.contentType("application/json");
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request
@@ -351,7 +376,6 @@ public class BaseStepDefinition {
    * @param nameIgnore   the name ignore
    * @param contentType  the content type
    * @param parameterMap the parameter map
-   *
    */
   @Given("^Populate (.*) with contentType(.*) given input$")
   public void loadRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
@@ -404,7 +428,7 @@ public class BaseStepDefinition {
       mapHeader.put("content-type", contentType);
       request = request.headers(mapHeader).contentType(contentType).body(body);
     } else {
-      Assert.assertTrue(fileBody +" input file is missing ", false);
+      Assert.assertTrue(fileBody + " input file is missing ", false);
     }
   }
 
@@ -417,7 +441,8 @@ public class BaseStepDefinition {
    * @throws IOException the io exception
    */
   @Given("add (.*) data inline with (.*) given input$")
-  public void createInlineRequest(String fileBody, String contentType, List<String> input) throws IOException {
+  public void createInlineRequest(String fileBody, String contentType, List<String> input)
+      throws IOException {
     if (input != null && !input.isEmpty()) {
       Map<String, String> mapHeader = new HashMap();
       mapHeader.put("content-type", contentType);
@@ -425,7 +450,7 @@ public class BaseStepDefinition {
           .collect(Collectors.joining());
       request = request.headers(mapHeader).contentType(contentType).body(listString);
     } else {
-      Assert.assertTrue(fileBody +" input inline is missing ", false);
+      Assert.assertTrue(fileBody + " input inline is missing ", false);
     }
   }
 
@@ -577,10 +602,99 @@ public class BaseStepDefinition {
    */
   @Then("^Verify the status code is (\\d+)")
   public void verifyStatusCode(int statusCode) {
-    json = response.then().log().ifValidationFails().statusCode(statusCode);
+    validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
     LOGGER.info(ScenarioContext.getContext().toString());
-    LOGGER.info(json.extract().body().asString());
+    LOGGER.info(validatableResponse.extract().body().asString());
   }
+
+
+  /**
+   * Verify response.
+   *
+   * @param resource the resource
+   * @param type     the data
+   * @param readData     the data
+   * @throws Throwable the throwable
+   */
+  @And("^Verify-standard (.*) all inline (.*) api includes following in the response$")
+  public void verifyFormatedMapson(String type, String resource, List<String> readData)
+      throws Throwable {
+    StandardProcessing processing = stdProcessorMap.get(type);
+    if (processing != null) {
+      String readXML = readData.stream().map(Object::toString)
+          .collect(Collectors.joining());
+      String jsonRequestActual = processing
+          .postResponseProcessing(validatableResponse.extract().body().asString());
+      String jsonRequestExpected = processing.postResponseProcessing(readXML);
+      if (jsonRequestExpected != null && jsonRequestActual != null) {
+        Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+        mapsonExpected.forEach((k, v) -> {
+          if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
+            Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
+            if (v == null) {
+              if (mapson.get(k) == null) {
+                assertNull(mapson.get(k));
+              } else {
+                assertEquals(" ", mapson.get(k));
+              }
+            } else {
+              LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
+              assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
+                  v, mapson.get(k));
+            }
+          }
+        });
+      } else {
+        assertTrue("Standard " + type + " has no response validation ", false);
+      }
+    } else {
+      assertTrue("Standard " + type + " is not implemented for response ", false);
+    }
+  }
+
+  /**
+   * Verify response.
+   *
+   * @param type     the data
+   * @param file     the data
+   * @param resource the resource
+   * @throws Throwable the throwable
+   */
+  @Given("^Verify-standard (.*) all (.*) file (.*) api includes following in the response$")
+  public void verifyFormatedMapson(String type, String file, String resource)
+      throws Throwable {
+    StandardProcessing processing = stdProcessorMap.get(type);
+    if (processing != null) {
+      String body = HelperUtil.readFileAsString(file);
+      String jsonRequestActual = processing
+          .postResponseProcessing(validatableResponse.extract().body().asString());
+      String jsonRequestExpected = processing.postResponseProcessing(body);
+      if (jsonRequestExpected != null && jsonRequestActual != null) {
+        Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+        mapsonExpected.forEach((k, v) -> {
+          if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
+            Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
+            if (v == null) {
+              if (mapson.get(k) == null) {
+                assertNull(mapson.get(k));
+              } else {
+                assertEquals(" ", mapson.get(k));
+              }
+            } else {
+              LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
+              assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
+                  v, mapson.get(k));
+            }
+          }
+        });
+      } else {
+        assertTrue("Standard " + type + " has no response validation ", false);
+      }
+    } else {
+      assertTrue("Standard " + type + " is not implemented for response ", false);
+    }
+  }
+
 
   /**
    * Verify response.
@@ -593,7 +707,8 @@ public class BaseStepDefinition {
   public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
     data.asMap(String.class, String.class).forEach((k, v) -> {
       if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-        Map<String, String> mapson = Mapson.buildMAPsonFromJson(json.extract().body().asString());
+        Map<String, String> mapson = Mapson.buildMAPsonFromJson(
+            validatableResponse.extract().body().asString());
         if (v == null) {
           if (mapson.get(k) == null) {
             assertNull(mapson.get(k));
@@ -636,7 +751,7 @@ public class BaseStepDefinition {
     if (body != null) {
       HelperUtil.assertXMLEquals(body, response.asString());
     } else {
-			Assert.assertTrue(fileBody + "  file is missing :", false );
+      Assert.assertTrue(fileBody + "  file is missing :", false);
     }
   }
 
@@ -650,7 +765,7 @@ public class BaseStepDefinition {
    */
   @And("^Verify (.*) response with (.*) includes in the response$")
   public void verifySingleResponse(String resource, String context) throws Throwable {
-    assertEquals(context, json.extract().body().asString());
+    assertEquals(context, validatableResponse.extract().body().asString());
   }
 
 
@@ -664,9 +779,10 @@ public class BaseStepDefinition {
   @And("^Verify (.*) includes following in the response$")
   public void verifyResponse(String dummyString, DataTable data) throws Throwable {
     data.asMap(String.class, String.class).forEach((k, v) -> {
-      LOGGER.info(v + " : " + json.extract().body().jsonPath().getString((String) k));
+      LOGGER
+          .info(v + " : " + validatableResponse.extract().body().jsonPath().getString((String) k));
       assertEquals(StepDefinitionHelper.getActualValue((String) v),
-          json.extract().body().jsonPath().getString((String) k));
+          validatableResponse.extract().body().jsonPath().getString((String) k));
     });
   }
 }
