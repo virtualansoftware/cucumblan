@@ -3,12 +3,14 @@ package io.virtualan.cucumblan.props;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The type Application configuration.
  *
  * @author Elan Thangamani
  */
+@Slf4j
 public class ApplicationConfiguration {
   private static Properties properties = new Properties();
   static {
@@ -21,10 +23,13 @@ public class ApplicationConfiguration {
       if(stream == null) {
         stream = ApplicationConfiguration.class.getClassLoader().getResourceAsStream("cucumblan.properties");
       }
-      properties.load(stream);
-
+      if(stream != null) {
+        properties.load(stream);
+      } else {
+        log.warn("unable to load cucumblan.properties");
+      }
     } catch (Exception e) {
-
+      log.warn("cucumblan.properties not found");
     }
   }
   /**

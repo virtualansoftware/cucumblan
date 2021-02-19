@@ -137,8 +137,7 @@
       <artifactId>swagger-parser</artifactId>
       <version>1.0.51</version>
     </dependency>
-
-      <dependency>
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20190722</version>
@@ -167,6 +166,11 @@
       <groupId>io.virtualan</groupId>
       <artifactId>mapson</artifactId>
       <version>${mapson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.5</version>
     </dependency>
   </dependencies>
 
