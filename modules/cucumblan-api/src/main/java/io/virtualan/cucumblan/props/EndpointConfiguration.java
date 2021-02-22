@@ -50,12 +50,15 @@ public class EndpointConfiguration {
 			}
 		});
 		int i = 0;
-		for(String file: myFiles) {
-			Properties resourceEndPoint  = new Properties();
-			try {
-				resourceEndPoint.load(new InputStreamReader(new FileInputStream("conf/"+file)));
-				propertiesMap.put(file.substring(file.indexOf(".")+1, file.lastIndexOf(".")), resourceEndPoint);
-			} catch (IOException e) {
+		if(myFiles != null) {
+			for (String file : myFiles) {
+				Properties resourceEndPoint = new Properties();
+				try {
+					resourceEndPoint.load(new InputStreamReader(new FileInputStream("conf/" + file)));
+					propertiesMap
+							.put(file.substring(file.indexOf(".") + 1, file.lastIndexOf(".")), resourceEndPoint);
+				} catch (IOException e) {
+				}
 			}
 		}
 	}
