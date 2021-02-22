@@ -50,7 +50,20 @@ public class ApplicationConfiguration {
     return properties.getProperty("data-inline") != null ?
         properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
   }
+
   /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static String getStandardPackage() {
+    return properties.getProperty("standard-package") != null ?
+        properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
+  }
+  /**
+
+
+   /**
    * Gets property.
    *
    * @param keyName the key name

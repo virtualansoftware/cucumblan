@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
 import org.junit.Assert;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 
 
 /**
@@ -90,7 +91,8 @@ public class BaseStepDefinition {
    * Load action processors.
    */
   public static void loadStandardProcessors() {
-    Reflections reflections = new Reflections("io.virtualan.cucumblan.standard");
+    Reflections reflections = new Reflections(ApplicationConfiguration.getStandardPackage(),
+        new SubTypesScanner(false));
     Set<Class<? extends StandardProcessing>> classes = reflections
         .getSubTypesOf(StandardProcessing.class);
     classes.stream().forEach(x -> {
