@@ -61,7 +61,7 @@
 	</build>
 	<modules>
 		<module>modules/cucumblan-api</module>
-<!--		<module>modules/cucumblan-ui</module>-->
+		<module>modules/cucumblan-ui</module>
 	</modules>
 	<profiles>
 		<!-- Samples -->

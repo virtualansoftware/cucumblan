@@ -615,41 +615,45 @@ public class BaseStepDefinition {
    *
    * @param resource the resource
    * @param type     the data
-   * @param readData     the data
+   * @param readData the data
    * @throws Throwable the throwable
    */
   @And("^Verify-standard (.*) all inline (.*) api includes following in the response$")
   public void verifyFormatedMapson(String type, String resource, List<String> readData)
       throws Throwable {
     StandardProcessing processing = stdProcessorMap.get(type);
-    if (processing != null &&  validatableResponse != null
-        && validatableResponse.extract().body().asString() != null) {
-      String readXML = readData.stream().map(Object::toString)
-          .collect(Collectors.joining());
-      String jsonRequestActual = processing
-          .postResponseProcessing(validatableResponse.extract().body().asString());
-      String jsonRequestExpected = processing.postResponseProcessing(readXML);
+    if (processing != null) {
+      if (validatableResponse != null
+          && validatableResponse.extract().body().asString() != null) {
+        String readXML = readData.stream().map(Object::toString)
+            .collect(Collectors.joining());
+        String jsonRequestActual = processing
+            .postResponseProcessing(validatableResponse.extract().body().asString());
+        String jsonRequestExpected = processing.postResponseProcessing(readXML);
 
-      if (jsonRequestExpected != null && jsonRequestActual != null) {
-        Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
-        Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
-        mapsonExpected.forEach((k, v) -> {
-          if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-            if (v == null) {
-              if (mapson.get(k) == null) {
-                assertNull(mapson.get(k));
+        if (jsonRequestExpected != null && jsonRequestActual != null) {
+          Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+          Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
+          mapsonExpected.forEach((k, v) -> {
+            if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
+              if (v == null) {
+                if (mapson.get(k) == null) {
+                  assertNull(mapson.get(k));
+                } else {
+                  assertEquals(" ", mapson.get(k));
+                }
               } else {
-                assertEquals(" ", mapson.get(k));
+                LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
+                assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
+                    v, mapson.get(k));
               }
-            } else {
-              LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
-              assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
-                  v, mapson.get(k));
             }
-          }
-        });
+          });
+        } else {
+          assertTrue("Standard " + type + " has no response validation ", false);
+        }
       } else {
-        assertTrue("Standard " + type + " has no response validation ", false);
+        assertTrue("Api Response was not received ", false);
       }
     } else {
       assertTrue("Standard " + type + " is not implemented for response ", false);
@@ -668,31 +672,36 @@ public class BaseStepDefinition {
   public void verifyFormatedMapson(String type, String file, String resource)
       throws Throwable {
     StandardProcessing processing = stdProcessorMap.get(type);
-    if (processing != null && validatableResponse != null && validatableResponse.extract().body().asString() != null) {
-      String body = HelperUtil.readFileAsString(file);
-      String jsonRequestActual = processing
-          .postResponseProcessing(validatableResponse.extract().body().asString());
-      String jsonRequestExpected = processing.postResponseProcessing(body);
-      if (jsonRequestExpected != null && jsonRequestActual != null) {
-        Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
-        Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
-        mapsonExpected.forEach((k, v) -> {
-          if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-            if (v == null) {
-              if (mapson.get(k) == null) {
-                assertNull(mapson.get(k));
+    if (processing != null) {
+      if (validatableResponse != null
+          && validatableResponse.extract().body().asString() != null) {
+        String body = HelperUtil.readFileAsString(file);
+        String jsonRequestActual = processing
+            .postResponseProcessing(validatableResponse.extract().body().asString());
+        String jsonRequestExpected = processing.postResponseProcessing(body);
+        if (jsonRequestExpected != null && jsonRequestActual != null) {
+          Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+          Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestActual);
+          mapsonExpected.forEach((k, v) -> {
+            if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
+              if (v == null) {
+                if (mapson.get(k) == null) {
+                  assertNull(mapson.get(k));
+                } else {
+                  assertEquals(" ", mapson.get(k));
+                }
               } else {
-                assertEquals(" ", mapson.get(k));
+                LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
+                assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
+                    v, mapson.get(k));
               }
-            } else {
-              LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
-              assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
-                  v, mapson.get(k));
             }
-          }
-        });
+          });
+        } else {
+          assertTrue("Standard " + type + " has no response validation ", false);
+        }
       } else {
-        assertTrue("Standard " + type + " has no response validation ", false);
+        assertTrue("Api Response was not received ", false);
       }
     } else {
       assertTrue("Standard " + type + " is not implemented for response ", false);
