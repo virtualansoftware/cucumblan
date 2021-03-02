@@ -70,7 +70,7 @@ public class ExcludeConfiguration {
     if(excludes != null &&  excludes.equalsIgnoreCase("IGNORE")) {
       LOGGER.info(" Skipping response comparison for resource : "+ resource );
       return true;
-    }else if (excludes != null && keyName != null) {
+    }else if (excludes != null && keyName != null && !excludes.trim().isEmpty()) {
       excludeList = Stream.of(excludes.split(",")).collect(Collectors.toList());
       return excludeList.contains(keyName) || excludeList.stream().anyMatch(x -> keyName.contains(x));
     } else if(excludes == null && findMatch(resource)){
