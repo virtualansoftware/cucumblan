@@ -684,8 +684,8 @@ public class BaseStepDefinition {
 
   private void attachResponse(ValidatableResponse validatableResponse) {
     if (validatableResponse != null && validatableResponse.extract().body() != null) {
-      scenario.attach(validatableResponse.extract().body().asString(), response.getContentType(),
-          response.getContentType().contains("xml") ? "response.xml" : "response.json");
+      String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+      scenario.attach(validatableResponse.extract().body().asString(), xmlType, "actual-response");
     }
   }
 
