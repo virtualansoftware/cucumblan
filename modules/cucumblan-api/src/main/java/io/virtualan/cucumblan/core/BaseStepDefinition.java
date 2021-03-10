@@ -25,6 +25,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -45,6 +47,7 @@ import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
+import java.awt.PageAttributes.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -52,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
@@ -86,6 +90,7 @@ public class BaseStepDefinition {
   private ValidatableResponse validatableResponse;
   private String jsonBody;
   private RequestSpecification request = given();
+  private Scenario scenario;
 
   /**
    * Load action processors.
@@ -256,6 +261,8 @@ public class BaseStepDefinition {
   public void addVariable(String responseValue, String key) {
     ScenarioContext.setContext(key,
         Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
+    scenario.attach(ScenarioContext.getContext().toString(), "text/plain", "PreDefinedDataSet : " + UUID
+        .randomUUID().toString());
   }
 
   /**
@@ -322,6 +329,8 @@ public class BaseStepDefinition {
   public void loadAsGlobalParam(String responseKey, String key) {
     ScenarioContext
         .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
+    scenario.attach(ScenarioContext.getContext().toString(), "text/plain", "StoredResponse : "+ UUID
+        .randomUUID().toString());
   }
 
 
@@ -597,8 +606,13 @@ public class BaseStepDefinition {
   }
 
 
+  @Before
+  public void before(Scenario scenario) {
+    this.scenario = scenario;
+  }
+
   /**
-   * Verify status code.
+   * Verify status code
    *
    * @param statusCode the status code
    */
@@ -607,8 +621,15 @@ public class BaseStepDefinition {
     validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
     LOGGER.info(ScenarioContext.getContext().toString());
     LOGGER.info(validatableResponse.extract().body().asString());
+    scenario.attach(ScenarioContext.getContext().toString(), "text/plain", "PreDefinedDataSet : " + UUID.randomUUID().toString());
   }
 
+  private void attachResponse(ValidatableResponse validatableResponse) {
+    if (validatableResponse != null && validatableResponse.extract().body() != null) {
+      scenario.attach(validatableResponse.extract().body().asString(), response.getContentType(),
+          response.getContentType().contains("xml") ? "response.xml" : "response.json");
+    }
+  }
 
   /**
    * Verify response.
@@ -621,6 +642,7 @@ public class BaseStepDefinition {
   @And("^Verify-standard (.*) all inline (.*) api includes following in the response$")
   public void verifyFormatedMapson(String type, String resource, List<String> readData)
       throws Throwable {
+    attachResponse(validatableResponse);
     StandardProcessing processing = stdProcessorMap.get(type);
     if (processing != null) {
       if (validatableResponse != null
@@ -671,6 +693,7 @@ public class BaseStepDefinition {
   @Given("^Verify-standard (.*) all (.*) file (.*) api includes following in the response$")
   public void verifyFormatedMapson(String type, String file, String resource)
       throws Throwable {
+    attachResponse(validatableResponse);
     StandardProcessing processing = stdProcessorMap.get(type);
     if (processing != null) {
       if (validatableResponse != null
@@ -718,6 +741,7 @@ public class BaseStepDefinition {
    */
   @And("^Verify-all (.*) api includes following in the response$")
   public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
+    attachResponse(validatableResponse);
     data.asMap(String.class, String.class).forEach((k, v) -> {
       if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
         Map<String, String> mapson = Mapson.buildMAPsonFromJson(
@@ -745,6 +769,7 @@ public class BaseStepDefinition {
    */
   @And("^Verify (.*) response inline includes in the response$")
   public void verifyFileResponse(String resource, List<String> xmlString) throws Throwable {
+    attachResponse(validatableResponse);
     String listString = xmlString.stream().map(Object::toString)
         .collect(Collectors.joining());
     HelperUtil.assertXMLEquals(listString, response.asString());
@@ -760,6 +785,7 @@ public class BaseStepDefinition {
   @And("^Verify (.*) response XML File (.*) includes in the response$")
   public void verifyXMLResponse(String resource, String fileBody)
       throws Throwable {
+    attachResponse(validatableResponse);
     String body = HelperUtil.readFileAsString(fileBody);
     if (body != null) {
       HelperUtil.assertXMLEquals(body, response.asString());
@@ -778,6 +804,7 @@ public class BaseStepDefinition {
    */
   @And("^Verify (.*) response with (.*) includes in the response$")
   public void verifySingleResponse(String resource, String context) throws Throwable {
+    attachResponse(validatableResponse);
     assertEquals(context, validatableResponse.extract().body().asString());
   }
 
@@ -791,6 +818,7 @@ public class BaseStepDefinition {
    */
   @And("^Verify (.*) includes following in the response$")
   public void verifyResponse(String dummyString, DataTable data) throws Throwable {
+    attachResponse(validatableResponse);
     data.asMap(String.class, String.class).forEach((k, v) -> {
       LOGGER
           .info(v + " : " + validatableResponse.extract().body().jsonPath().getString((String) k));
