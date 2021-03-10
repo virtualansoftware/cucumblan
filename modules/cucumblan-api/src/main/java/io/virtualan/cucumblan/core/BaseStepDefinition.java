@@ -59,6 +59,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -420,6 +421,8 @@ public class BaseStepDefinition {
    */
   @Given("^add (.*) data with (.*) given input$")
   public void createRequest(String body, String contentType) {
+    scenario.attach(body
+        , contentType, "requestData : " + UUID.randomUUID().toString());
     request = request.contentType(contentType).body(body);
   }
 
@@ -478,7 +481,10 @@ public class BaseStepDefinition {
   public void createRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
       throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
+    scenario.attach(jsonBody
+        , contentType, "requestData : " + UUID.randomUUID().toString());
     request = request.contentType(contentType).body(jsonBody);
+
   }
 
 
@@ -492,6 +498,8 @@ public class BaseStepDefinition {
   @Given("^Create (.*) with given input$")
   public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
+    scenario.attach(jsonBody
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     request = request.contentType("application/json").body(jsonBody);
   }
 
@@ -505,6 +513,8 @@ public class BaseStepDefinition {
   @Given("^Update (.*) with given input$")
   public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
+    scenario.attach(jsonBody
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     request = request.contentType("application/json").body(jsonBody);
   }
 
@@ -520,6 +530,8 @@ public class BaseStepDefinition {
   public void updateRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
       throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
+    scenario.attach(jsonBody
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     request = request.contentType(contentType).body(jsonBody);
   }
 
@@ -535,10 +547,20 @@ public class BaseStepDefinition {
   @When("^(.*) post (.*) in (.*) resource on (.*)")
   public void createRequest(String dummyString, String acceptContentType, String resource,
       String system) {
-    response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
+    String url = StepDefinitionHelper.getHostName(resource, system);
+    String contentType = acceptContentType;
+    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    JSONObject object = new JSONObject();
+    object.put("url", url);
+    object.put("AcceptContentType", contentType);
+    object.put("resource", resourceDetails);
+    scenario.attach(object.toString()
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
+
+    response = request.baseUri(url).when()
         .log().all()
         .accept(acceptContentType)
-        .post(StepDefinitionHelper.getActualResource(resource, system));
+        .post(resourceDetails);
   }
 
   /**
@@ -552,6 +574,15 @@ public class BaseStepDefinition {
   @When("^(.*) get (.*) in (.*) resource on (.*)")
   public void readRequest(String dummyString, String acceptContentType, String resource,
       String system) {
+    String url = StepDefinitionHelper.getHostName(resource, system);
+    String contentType = acceptContentType;
+    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    JSONObject object = new JSONObject();
+    object.put("url", url);
+    object.put("AcceptContentType", contentType);
+    object.put("resource", resourceDetails);
+    scenario.attach(object.toString()
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .get(StepDefinitionHelper.getActualResource(resource, system));
@@ -568,6 +599,15 @@ public class BaseStepDefinition {
   @When("^(.*) put (.*) in (.*) resource on (.*)")
   public void modifyRequest(String dummyString, String acceptContentType, String resource,
       String system) {
+    String url = StepDefinitionHelper.getHostName(resource, system);
+    String contentType = acceptContentType;
+    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    JSONObject object = new JSONObject();
+    object.put("url", url);
+    object.put("AcceptContentType", contentType);
+    object.put("resource", resourceDetails);
+    scenario.attach(object.toString()
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .put(StepDefinitionHelper.getActualResource(resource, system));
@@ -584,6 +624,15 @@ public class BaseStepDefinition {
   @When("^(.*) patch (.*) in (.*) resource on (.*)")
   public void patchRequest(String dummyString, String acceptContentType, String resource,
       String system) {
+    String url = StepDefinitionHelper.getHostName(resource, system);
+    String contentType = acceptContentType;
+    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    JSONObject object = new JSONObject();
+    object.put("url", url);
+    object.put("AcceptContentType", contentType);
+    object.put("resource", resourceDetails);
+    scenario.attach(object.toString()
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .patch(StepDefinitionHelper.getActualResource(resource, system));
@@ -600,6 +649,15 @@ public class BaseStepDefinition {
   @When("^(.*) delete (.*) in (.*) resource on (.*)")
   public void deleteById(String dummyString, String acceptContentType, String resource,
       String system) {
+    String url = StepDefinitionHelper.getHostName(resource, system);
+    String contentType = acceptContentType;
+    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    JSONObject object = new JSONObject();
+    object.put("url", url);
+    object.put("AcceptContentType", contentType);
+    object.put("resource", resourceDetails);
+    scenario.attach(object.toString()
+        , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .delete(StepDefinitionHelper.getActualResource(resource, system));
