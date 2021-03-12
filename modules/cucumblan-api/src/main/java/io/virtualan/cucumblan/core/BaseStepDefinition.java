@@ -262,8 +262,6 @@ public class BaseStepDefinition {
   public void addVariable(String responseValue, String key) {
     ScenarioContext.setContext(key,
         Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
-    scenario.attach(ScenarioContext.getContext().toString(), "text/plain", "PreDefinedDataSet : " + UUID
-        .randomUUID().toString());
   }
 
   /**
@@ -330,8 +328,6 @@ public class BaseStepDefinition {
   public void loadAsGlobalParam(String responseKey, String key) {
     ScenarioContext
         .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
-    scenario.attach(ScenarioContext.getContext().toString(), "text/plain", "StoredResponse : "+ UUID
-        .randomUUID().toString());
   }
 
 
@@ -421,8 +417,6 @@ public class BaseStepDefinition {
    */
   @Given("^add (.*) data with (.*) given input$")
   public void createRequest(String body, String contentType) {
-    scenario.attach(body
-        , contentType, "requestData : " + UUID.randomUUID().toString());
     request = request.contentType(contentType).body(body);
   }
 
@@ -554,6 +548,8 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
+    object.put("context", new JSONObject(ScenarioContext.getContext()));
+
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
 
@@ -581,6 +577,8 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
+    object.put("context", new JSONObject(ScenarioContext.getContext()));
+
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
@@ -606,6 +604,8 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
+    object.put("context", new JSONObject(ScenarioContext.getContext()));
+
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
@@ -631,6 +631,8 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
+    object.put("context", new JSONObject(ScenarioContext.getContext()));
+
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
@@ -656,6 +658,7 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
+    object.put("context", new JSONObject(ScenarioContext.getContext()));
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
