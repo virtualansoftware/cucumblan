@@ -21,6 +21,8 @@
 package io.virtualan.cucumblan.core;
 
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.Scenario;
+import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.ui.action.Action;
 import io.virtualan.cucumblan.ui.core.PageElement;
@@ -29,9 +31,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -39,13 +44,11 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.reflections.Reflections;
 
-import io.cucumber.datatable.DataTable;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import io.cucumber.java.After;
 import java.util.concurrent.TimeUnit;
+import org.reflections.scanners.SubTypesScanner;
 
 
 /**
@@ -69,7 +72,8 @@ public class UIBaseStepDefinition {
    * Load action processors.
    */
   public static void loadActionProcessors() {
-    Reflections reflections = new Reflections("io.virtualan.cucumblan.ui.actionimpl");
+    Reflections reflections = new Reflections(ApplicationConfiguration.getStandardPackage(),
+        new SubTypesScanner(false));
     Set<Class<? extends Action>> classes = reflections.getSubTypesOf(Action.class);
     classes.stream().forEach(x -> {
       Action action = null;
@@ -109,6 +113,17 @@ public class UIBaseStepDefinition {
         throw new IllegalArgumentException("Browser \"" + driverName + "\" isn't supported.");
     }
     driver.get(url);
+  }
+
+  @After
+  public void embedScreenshotOnFail(Scenario s) {
+    if (s.isFailed()) try {
+      final byte[] screenshot = ((TakesScreenshot) driver)
+          .getScreenshotAs(OutputType.BYTES);
+      s.attach(screenshot , "image/png" , "Failed-Image :" + UUID.randomUUID().toString());
+    } catch (ClassCastException cce) {
+      LOGGER.warning(" Error Message : " + cce.getMessage());
+    }
   }
 
   /**
