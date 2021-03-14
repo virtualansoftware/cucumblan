@@ -137,7 +137,6 @@ public class BaseStepDefinition {
     RestAssured.authentication = RestAssured.certificate(identifier, value);
   }
 
-
   /**
    * Read request by path param.
    *
