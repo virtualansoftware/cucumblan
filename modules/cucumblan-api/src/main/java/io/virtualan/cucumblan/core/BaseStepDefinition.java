@@ -221,6 +221,7 @@ public class BaseStepDefinition {
   @Given("^Provided all the feature level parameters$")
   public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
     ScenarioContext.setContext(globalParams);
+    scenario.attach(new JSONObject(ScenarioContext.getPrintableContextObject()).toString(), "application/json", "requestData : " + UUID.randomUUID().toString());
   }
 
   /**
