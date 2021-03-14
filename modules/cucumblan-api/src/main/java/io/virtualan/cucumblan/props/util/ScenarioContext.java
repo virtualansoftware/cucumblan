@@ -2,6 +2,8 @@ package io.virtualan.cucumblan.props.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.json.JSONException;
 
 /**
  * The type Scenario context.
@@ -40,7 +42,17 @@ public class ScenarioContext {
 		scenarioContext.put(key, value);
 	}
 
-  /**
+	public static Map<String, String> getPrintableContextObject() throws JSONException {
+		Map<String, String> resultValues = getContext().entrySet().stream()
+				.collect(
+						Collectors.toMap( entry -> entry.getKey(),
+								entry -> entry.getKey().contains("password") ? "xxxxxxxxxxxx" : entry.getValue()));
+
+		return resultValues;
+	}
+
+
+	/**
    * Gets context.
    *
    * @param key the key

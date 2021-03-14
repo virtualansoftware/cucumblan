@@ -547,7 +547,7 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
-    object.put("context", new JSONObject(ScenarioContext.getContext()));
+    object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
@@ -576,7 +576,7 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
-    object.put("context", new JSONObject(ScenarioContext.getContext()));
+    object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
@@ -603,7 +603,7 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
-    object.put("context", new JSONObject(ScenarioContext.getContext()));
+    object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
@@ -630,7 +630,7 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
-    object.put("context", new JSONObject(ScenarioContext.getContext()));
+    object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
@@ -657,7 +657,7 @@ public class BaseStepDefinition {
     object.put("url", url);
     object.put("AcceptContentType", contentType);
     object.put("resource", resourceDetails);
-    object.put("context", new JSONObject(ScenarioContext.getContext()));
+    object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
     scenario.attach(object.toString()
         , "application/json", "requestData : " + UUID.randomUUID().toString());
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
