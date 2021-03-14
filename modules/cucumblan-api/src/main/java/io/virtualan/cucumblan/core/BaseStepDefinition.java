@@ -681,7 +681,7 @@ public class BaseStepDefinition {
     validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
     LOGGER.info(ScenarioContext.getContext().toString());
     LOGGER.info(validatableResponse.extract().body().asString());
-    scenario.attach(ScenarioContext.getContext().toString(), "text/plain", "PreDefinedDataSet : " + UUID.randomUUID().toString());
+    scenario.attach(ScenarioContext.getPrintableContextObject().toString(), "text/plain", "PreDefinedDataSet : " + UUID.randomUUID().toString());
   }
 
   private void attachResponse(ValidatableResponse validatableResponse) {
