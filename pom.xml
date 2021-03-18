@@ -62,6 +62,7 @@
 	<modules>
 		<module>modules/cucumblan-api</module>
 		<module>modules/cucumblan-ui</module>
+		<module>modules/cucumblan-db</module>
 	</modules>
 	<profiles>
 		<!-- Samples -->
