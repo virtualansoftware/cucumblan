@@ -126,6 +126,7 @@ public class BaseStepDefinition {
     request = given().pathParam(identifier, StepDefinitionHelper.getActualValue(value));
   }
 
+
   /**
    * Read request by path param.
    *
@@ -338,7 +339,7 @@ public class BaseStepDefinition {
    * @param parameterMap the parameter map
    */
   @Given("^add (.*) with given path params$")
-  public void readPathParamsRequest(String nameIgnore, Map<String, String> parameterMap) {
+  public void readParamsRequest(String nameIgnore, Map<String, String> parameterMap) {
     request = request.contentType("application/json");
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request
@@ -346,6 +347,49 @@ public class BaseStepDefinition {
     }
   }
 
+  /**
+   * Read request.
+   *
+   * @param nameIgnore   the name ignore
+   * @param parameterMap the parameter map
+   */
+  @Given("^add (.*) with (.*) given form params$")
+  public void readMultiParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
+    request = request.contentType(contentType);
+    for (Map.Entry<String, String> params : parameterMap.entrySet()) {
+      request = request
+          .param(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+    }
+  }
+
+  /**
+   * Read request.
+   *
+   * @param nameIgnore   the name ignore
+   * @param parameterMap the parameter map
+   */
+  @Given("^add (.*) with (.*) given multipart-form params$")
+  public void readPathParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
+    request = request.contentType(contentType);
+    for (Map.Entry<String, String> params : parameterMap.entrySet()) {
+      if (params.getKey().contains("MULTI-PART")) {
+        if(params.getValue() != null) {
+          String fileAndType = StepDefinitionHelper.getActualValue(params.getValue()).toString();
+          if(params.getKey().split("=").length  == 2 && fileAndType.split("=").length ==2) {
+            request = request
+                .multiPart(params.getKey().split("=")[1], fileAndType.split("=")[0],
+                    fileAndType.split("=")[1]);
+          } else {
+            scenario.log("MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
+            LOGGER.warning("MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
+          }
+        }
+      } else {
+        request = request
+            .param(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+      }
+    }
+  }
 
   /**
    * Read request.
