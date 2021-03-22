@@ -48,6 +48,7 @@ import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
 import java.awt.PageAttributes.MediaType;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -377,7 +378,8 @@ public class BaseStepDefinition {
           String fileAndType = StepDefinitionHelper.getActualValue(params.getValue()).toString();
           if(params.getKey().split("=").length  == 2 && fileAndType.split("=").length ==2) {
             request = request
-                .multiPart(params.getKey().split("=")[1], fileAndType.split("=")[0],
+                .multiPart(params.getKey().split("=")[1],
+                    new File(BaseStepDefinition.class.getClassLoader().getResource(fileAndType.split("=")[0]).getFile()),
                     fileAndType.split("=")[1]);
           } else {
             scenario.log("MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
