@@ -32,6 +32,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -202,6 +203,21 @@ public class BaseStepDefinition {
   }
 
   /**
+   * Read request.
+   *
+   * @param nameIgnore   the name ignore
+   * @param parameterMap the parameter map
+   */
+  @Given("add (.*) with given cookie params$")
+  public void readAllCookieParams(String nameIgnore, Map<String, String> parameterMap) {
+    for (Map.Entry<String, String> params : parameterMap.entrySet()) {
+      request = request.cookie(new
+          Cookie.Builder(params.getKey(),
+          StepDefinitionHelper.getActualValue(params.getValue()).toString()).build());
+    }
+  }
+
+  /**
    * Read request by query param.
    *
    * @param dummy      the dummy
@@ -327,10 +343,21 @@ public class BaseStepDefinition {
    */
   @Given("^Store the (.*) value of the key as (.*)")
   public void loadAsGlobalParam(String responseKey, String key) {
-    ScenarioContext
-        .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
+    String value = validatableResponse.extract().body().jsonPath().getString(responseKey);
+    if (value != null) {
+      ScenarioContext
+          .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
+    } else if (response.getCookie(responseKey) != null) {
+      ScenarioContext
+          .setContext(key, response.getCookie(responseKey));
+    } else if (response.getHeader(responseKey) != null) {
+      ScenarioContext
+          .setContext(key, response.getCookie(responseKey));
+    } else {
+      LOGGER.warning(responseKey +" :  for " + key + " not found");
+      scenario.log(responseKey +" :  for " + key + " not found");
+    }
   }
-
 
   /**
    * Read request.

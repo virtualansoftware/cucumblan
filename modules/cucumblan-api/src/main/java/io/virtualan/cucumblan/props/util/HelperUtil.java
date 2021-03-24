@@ -14,8 +14,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.XpathEngine;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -75,8 +75,9 @@ public class HelperUtil {
       throws Exception {
     Document expectedDoc = getDocument(expectedXML);
     Document actualDoc = getDocument(actualXML);
-    for (String xpath : xpaths) {
-      XMLAssert.assertXpathValuesEqual(xpath, expectedDoc, xpath, actualDoc);
+    for (String xpathStr : xpaths) {
+      XpathEngine xpath = XMLUnit.newXpathEngine();
+      Assert.assertEquals(xpathStr, xpath.evaluate(xpathStr, expectedDoc), xpath.evaluate(xpathStr, actualDoc));
     }
   }
 
@@ -92,11 +93,11 @@ public class HelperUtil {
      Object expected = getJSON(expectedjson, jpath);
      Object actual = getJSON(actualjson, jpath);
      if (expected instanceof  JSONObject){
-       Assert.assertTrue(VirtualJSONAssert.jAssertObject((JSONObject) expected, (JSONObject) actual, JSONCompareMode.LENIENT));
+       Assert.assertTrue(jpath, VirtualJSONAssert.jAssertObject((JSONObject) expected, (JSONObject) actual, JSONCompareMode.LENIENT));
      } else if (expected instanceof  JSONArray){
-       Assert.assertTrue(VirtualJSONAssert.jAssertArray((JSONArray) expected, (JSONArray) actual, JSONCompareMode.LENIENT));
+       Assert.assertTrue(jpath, VirtualJSONAssert.jAssertArray((JSONArray) expected, (JSONArray) actual, JSONCompareMode.LENIENT));
      } else {
-       Assert.assertEquals(expected.toString(), actual.toString());
+       Assert.assertEquals(jpath, expected.toString(), actual.toString());
      }
     }
   }
