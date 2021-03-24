@@ -47,7 +47,6 @@ import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
-import java.awt.PageAttributes.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +92,7 @@ public class BaseStepDefinition {
   private String jsonBody;
   private RequestSpecification request = given();
   private Scenario scenario;
-
+  private int sequence;
   /**
    * Load action processors.
    */
@@ -223,7 +222,7 @@ public class BaseStepDefinition {
   @Given("^Provided all the feature level parameters$")
   public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
     ScenarioContext.setContext(globalParams);
-    scenario.attach(new JSONObject(ScenarioContext.getPrintableContextObject()).toString(), "application/json", "requestData : " + UUID.randomUUID().toString());
+    scenario.attach(new JSONObject(ScenarioContext.getPrintableContextObject()).toString(), "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
   }
 
   /**
@@ -522,7 +521,7 @@ public class BaseStepDefinition {
       throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , contentType, "requestData : " + UUID.randomUUID().toString());
+        , contentType, "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType(contentType).body(jsonBody);
 
   }
@@ -539,7 +538,7 @@ public class BaseStepDefinition {
   public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType("application/json").body(jsonBody);
   }
 
@@ -554,7 +553,7 @@ public class BaseStepDefinition {
   public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType("application/json").body(jsonBody);
   }
 
@@ -571,7 +570,7 @@ public class BaseStepDefinition {
       throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType(contentType).body(jsonBody);
   }
 
@@ -597,7 +596,7 @@ public class BaseStepDefinition {
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
 
     response = request.baseUri(url).when()
         .log().all()
@@ -626,7 +625,7 @@ public class BaseStepDefinition {
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .get(StepDefinitionHelper.getActualResource(resource, system));
@@ -653,7 +652,7 @@ public class BaseStepDefinition {
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .put(StepDefinitionHelper.getActualResource(resource, system));
@@ -680,7 +679,7 @@ public class BaseStepDefinition {
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .patch(StepDefinitionHelper.getActualResource(resource, system));
@@ -706,7 +705,7 @@ public class BaseStepDefinition {
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .delete(StepDefinitionHelper.getActualResource(resource, system));
@@ -716,6 +715,7 @@ public class BaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    this.sequence = 1;
   }
 
   /**
@@ -728,14 +728,20 @@ public class BaseStepDefinition {
     validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
     LOGGER.info(ScenarioContext.getContext().toString());
     LOGGER.info(validatableResponse.extract().body().asString());
-    scenario.attach(ScenarioContext.getPrintableContextObject().toString(), "text/plain", "PreDefinedDataSet : " + UUID.randomUUID().toString());
+    scenario.attach(ScenarioContext.getPrintableContextObject().toString(), "text/plain", "PreDefinedDataSet :  " + scenario.getName()+" : " + (sequence++));
   }
 
   private void attachResponse(ValidatableResponse validatableResponse) {
     if (validatableResponse != null && validatableResponse.extract().body() != null) {
       String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-      scenario.attach(validatableResponse.extract().body().asString(), xmlType, "actual-response");
+      scenario.attach(validatableResponse.extract().body().asString(), xmlType, "actual-response " + scenario.getName()+" : " + (sequence++));
     }
+  }
+
+  private void attachActulaResponse(String actual) {
+    String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+    scenario.attach(actual, xmlType, "expected-response " + scenario.getName()+" : " + (sequence++));
+
   }
 
   /**
@@ -906,11 +912,33 @@ public class BaseStepDefinition {
    * Mock single response.
    *
    * @param resource the resource
+   * @param fileBody the file body
+   */
+  @And("^Verify (.*) response (.*) include byPath (.*) includes in the response$")
+  public void verifyXMLByPathResponse(String resource, String contentType,
+      String fileBody, List<String> xpaths) throws Exception {
+    String body = HelperUtil.readFileAsString(fileBody);
+    attachActulaResponse(body);
+    attachResponse(validatableResponse);
+    if (body != null) {
+      if(contentType.contains("xml")) {
+        HelperUtil.assertXpathsEqual(xpaths, body, response.asString());
+      } else {
+        HelperUtil.assertJsonpathEqual(xpaths, body, response.asString());
+      }
+    } else {
+      Assert.assertTrue(fileBody + "  file is missing :", false);
+    }
+  }
+
+  /**
+   * Mock single response.
+   *
+   * @param resource the resource
    * @param context  the context
-   * @throws Throwable the throwable
    */
   @And("^Verify (.*) response with (.*) includes in the response$")
-  public void verifySingleResponse(String resource, String context) throws Throwable {
+  public void verifySingleResponse(String resource, String context)  {
     attachResponse(validatableResponse);
     assertEquals(context, validatableResponse.extract().body().asString());
   }
