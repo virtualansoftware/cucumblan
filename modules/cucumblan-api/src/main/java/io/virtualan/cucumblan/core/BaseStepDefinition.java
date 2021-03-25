@@ -32,6 +32,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.config.EncoderConfig;
+import io.restassured.http.ContentType;
+import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -47,7 +50,6 @@ import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
-import java.awt.PageAttributes.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +95,8 @@ public class BaseStepDefinition {
   private String jsonBody;
   private RequestSpecification request = given();
   private Scenario scenario;
-
+  private int sequence;
+  private String acceptContentType;
   /**
    * Load action processors.
    */
@@ -184,6 +187,9 @@ public class BaseStepDefinition {
    */
   @Given("^(.*) with an header param (.*) of (.*)")
   public void readRequestByHeaderParam(String dummy, String identifier, String value) {
+    if("Accept".equalsIgnoreCase(identifier)){
+      acceptContentType = value;
+    }
     request = request.header(identifier, StepDefinitionHelper.getActualValue(value));
   }
 
@@ -197,8 +203,26 @@ public class BaseStepDefinition {
   @Given("add (.*) with given header params$")
   public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap) {
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
+      if("Accept".equalsIgnoreCase(params.getKey())){
+        acceptContentType = StepDefinitionHelper.getActualValue(params.getValue()).toString();
+      }
       request = request
           .header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+    }
+  }
+
+  /**
+   * Read request.
+   *
+   * @param nameIgnore   the name ignore
+   * @param parameterMap the parameter map
+   */
+  @Given("add (.*) with given cookie params$")
+  public void readAllCookieParams(String nameIgnore, Map<String, String> parameterMap) {
+    for (Map.Entry<String, String> params : parameterMap.entrySet()) {
+      request = request.cookie(new
+          Cookie.Builder(params.getKey(),
+          StepDefinitionHelper.getActualValue(params.getValue()).toString()).build());
     }
   }
 
@@ -223,7 +247,7 @@ public class BaseStepDefinition {
   @Given("^Provided all the feature level parameters$")
   public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
     ScenarioContext.setContext(globalParams);
-    scenario.attach(new JSONObject(ScenarioContext.getPrintableContextObject()).toString(), "application/json", "requestData : " + UUID.randomUUID().toString());
+    scenario.attach(new JSONObject(ScenarioContext.getPrintableContextObject()).toString(), "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
   }
 
   /**
@@ -328,10 +352,21 @@ public class BaseStepDefinition {
    */
   @Given("^Store the (.*) value of the key as (.*)")
   public void loadAsGlobalParam(String responseKey, String key) {
-    ScenarioContext
-        .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
+    String value = validatableResponse.extract().body().jsonPath().getString(responseKey);
+    if (value != null) {
+      ScenarioContext
+          .setContext(key, validatableResponse.extract().body().jsonPath().getString(responseKey));
+    } else if (response.getCookie(responseKey) != null) {
+      ScenarioContext
+          .setContext(key, response.getCookie(responseKey));
+    } else if (response.getHeader(responseKey) != null) {
+      ScenarioContext
+          .setContext(key, response.getCookie(responseKey));
+    } else {
+      LOGGER.warning(responseKey +" :  for " + key + " not found");
+      scenario.log(responseKey +" :  for " + key + " not found");
+    }
   }
-
 
   /**
    * Read request.
@@ -356,7 +391,10 @@ public class BaseStepDefinition {
    */
   @Given("^add (.*) with (.*) given form params$")
   public void readMultiParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
-    request = request.contentType(contentType);
+    request = request.config(RestAssured.config()
+        .encoderConfig(EncoderConfig.encoderConfig()
+            .encodeContentTypeAs(contentType,
+                ContentType.fromContentType(contentType))));
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request
           .param(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -371,7 +409,10 @@ public class BaseStepDefinition {
    */
   @Given("^add (.*) with (.*) given multipart-form params$")
   public void readPathParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
-    request = request.contentType(contentType);
+    request = request.config(RestAssured.config()
+        .encoderConfig(EncoderConfig.encoderConfig()
+            .encodeContentTypeAs(contentType,
+                ContentType.fromContentType(contentType))));
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       if (params.getKey().contains("MULTI-PART")) {
         if(params.getValue() != null) {
@@ -522,7 +563,7 @@ public class BaseStepDefinition {
       throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , contentType, "requestData : " + UUID.randomUUID().toString());
+        , contentType, "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType(contentType).body(jsonBody);
 
   }
@@ -539,7 +580,7 @@ public class BaseStepDefinition {
   public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType("application/json").body(jsonBody);
   }
 
@@ -554,7 +595,7 @@ public class BaseStepDefinition {
   public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType("application/json").body(jsonBody);
   }
 
@@ -571,7 +612,7 @@ public class BaseStepDefinition {
       throws Exception {
     jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
     scenario.attach(jsonBody
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     request = request.contentType(contentType).body(jsonBody);
   }
 
@@ -588,16 +629,16 @@ public class BaseStepDefinition {
   public void createRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
 
     response = request.baseUri(url).when()
         .log().all()
@@ -617,7 +658,7 @@ public class BaseStepDefinition {
   public void readRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    String contentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
@@ -626,7 +667,7 @@ public class BaseStepDefinition {
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .get(StepDefinitionHelper.getActualResource(resource, system));
@@ -644,16 +685,16 @@ public class BaseStepDefinition {
   public void modifyRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .put(StepDefinitionHelper.getActualResource(resource, system));
@@ -671,16 +712,16 @@ public class BaseStepDefinition {
   public void patchRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .patch(StepDefinitionHelper.getActualResource(resource, system));
@@ -698,15 +739,15 @@ public class BaseStepDefinition {
   public void deleteById(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
     scenario.attach(object.toString()
-        , "application/json", "requestData : " + UUID.randomUUID().toString());
+        , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
     response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
         .delete(StepDefinitionHelper.getActualResource(resource, system));
@@ -716,6 +757,8 @@ public class BaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    this.sequence = 1;
+    this.acceptContentType = null;
   }
 
   /**
@@ -728,14 +771,19 @@ public class BaseStepDefinition {
     validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
     LOGGER.info(ScenarioContext.getContext().toString());
     LOGGER.info(validatableResponse.extract().body().asString());
-    scenario.attach(ScenarioContext.getPrintableContextObject().toString(), "text/plain", "PreDefinedDataSet : " + UUID.randomUUID().toString());
+    scenario.attach(ScenarioContext.getPrintableContextObject().toString(), "text/plain", "PreDefinedDataSet :  " + scenario.getName()+" : " + (sequence++));
   }
 
   private void attachResponse(ValidatableResponse validatableResponse) {
     if (validatableResponse != null && validatableResponse.extract().body() != null) {
       String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-      scenario.attach(validatableResponse.extract().body().asString(), xmlType, "actual-response");
+      scenario.attach(validatableResponse.extract().body().asString(), xmlType, "actual-response " + scenario.getName()+" : " + (sequence++));
     }
+  }
+
+  private void attachActualResponse(String actual) {
+    String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+    scenario.attach(actual, xmlType, "expected-response " + scenario.getName()+" : " + (sequence++));
   }
 
   /**
@@ -906,11 +954,33 @@ public class BaseStepDefinition {
    * Mock single response.
    *
    * @param resource the resource
+   * @param fileBody the file body
+   */
+  @And("^Verify (.*) response (.*) include byPath (.*) includes in the response$")
+  public void verifyXMLByPathResponse(String resource, String contentType,
+      String fileBody, List<String> xpaths) throws Exception {
+    String body = HelperUtil.readFileAsString(fileBody);
+    attachActualResponse(body);
+    attachResponse(validatableResponse);
+    if (body != null) {
+      if(contentType.contains("xml")) {
+        HelperUtil.assertXpathsEqual(xpaths, body, response.asString());
+      } else {
+        HelperUtil.assertJsonpathEqual(xpaths, body, response.asString());
+      }
+    } else {
+      Assert.assertTrue(fileBody + "  file is missing :", false);
+    }
+  }
+
+  /**
+   * Mock single response.
+   *
+   * @param resource the resource
    * @param context  the context
-   * @throws Throwable the throwable
    */
   @And("^Verify (.*) response with (.*) includes in the response$")
-  public void verifySingleResponse(String resource, String context) throws Throwable {
+  public void verifySingleResponse(String resource, String context)  {
     attachResponse(validatableResponse);
     assertEquals(context, validatableResponse.extract().body().asString());
   }
