@@ -32,6 +32,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.config.EncoderConfig;
+import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
@@ -94,6 +96,7 @@ public class BaseStepDefinition {
   private RequestSpecification request = given();
   private Scenario scenario;
   private int sequence;
+  private String acceptContentType;
   /**
    * Load action processors.
    */
@@ -184,6 +187,9 @@ public class BaseStepDefinition {
    */
   @Given("^(.*) with an header param (.*) of (.*)")
   public void readRequestByHeaderParam(String dummy, String identifier, String value) {
+    if("Accept".equalsIgnoreCase(identifier)){
+      acceptContentType = value;
+    }
     request = request.header(identifier, StepDefinitionHelper.getActualValue(value));
   }
 
@@ -197,6 +203,9 @@ public class BaseStepDefinition {
   @Given("add (.*) with given header params$")
   public void readAllHeaderParams(String nameIgnore, Map<String, String> parameterMap) {
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
+      if("Accept".equalsIgnoreCase(params.getKey())){
+        acceptContentType = StepDefinitionHelper.getActualValue(params.getValue()).toString();
+      }
       request = request
           .header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
     }
@@ -382,7 +391,10 @@ public class BaseStepDefinition {
    */
   @Given("^add (.*) with (.*) given form params$")
   public void readMultiParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
-    request = request.contentType(contentType);
+    request = request.config(RestAssured.config()
+        .encoderConfig(EncoderConfig.encoderConfig()
+            .encodeContentTypeAs(contentType,
+                ContentType.fromContentType(contentType))));
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       request = request
           .param(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -397,7 +409,10 @@ public class BaseStepDefinition {
    */
   @Given("^add (.*) with (.*) given multipart-form params$")
   public void readPathParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
-    request = request.contentType(contentType);
+    request = request.config(RestAssured.config()
+        .encoderConfig(EncoderConfig.encoderConfig()
+            .encodeContentTypeAs(contentType,
+                ContentType.fromContentType(contentType))));
     for (Map.Entry<String, String> params : parameterMap.entrySet()) {
       if (params.getKey().contains("MULTI-PART")) {
         if(params.getValue() != null) {
@@ -614,11 +629,11 @@ public class BaseStepDefinition {
   public void createRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
@@ -643,7 +658,7 @@ public class BaseStepDefinition {
   public void readRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    String contentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
@@ -670,11 +685,11 @@ public class BaseStepDefinition {
   public void modifyRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
@@ -697,11 +712,11 @@ public class BaseStepDefinition {
   public void patchRequest(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
 
@@ -724,11 +739,11 @@ public class BaseStepDefinition {
   public void deleteById(String dummyString, String acceptContentType, String resource,
       String system) {
     String url = StepDefinitionHelper.getHostName(resource, system);
-    String contentType = acceptContentType;
+    acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
     String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
-    object.put("AcceptContentType", contentType);
+    object.put("AcceptContentType", acceptContentType);
     object.put("resource", resourceDetails);
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
     scenario.attach(object.toString()
@@ -743,6 +758,7 @@ public class BaseStepDefinition {
   public void before(Scenario scenario) {
     this.scenario = scenario;
     this.sequence = 1;
+    this.acceptContentType = null;
   }
 
   /**
@@ -765,10 +781,9 @@ public class BaseStepDefinition {
     }
   }
 
-  private void attachActulaResponse(String actual) {
+  private void attachActualResponse(String actual) {
     String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
     scenario.attach(actual, xmlType, "expected-response " + scenario.getName()+" : " + (sequence++));
-
   }
 
   /**
@@ -945,7 +960,7 @@ public class BaseStepDefinition {
   public void verifyXMLByPathResponse(String resource, String contentType,
       String fileBody, List<String> xpaths) throws Exception {
     String body = HelperUtil.readFileAsString(fileBody);
-    attachActulaResponse(body);
+    attachActualResponse(body);
     attachResponse(validatableResponse);
     if (body != null) {
       if(contentType.contains("xml")) {
