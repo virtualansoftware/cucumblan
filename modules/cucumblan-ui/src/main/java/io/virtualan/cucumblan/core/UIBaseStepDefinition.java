@@ -21,12 +21,15 @@
 package io.virtualan.cucumblan.core;
 
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
+import io.virtualan.cucumblan.props.util.UIHelper;
 import io.virtualan.cucumblan.ui.action.Action;
 import io.virtualan.cucumblan.ui.core.PageElement;
 import io.virtualan.cucumblan.ui.core.PagePropLoader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,16 +69,28 @@ public class UIBaseStepDefinition {
   }
 
   private WebDriver driver = null;
-  private PageElement pageElement;
+  private Scenario scenario;
+
+  @Before
+  public void before(Scenario scenario) {
+    this.scenario = scenario;
+    //this.sequence = 1;
+  }
 
   /**
    * Load action processors.
    */
   public static void loadActionProcessors() {
-    Reflections reflections = new Reflections(ApplicationConfiguration.getStandardPackage(),
+    Reflections reflections = new Reflections("io.virtualan.cucumblan.ui.actionimpl",
         new SubTypesScanner(false));
-    Set<Class<? extends Action>> classes = reflections.getSubTypesOf(Action.class);
-    classes.stream().forEach(x -> {
+    Set<Class<? extends Action>> buildInclasses = reflections.getSubTypesOf(Action.class);
+     reflections = new Reflections(ApplicationConfiguration.getActionPackage(),
+        new SubTypesScanner(false));
+    Set<Class<? extends Action>> customclasses = reflections.getSubTypesOf(Action.class);
+    if(customclasses != null) {
+      buildInclasses.addAll(customclasses);
+    }
+    buildInclasses.stream().forEach(x -> {
       Action action = null;
       try {
         action = x.newInstance();
@@ -92,10 +107,10 @@ public class UIBaseStepDefinition {
    * Load driver and url.
    *
    * @param driverName the driver name
-   * @param url        the url
+   * @param resource        the url
    */
-  @Given("Load Driver (.*) And URL (.*)$")
-  public void loadDriverAndURL(String driverName, String url) {
+  @Given("Load Driver (.*) And URL on (.*)$")
+  public void loadDriverAndURL(String driverName, String resource) {
     switch (driverName) {
       case "CHROME":
         System.setProperty("webdriver.chrome.driver", "conf/chromedriver.exe");
@@ -111,6 +126,13 @@ public class UIBaseStepDefinition {
         break;
       default:
         throw new IllegalArgumentException("Browser \"" + driverName + "\" isn't supported.");
+    }
+    String url = UIHelper.getUrl(resource);
+    if(url == null){
+      scenario.log("Url missing for "+ resource);
+      System.exit(-1);
+    } else {
+      scenario.log("Url for "+ resource + " : " + url);
     }
     driver.get(url);
   }
@@ -138,16 +160,33 @@ public class UIBaseStepDefinition {
   public void loadPage(String pageName, String resource, DataTable dt) throws Exception {
     List<Map<String, String>> data = dt.asMaps();
     Map<String, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
+    if(pageMap != null && !pageMap.isEmpty()) {
 
-    pageMap.forEach((k, v) -> {
-      String elementValue = data.get(0).get(v.getPageElementName());
-      try {
-        actionProcessor(v.getPageElementName(), elementValue, v);
-      } catch (InterruptedException e) {
-        LOGGER.warning("Unable to process this page: " + pageName);
-      }
-    });
-
+      pageMap.forEach((k, v) -> {
+        String elementValue = data.get(0).get(v.getPageElementName());
+        //if(elementValue != null) {
+          try {
+            actionProcessor(v.getPageElementName(), elementValue, v);
+          } catch (InterruptedException e) {
+            LOGGER.warning("Unable to process this page: " + pageName);
+            Assertions.assertTrue(false,
+                pageName + " Page for resource " + resource + " (" + v.getPageElementName() + " : "
+                    + elementValue + ":" + v + "): " + e.getMessage());
+          } catch (Exception e) {
+            LOGGER.warning("Unable to process this page: " + pageName);
+            Assertions.assertTrue(false,
+                pageName + " Page for resource " + resource + " (" + v.getPageElementName() + " : "
+                    + elementValue + ":" + v + "): " + e.getMessage());
+          }
+//        } else {
+//          Assertions.assertTrue(false,
+//              pageName + " Page for resource " + resource + " (" + v.getPageElementName() + " : "
+//                  + elementValue + ":" + v + "): incorrect field name" );
+//        }
+      });
+    } else {
+      Assertions.assertTrue(false, pageName+ " Page is not found for resource " +  resource);
+    }
   }
 
   /**
@@ -181,10 +220,10 @@ public class UIBaseStepDefinition {
    */
   @After
   public void cleanUp() {
-    if(driver != null) {
+    if(driver != null && ApplicationConfiguration.isProdMode()) {
       driver.close();
     }else {
-      LOGGER.warning(" Driver not loaded : ");
+      LOGGER.warning(" Driver not loaded/Closed : ");
     }
   }
 

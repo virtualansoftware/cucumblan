@@ -3,9 +3,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.virtualan</groupId>
-  <artifactId>cucumblan-jdbc</artifactId>
+  <artifactId>cucumblan-db</artifactId>
   <packaging>jar</packaging>
-  <name>cucumblan-jdbc</name>
+  <name>cucumblan-db</name>
   <version>0.0.1-SNAPSHOT</version>
   <properties>
     <junit.version>5.5.2</junit.version>

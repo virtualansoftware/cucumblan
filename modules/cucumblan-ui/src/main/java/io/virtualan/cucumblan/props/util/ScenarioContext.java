@@ -66,7 +66,7 @@ public class ScenarioContext {
      * @return the context
      */
     public static Object getContext(String key) {
-        return scenarioContext.get(key.toString());
+        return scenarioContext.get(key);
     }
 
     /**

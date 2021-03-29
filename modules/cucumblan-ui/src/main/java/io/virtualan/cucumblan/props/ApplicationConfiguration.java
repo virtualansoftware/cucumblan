@@ -59,9 +59,31 @@ public class ApplicationConfiguration {
    *
    * @return the property
    */
+  public static boolean isProdMode() {
+    return properties.getProperty("prod-mode") != null ?
+        properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
+  }
+
+
+  /**
+   * Gets property.
+   *
+   * @return the property
+   */
   public static String getStandardPackage() {
     return properties.getProperty("standard-package") != null ?
         properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
+  }
+  /**
+
+   /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static String getActionPackage() {
+    return properties.getProperty("action-package") != null ?
+        properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
   }
   /**
 

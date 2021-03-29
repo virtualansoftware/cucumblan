@@ -38,6 +38,7 @@ import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
@@ -48,7 +49,9 @@ import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
+import io.virtualan.jassert.VirtualJSONAssert;
 import io.virtualan.mapson.Mapson;
+import io.virtualan.mapson.exception.BadInputDataException;
 import io.virtualan.util.Helper;
 import java.io.File;
 import java.io.IOException;
@@ -58,14 +61,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 
 /**
@@ -915,8 +919,19 @@ public class BaseStepDefinition {
     });
   }
 
+  @Then("Verify (.*) response csvson includes in the response")
+  public void validateCsvonJson(List<String> csvline) throws BadInputDataException {
+    JSONArray jsonArray = Csvson.buildCSVson(csvline , ScenarioContext.getContext());
+    scenario.attach(jsonArray.toString(2), "application/json", "CSVson");
+    Assert.assertTrue(VirtualJSONAssert
+        .jAssertObject(jsonArray.optJSONObject(0),
+            new JSONObject(validatableResponse.extract().body().asString()),
+            JSONCompareMode.STRICT));
+  }
+
+
   /**
-   * Mock single response.
+   *  single response.
    *
    * @param resource  the resource
    * @param xmlString the xml string
@@ -927,7 +942,11 @@ public class BaseStepDefinition {
     attachResponse(validatableResponse);
     String listString = xmlString.stream().map(Object::toString)
         .collect(Collectors.joining());
-    HelperUtil.assertXMLEquals(listString, response.asString());
+    if(response.getContentType().contains("xml")) {
+      HelperUtil.assertXMLEquals(listString, response.asString());
+    } else {
+      HelperUtil.assertJSONObject(resource, listString, response.asString());
+    }
   }
 
   /**
