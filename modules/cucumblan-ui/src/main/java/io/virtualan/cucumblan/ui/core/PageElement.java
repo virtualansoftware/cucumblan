@@ -106,4 +106,12 @@ public class PageElement {
     this.pageElementXPath = pageElementXPath;
   }
 
+  @Override
+  public String toString() {
+    return "PageElement{" +
+        "pageElementName='" + pageElementName + '\'' +
+        ", pageElementAction='" + pageElementAction + '\'' +
+        ", pageElementXPath='" + pageElementXPath + '\'' +
+        '}';
+  }
 }
