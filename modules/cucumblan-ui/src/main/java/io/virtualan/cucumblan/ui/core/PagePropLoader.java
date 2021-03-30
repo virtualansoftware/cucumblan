@@ -57,8 +57,8 @@ public class PagePropLoader {
       if(inputStream != null) {
         prop.load(inputStream);
         for (Entry<Object, Object> p : prop.entrySet()) {
-          String[] page = ((String) p.getValue()).split(",");
-          pageMap.put(p.getKey().toString(), new PageElement(page[0], page[1], page[2]));
+          String[] page = ((String) p.getValue()).split("<~~>");
+          pageMap.put(p.getKey().toString(), new PageElement(page[0], page[1], page[2], page[3]));
         }
       } else {
         LOGGER.warning("propFileName is not found >>> " + propFileName );

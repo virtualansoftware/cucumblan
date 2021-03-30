@@ -35,7 +35,7 @@ public class SendKeyActionImpl implements Action {
      */
     @Override
     public String getType() {
-        return "SEND_KEY";
+        return "SET_TEXT";
     }
 
     /**
