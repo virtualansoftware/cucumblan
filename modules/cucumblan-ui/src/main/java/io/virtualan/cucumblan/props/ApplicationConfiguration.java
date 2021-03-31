@@ -1,11 +1,9 @@
 package io.virtualan.cucumblan.props;
 
-import io.virtualan.cucumblan.core.UIBaseStepDefinition;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * The type Application configuration.
@@ -77,6 +75,16 @@ public class ApplicationConfiguration {
   /**
 
    /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static String getMessageTypePackage() {
+    return properties.getProperty("message-package") != null ?
+        properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
+  }
+
+  /**
    * Gets property.
    *
    * @return the property

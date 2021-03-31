@@ -84,7 +84,7 @@ public class ApplicationConfiguration {
         properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
   }
 
-  /**
+   /**
    * Gets property.
    *
    * @return the property

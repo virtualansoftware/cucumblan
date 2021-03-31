@@ -79,6 +79,16 @@ public class ApplicationConfiguration {
    *
    * @return the property
    */
+  public static String getMessageTypePackage() {
+    return properties.getProperty("message-package") != null ?
+        properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
+  }
+
+  /**
+   * Gets property.
+   *
+   * @return the property
+   */
   public static String getActionPackage() {
     return properties.getProperty("action-package") != null ?
         properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
