@@ -20,14 +20,17 @@ package io.virtualan.cucumblan.message.type;
  */
 
 
-import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
+import java.util.List;
+import org.apache.kafka.common.header.Headers;
 
 /**
  * The interface Message type.
  *
+ * @param <T>  the type parameter
+ * @param <TT> the type parameter
  * @author Elan Thangmani
  */
-public interface MessageType {
+public interface MessageType<T, TT> {
 
     /**
      * Gets type.
@@ -39,27 +42,32 @@ public interface MessageType {
     /**
      * Gets id.
      *
-     * @param <T> the type parameter
      * @return the id
      */
-    <T> T getId();
+    T getId();
 
 
     /**
      * Gets message.
      *
-     * @param <TT> the type parameter
      * @return the message
      */
-    <TT> TT getMessage();
+    TT getMessage();
 
     /**
-     * Build message message type.
+     * Gets message.
      *
-     * @param key   the key
-     * @param value the value
+     * @return the message
+     */
+    Headers getHeaders();
+
+
+    /**
+     * Build message type.
+     *
+     * @param tt the tt
      * @return the message type
      */
-    MessageType buildMessage(Object record, String key, Object value) throws MessageNotDefinedException;
+    MessageType build(Object tt);
 
 }

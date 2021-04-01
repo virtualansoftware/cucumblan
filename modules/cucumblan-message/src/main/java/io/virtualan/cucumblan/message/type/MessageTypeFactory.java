@@ -27,14 +27,19 @@ import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
  *
  * @author Elan Thangmani
  */
-public interface MessageTypeFactory {
+
+public interface  MessageTypeFactory<T, TT> {
     /**
      * Build message message type.
      *
+     * @param record   the key
      * @param key   the key
      * @param value the value
      * @return the message type
      */
-    MessageType buildMessage(Object record, String key, Object value) throws MessageNotDefinedException;
+
+     MessageType buildMessage(Object record, T key, TT value) throws MessageNotDefinedException;
+
+     MessageType buildMessageType(String type, T key, TT value) throws MessageNotDefinedException;
 
 }

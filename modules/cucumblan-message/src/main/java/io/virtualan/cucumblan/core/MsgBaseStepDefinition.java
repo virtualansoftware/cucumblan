@@ -17,7 +17,6 @@
  *
  */
 
-
 package io.virtualan.cucumblan.core;
 
 
@@ -26,13 +25,18 @@ import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaClient;
+import io.virtualan.cucumblan.core.msg.kafka.KafkaProducerClient;
 import io.virtualan.cucumblan.core.msg.kafka.MessageContext;
+import io.virtualan.cucumblan.message.type.MessageType;
+import io.virtualan.cucumblan.props.TopicConfiguration;
+import io.virtualan.cucumblan.props.util.MsgHelper;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
-import io.virtualan.jassert.VirtualJSONAssert;
+import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.exception.BadInputDataException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
-import org.apache.kafka.common.protocol.types.Field.Str;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
@@ -45,11 +49,11 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  *
  * @author Elan Thangamani
  */
+
+@Slf4j
 public class MsgBaseStepDefinition {
 
-  private final static Logger LOGGER = Logger.getLogger(MsgBaseStepDefinition.class.getName());
   private Scenario scenario;
-
 
   @Before
   public void before(Scenario scenario) {
@@ -57,13 +61,39 @@ public class MsgBaseStepDefinition {
   }
 
 
-  @Given("send message (.*) on the (.*)")
-  public void produceMessage(String eventName, String resource, List<String> message) {
+  @Given("send message (.*) in partition (.*) on the (.*) for (.*) $")
+  public void produceMessageWithPartition(String eventName, Integer partition, String resource,
+      String type, List<String> messages) {
+    String topic = TopicConfiguration.getProperty(eventName);
+    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    MessageType builtMessage = messageType.build(messages);
+    scenario.log(builtMessage.toString());
+    KafkaProducerClient
+        .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+            partition);
+  }
 
+  @Given("send message (.*) on the (.*) for (.*)$")
+  public void produceMessage(String eventName, String resource, String type,
+      List<String> messages) {
+    String topic = TopicConfiguration.getProperty(eventName);
+    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    MessageType builtMessage = messageType.build(messages);
+    scenario.log(builtMessage.toString());
+    if (builtMessage.getId() != null) {
+      KafkaProducerClient
+          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+              null);
+    } else {
+      KafkaProducerClient
+          .sendMessage(resource, topic, null, builtMessage.getMessage(),
+              null);
+    }
   }
 
   @Given("verify (.*) contains (.*) on the (.*)")
-  public void consumeMessage(String eventName, String id, String resource, List<String> csvson)
+  public void verifyConsumedJSONObject(String eventName, String id, String resource,
+      List<String> csvson)
       throws InterruptedException, BadInputDataException {
     KafkaClient client = new KafkaClient(eventName, resource);
     client.run();
@@ -72,7 +102,8 @@ public class MsgBaseStepDefinition {
     if (expectedJson == null) {
       expectedJson = KafkaClient.getEvent(eventName, id, recheck);
     }
-    if (expectedJson == null) {
+    if (expectedJson != null) {
+      scenario.attach(expectedJson.toString(), "application/json", "verifyConsumedJSONObject");
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext());
       if (expectedJson instanceof JSONObject) {
         JSONAssert.assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson,
@@ -81,9 +112,34 @@ public class MsgBaseStepDefinition {
         JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
       }
     } else {
-      Assertions.assertTrue(false, " Unable to read event name ("+ eventName+") with identifier : "+ id);
+      Assertions.assertTrue(false,
+          " Unable to read event name (" + eventName + ") with identifier : " + id);
     }
   }
 
+  @Given("verify-by-elements (.*) contains (.*) on the (.*)")
+  public void consumeMessage(String eventName, String id, String resource,
+      Map<String, String> keyValue)
+      throws InterruptedException {
+    KafkaClient client = new KafkaClient(eventName, resource);
+    client.run();
+    int recheck = 5;
+    Object expectedJson = MessageContext.getEventContextMap(eventName, id);
+    if (expectedJson == null) {
+      expectedJson = KafkaClient.getEvent(eventName, id, recheck);
+    }
+    if (expectedJson != null) {
+      scenario.attach(expectedJson.toString(), "application/json", "verifyConsumedJSONObject");
+      Object finalExpectedJson = expectedJson;
+      keyValue.forEach((k, v) -> {
+        Object value = MsgHelper.getJSON(finalExpectedJson.toString(), k);
+        Assertions.assertEquals(StepDefinitionHelper.getActualValue((String) v),
+            value, k + " is not failed.");
+      });
+    } else {
+      Assertions.assertTrue(false,
+          " Unable to read event name (" + eventName + ") with identifier : " + id);
+    }
+  }
 
 }
