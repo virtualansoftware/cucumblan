@@ -24,7 +24,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.virtualan.csvson.Csvson;
-import io.virtualan.cucumblan.core.msg.kafka.KafkaClient;
+import io.virtualan.cucumblan.core.msg.kafka.KafkaConsumerClient;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaProducerClient;
 import io.virtualan.cucumblan.core.msg.kafka.MessageContext;
 import io.virtualan.cucumblan.message.type.MessageType;
@@ -35,7 +35,6 @@ import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.exception.BadInputDataException;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,7 +60,7 @@ public class MsgBaseStepDefinition {
   }
 
 
-  @Given("send message (.*) in partition (.*) on the (.*) for (.*) $")
+  @Given("send message event (.*) in partition (.*) on the (.*) with type (.*)$")
   public void produceMessageWithPartition(String eventName, Integer partition, String resource,
       String type, List<String> messages) {
     String topic = TopicConfiguration.getProperty(eventName);
@@ -73,7 +72,7 @@ public class MsgBaseStepDefinition {
             partition);
   }
 
-  @Given("send message (.*) on the (.*) for (.*)$")
+  @Given("send message event (.*) on the (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
       List<String> messages) {
     String topic = TopicConfiguration.getProperty(eventName);
@@ -91,16 +90,16 @@ public class MsgBaseStepDefinition {
     }
   }
 
-  @Given("verify (.*) contains (.*) on the (.*)")
+  @Given("verify (.*) contains (.*) on the (.*)$")
   public void verifyConsumedJSONObject(String eventName, String id, String resource,
       List<String> csvson)
       throws InterruptedException, BadInputDataException {
-    KafkaClient client = new KafkaClient(eventName, resource);
+    KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
     client.run();
     int recheck = 5;
     Object expectedJson = MessageContext.getEventContextMap(eventName, id);
     if (expectedJson == null) {
-      expectedJson = KafkaClient.getEvent(eventName, id, recheck);
+      expectedJson = KafkaConsumerClient.getEvent(eventName, id, recheck);
     }
     if (expectedJson != null) {
       scenario.attach(expectedJson.toString(), "application/json", "verifyConsumedJSONObject");
@@ -117,22 +116,22 @@ public class MsgBaseStepDefinition {
     }
   }
 
-  @Given("verify-by-elements (.*) contains (.*) on the (.*)")
+  @Given("verify-by-elements (.*) contains (.*) on the (.*)$")
   public void consumeMessage(String eventName, String id, String resource,
       Map<String, String> keyValue)
       throws InterruptedException {
-    KafkaClient client = new KafkaClient(eventName, resource);
+    KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
     client.run();
     int recheck = 5;
-    Object expectedJson = MessageContext.getEventContextMap(eventName, id);
+    MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
     if (expectedJson == null) {
-      expectedJson = KafkaClient.getEvent(eventName, id, recheck);
+      expectedJson = (MessageType) KafkaConsumerClient.getEvent(eventName, id, recheck);
     }
     if (expectedJson != null) {
-      scenario.attach(expectedJson.toString(), "application/json", "verifyConsumedJSONObject");
-      Object finalExpectedJson = expectedJson;
+      scenario.attach(expectedJson.getMessage().toString(), "application/json", "verifyConsumedJSONObject");
+      MessageType finalExpectedJson = expectedJson;
       keyValue.forEach((k, v) -> {
-        Object value = MsgHelper.getJSON(finalExpectedJson.toString(), k);
+        Object value = MsgHelper.getJSON(finalExpectedJson.getMessage().toString(), k);
         Assertions.assertEquals(StepDefinitionHelper.getActualValue((String) v),
             value, k + " is not failed.");
       });
