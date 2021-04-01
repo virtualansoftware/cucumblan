@@ -6,16 +6,16 @@ import java.util.stream.Collectors;
 import org.apache.kafka.common.header.Headers;
 import org.json.JSONObject;
 
-public class JSONMessage implements MessageType<Integer, JSONObject> {
+public class JSONMessage implements MessageType<Integer, String> {
 
   private String type = "JSON";
   private Integer id;
-  private JSONObject body;
+  private String body;
 
   public JSONMessage() {
   }
 
-  public JSONMessage(Integer id, JSONObject body) {
+  public JSONMessage(Integer id, String body) {
     this.body = body;
     this.id = id;
   }
@@ -36,7 +36,7 @@ public class JSONMessage implements MessageType<Integer, JSONObject> {
   }
 
   @Override
-  public JSONObject getMessage() {
+  public String getMessage() {
     return body;
   }
 
@@ -44,7 +44,7 @@ public class JSONMessage implements MessageType<Integer, JSONObject> {
   public MessageType build(Object messages) {
     String message  =((List<String>)messages).stream().collect(Collectors.joining());
     JSONObject body = new JSONObject(message);
-    return new JSONMessage(body.getInt("id"), body);
+    return new JSONMessage(body.getInt("id"), message);
   }
 
   @Override

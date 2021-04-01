@@ -88,7 +88,7 @@ public class HelperUtil {
     }
   }
 
-  private static Object getJSON(String jsonString, String path){
+  public static Object getJSON(String jsonString, String path){
     DocumentContext docCtx = JsonPath.parse(jsonString);
     JsonPath jsonPath = JsonPath.compile(path);
     Object value =docCtx.read(jsonPath);

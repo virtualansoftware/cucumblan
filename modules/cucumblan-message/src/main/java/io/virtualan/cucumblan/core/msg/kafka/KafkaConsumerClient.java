@@ -5,8 +5,6 @@ import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.message.type.MessageTypeFactory;
 import io.virtualan.cucumblan.props.TopicConfiguration;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -18,20 +16,21 @@ import java.util.logging.Logger;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-public class KafkaClient {
+public class KafkaConsumerClient {
 
-  private final static Logger LOGGER = Logger.getLogger(KafkaClient.class.getName());
+  private final static Logger LOGGER = Logger.getLogger(KafkaConsumerClient.class.getName());
 
   private final KafkaConsumer consumer;
   private final String eventName;
   private List<String> topic;
 
 
-  public KafkaClient(String eventName, String resource) {
+  public KafkaConsumerClient(String eventName, String resource) {
     Properties props = new Properties();
     this.eventName = eventName;
     try {
-      InputStream stream = new FileInputStream(new File("consumer-" + resource + ".properties"));
+      InputStream stream = Thread.currentThread().getContextClassLoader()
+          .getResourceAsStream("consumer-" + resource + ".properties");
       props.load(stream);
     } catch (IOException e) {
       LOGGER.warning("consumer-" + resource + ".properties is not loaded");
@@ -58,10 +57,10 @@ public class KafkaClient {
 
   private List<String> loadTopic(String eventName) {
     String topics = TopicConfiguration.getProperty(eventName);
-    if (topic == null) {
+    if (topics == null) {
       LOGGER.warning(eventName + " - Topic is not configured.");
+      System.exit(1);
     }
-    System.exit(1);
     return Arrays.asList(topics.split(";"));
   }
 
@@ -69,25 +68,33 @@ public class KafkaClient {
     this.topic = loadTopic(eventName);
     consumer.subscribe(this.topic);
     LOGGER.info(" Read Received message: " + topic);
+    int noMessageFound = 0;
     while (true) {
       final ConsumerRecords<String, String>
           consumerRecords = consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
+      if (consumerRecords.count() == 0) {
+        noMessageFound++;
+        if (noMessageFound > 10)
+          // If no message found count is reached to threshold exit loop.
+          break;
+        else
+          continue;
+      }
       consumerRecords.forEach(record -> {
-        LOGGER.info(record.topic() + " topic " + record.key() + " ::: >>> " + record.value());
+        //LOGGER.info(record.topic() + " topic " + record.key().toString() + " ::: >>> " + record.value());
         for (MessageTypeFactory messageType : MessageContext.getMessageTypeFactories()) {
           try {
             MessageType obj = messageType.buildMessage(record, record.key(), record.value());
-            if (eventName.equalsIgnoreCase(obj.getType())) {
-              MessageContext.setEventContextMap(eventName, (String) obj.getId(), obj);
-            }
+            MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
           } catch (MessageNotDefinedException e) {
             LOGGER.warning(record.key() + " is not defined " + e.getMessage());
           }
         }
         consumer.commitAsync();
       });
-      consumer.close();
-      LOGGER.info("DONE");
     }
+    consumer.close();
+    LOGGER.info("DONE");
+
   }
 }

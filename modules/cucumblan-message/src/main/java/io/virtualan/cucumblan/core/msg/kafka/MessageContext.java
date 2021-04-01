@@ -55,6 +55,7 @@ public class MessageContext {
 
   static {
     loadMessageTypeFactories();
+    loadMessageTypes();
   }
 
   private MessageContext() {

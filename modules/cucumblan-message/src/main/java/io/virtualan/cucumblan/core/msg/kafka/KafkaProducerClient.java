@@ -18,7 +18,7 @@ public class KafkaProducerClient {
   public static <T, TT> Producer<T, TT> createProducer(String resource) {
     Properties props = new Properties();
     try {
-      InputStream stream = new FileInputStream(new File("producer-" + resource + ".properties"));
+      InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("producer-" + resource + ".properties");
       props.load(stream);
     } catch (IOException e) {
       log.warn("producer-" + resource + ".properties is not loaded");
@@ -29,7 +29,7 @@ public class KafkaProducerClient {
 
   public static <T, TT> void sendMessage(String resource, String topic, T key, TT msg, Integer partition) {
     ProducerRecord<T, TT> record = null;
-    if (key != null && partition == null) {
+    if (key != null && partition != null) {
       record = new ProducerRecord<T, TT>(topic, partition, key, msg);
     } else if (key != null) {
       record = new ProducerRecord<T, TT>(topic, key, msg);
