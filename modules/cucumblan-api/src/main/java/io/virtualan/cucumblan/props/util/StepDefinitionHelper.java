@@ -14,6 +14,7 @@ import org.json.JSONTokener;
 public class StepDefinitionHelper {
 	private final static Logger LOGGER = Logger.getLogger(StepDefinitionHelper.class.getName());
 
+
 	/**
 	 * Gets actual value.
 	 *
@@ -45,6 +46,26 @@ public class StepDefinitionHelper {
 	}
 
 	/**
+	 * Build json string string.
+	 *
+	 * @param fileName  the file name
+	 * @param jsonInput the json input
+	 * @return the string
+	 * @throws Exception the exception
+	 */
+	public static String buildJsonString(String fileName, String jsonInput) throws Exception {
+		try {
+			JSONTokener tokener = new JSONTokener(jsonInput);
+			JSONObject object = new JSONObject(tokener);
+			return object.toString();
+		} catch (JSONException e) {
+			// Update Later
+			throw new Exception("Validate " + fileName + " has correct Json format?? " + e.getMessage());
+		}
+	}
+
+
+	/**
 	 * Gets object value.
 	 *
 	 * @param value the value
@@ -67,23 +88,5 @@ public class StepDefinitionHelper {
 		}
 	}
 
-	/**
-	 * Build json string string.
-	 *
-	 * @param fileName  the file name
-	 * @param jsonInput the json input
-	 * @return the string
-	 * @throws Exception the exception
-	 */
-	public static String buildJsonString(String fileName, String jsonInput) throws Exception {
-		try {
-			JSONTokener tokener = new JSONTokener(jsonInput);
-			JSONObject object = new JSONObject(tokener);
-			return object.toString();
-		} catch (JSONException e) {
-			// Update Later
-			throw new Exception("Validate " + fileName + " has correct Json format?? " + e.getMessage());
-		}
-	}
 
 }
