@@ -16,6 +16,9 @@ import java.util.logging.Logger;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+/**
+ * The type Kafka consumer client.
+ */
 public class KafkaConsumerClient {
 
   private final static Logger LOGGER = Logger.getLogger(KafkaConsumerClient.class.getName());
@@ -25,6 +28,12 @@ public class KafkaConsumerClient {
   private List<String> topic;
 
 
+  /**
+   * Instantiates a new Kafka consumer client.
+   *
+   * @param eventName the event name
+   * @param resource  the resource
+   */
   public KafkaConsumerClient(String eventName, String resource) {
     Properties props = new Properties();
     this.eventName = eventName;
@@ -39,6 +48,15 @@ public class KafkaConsumerClient {
     consumer = new KafkaConsumer(props);
   }
 
+  /**
+   * Gets event.
+   *
+   * @param eventName  the event name
+   * @param identifier the identifier
+   * @param recheck    the recheck
+   * @return the event
+   * @throws InterruptedException the interrupted exception
+   */
   public static Object getEvent(String eventName, String identifier, int recheck)
       throws InterruptedException {
     if (recheck > 5) {
@@ -64,6 +82,9 @@ public class KafkaConsumerClient {
     return Arrays.asList(topics.split(";"));
   }
 
+  /**
+   * Run.
+   */
   public void run() {
     this.topic = loadTopic(eventName);
     consumer.subscribe(this.topic);

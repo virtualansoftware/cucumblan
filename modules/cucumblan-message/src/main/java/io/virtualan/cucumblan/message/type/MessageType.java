@@ -63,6 +63,7 @@ public interface MessageType<T, TT> {
      */
     Object getMessageAsJson();
 
+
     /**
      * Gets message.
      *

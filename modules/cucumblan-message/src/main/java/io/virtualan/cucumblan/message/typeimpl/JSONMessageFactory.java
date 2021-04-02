@@ -6,8 +6,14 @@ import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.message.type.MessageTypeFactory;
 import org.json.JSONObject;
 
+/**
+ * The type Json message factory.
+ */
 public class JSONMessageFactory implements MessageTypeFactory<Integer, String> {
 
+  /**
+   * Instantiates a new Json message factory.
+   */
   public JSONMessageFactory(){
   }
 

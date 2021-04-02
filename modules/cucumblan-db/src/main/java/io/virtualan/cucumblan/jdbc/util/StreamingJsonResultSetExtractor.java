@@ -16,8 +16,10 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class StreamingJsonResultSetExtractor implements ResultSetExtractor<Void> {
  
   private final OutputStream os;
- 
+
   /**
+   * Instantiates a new Streaming json result set extractor.
+   *
    * @param os the OutputStream to stream the JSON to
    */
   public StreamingJsonResultSetExtractor(final OutputStream os) {

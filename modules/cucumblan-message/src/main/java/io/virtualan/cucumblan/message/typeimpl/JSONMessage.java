@@ -6,15 +6,27 @@ import java.util.stream.Collectors;
 import org.apache.kafka.common.header.Headers;
 import org.json.JSONObject;
 
+/**
+ * The type Json message.
+ */
 public class JSONMessage implements MessageType<Integer, String> {
 
   private String type = "JSON";
   private Integer id;
   private String body;
 
+  /**
+   * Instantiates a new Json message.
+   */
   public JSONMessage() {
   }
 
+  /**
+   * Instantiates a new Json message.
+   *
+   * @param id   the id
+   * @param body the body
+   */
   public JSONMessage(Integer id, String body) {
     this.body = body;
     this.id = id;

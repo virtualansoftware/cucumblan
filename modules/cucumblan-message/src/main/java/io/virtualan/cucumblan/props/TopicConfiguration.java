@@ -18,6 +18,9 @@ public class TopicConfiguration {
     reload();
   }
 
+  /**
+   * Reload.
+   */
   public static  void reload(){
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("topic.properties");
@@ -37,6 +40,8 @@ public class TopicConfiguration {
   /**
    * Gets properties.
    *
+   * @param key   the key
+   * @param value the value
    */
   public static void setProperty(String key, String value) {
     properties.put(key, value);

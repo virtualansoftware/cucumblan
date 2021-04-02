@@ -36,7 +36,6 @@ import org.reflections.scanners.SubTypesScanner;
  *
  * @author Elan Thangamani
  */
-
 @Slf4j
 public class MessageContext {
 
@@ -45,10 +44,20 @@ public class MessageContext {
   private static final List<MessageTypeFactory> messageTypeFactories = new ArrayList<>();
   private static Map<String, Map<String, Object>> messageContext = new HashMap<>();
 
+  /**
+   * Gets message type factories.
+   *
+   * @return the message type factories
+   */
   public static List<MessageTypeFactory> getMessageTypeFactories() {
     return messageTypeFactories;
   }
 
+  /**
+   * Gets message types.
+   *
+   * @return the message types
+   */
   public static Map<String, MessageType> getMessageTypes() {
     return messageTypes;
   }
@@ -110,6 +119,13 @@ public class MessageContext {
     return messageContext != null && !messageContext.isEmpty();
   }
 
+  /**
+   * Gets event context map.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @return the event context map
+   */
   public static Object getEventContextMap(String eventName, String id) {
     Map<String, Object> events = new HashMap<>();
     if (isContains(eventName)) {
@@ -141,6 +157,13 @@ public class MessageContext {
     return messageContext.containsKey(key);
   }
 
+  /**
+   * Sets event context map.
+   *
+   * @param eventName  the event name
+   * @param id         the id
+   * @param jsonobject the jsonobject
+   */
   public static void setEventContextMap(String eventName, String id, Object jsonobject) {
     Map<String, Object> events = new HashMap<>();
     if (isContains(eventName)) {

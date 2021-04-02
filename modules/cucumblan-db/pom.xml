@@ -4,7 +4,7 @@
   <artifactId>cucumblan-db</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-db</name>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.1-SNAPSHOT</version>
   <properties>
     <junit.version>5.5.2</junit.version>
     <mapson.version>1.1.4</mapson.version>

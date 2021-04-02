@@ -46,16 +46,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author Elan Thangamani
  */
-
 public class DBBaseStepDefinition {
 
   private final static Logger LOGGER = Logger.getLogger(DBBaseStepDefinition.class.getName());
+  /**
+   * The Jdbc template map.
+   */
   static Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<String, JdbcTemplate>();
 
   static {
     loadAllDataSource();
   }
 
+  /**
+   * The Scenario.
+   */
   Scenario scenario;
 
   private static void loadAllDataSource() {
@@ -86,11 +91,24 @@ public class DBBaseStepDefinition {
     }
   }
 
+  /**
+   * Before.
+   *
+   * @param scenario the scenario
+   */
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
   }
 
+  /**
+   * Insert sql.
+   *
+   * @param dummy    the dummy
+   * @param resource the resource
+   * @param sqls     the sqls
+   * @throws Exception the exception
+   */
   @Given("perform a (.*) DDL sql on (.*)$")
   @Given("update the given sql for (.*) on (.*)$")
   @Given("delete the given sql for (.*) on (.*)$")
@@ -119,6 +137,15 @@ public class DBBaseStepDefinition {
   }
 
 
+  /**
+   * Verify.
+   *
+   * @param dummy1    the dummy 1
+   * @param dummy     the dummy
+   * @param resource  the resource
+   * @param selectSql the select sql
+   * @throws Exception the exception
+   */
   @Given("verify (.*) with the given sql for (.*) on (.*)$")
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {

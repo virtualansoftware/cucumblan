@@ -11,6 +11,9 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 
+/**
+ * The type Helper util.
+ */
 @Slf4j
 public class HelperUtil {
 
@@ -34,6 +37,12 @@ public class HelperUtil {
     }
   }
 
+  /**
+   * Read file as string string.
+   *
+   * @param fileBody the file body
+   * @return the string
+   */
   public static String readFileAsString(String fileBody) {
     String body = null;
     InputStream stream = Thread.currentThread().getContextClassLoader()
@@ -51,6 +60,13 @@ public class HelperUtil {
   }
 
 
+  /**
+   * Assert xml equals.
+   *
+   * @param expectedXML the expected xml
+   * @param actualXML   the actual xml
+   * @throws Exception the exception
+   */
   public static void assertXMLEquals(String expectedXML, String actualXML) throws Exception {
     XMLUnit.setIgnoreWhitespace(true);
     XMLUnit.setIgnoreAttributeOrder(true);

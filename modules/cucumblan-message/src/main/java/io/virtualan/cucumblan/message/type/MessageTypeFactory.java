@@ -25,21 +25,32 @@ import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 /**
  * The interface Message type.
  *
+ * @param <T>  the type parameter
+ * @param <TT> the type parameter
  * @author Elan Thangmani
  */
-
 public interface  MessageTypeFactory<T, TT> {
-    /**
-     * Build message message type.
-     *
-     * @param record   the key
-     * @param key   the key
-     * @param value the value
-     * @return the message type
-     */
 
-     MessageType buildMessage(Object record, T key, TT value) throws MessageNotDefinedException;
+  /**
+   * Build message message type.
+   *
+   * @param record the key
+   * @param key    the key
+   * @param value  the value
+   * @return the message type
+   * @throws MessageNotDefinedException the message not defined exception
+   */
+  MessageType buildMessage(Object record, T key, TT value) throws MessageNotDefinedException;
 
-     MessageType buildMessageType(String type, T key, TT value) throws MessageNotDefinedException;
+  /**
+   * Build message type message type.
+   *
+   * @param type  the type
+   * @param key   the key
+   * @param value the value
+   * @return the message type
+   * @throws MessageNotDefinedException the message not defined exception
+   */
+  MessageType buildMessageType(String type, T key, TT value) throws MessageNotDefinedException;
 
 }

@@ -48,18 +48,31 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  *
  * @author Elan Thangamani
  */
-
 @Slf4j
 public class MsgBaseStepDefinition {
 
   private Scenario scenario;
 
+  /**
+   * Before.
+   *
+   * @param scenario the scenario
+   */
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
   }
 
 
+  /**
+   * Produce message with partition.
+   *
+   * @param eventName the event name
+   * @param partition the partition
+   * @param resource  the resource
+   * @param type      the type
+   * @param messages  the messages
+   */
   @Given("send message event (.*) in partition (.*) on the (.*) with type (.*)$")
   public void produceMessageWithPartition(String eventName, Integer partition, String resource,
       String type, List<String> messages) {
@@ -72,6 +85,14 @@ public class MsgBaseStepDefinition {
             partition);
   }
 
+  /**
+   * Produce message.
+   *
+   * @param eventName the event name
+   * @param resource  the resource
+   * @param type      the type
+   * @param messages  the messages
+   */
   @Given("send message event (.*) on the (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
       List<String> messages) {
@@ -90,6 +111,16 @@ public class MsgBaseStepDefinition {
     }
   }
 
+  /**
+   * Verify consumed json object.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @param resource  the resource
+   * @param csvson    the csvson
+   * @throws InterruptedException  the interrupted exception
+   * @throws BadInputDataException the bad input data exception
+   */
   @Given("verify (.*) contains (.*) on the (.*)$")
   public void verifyConsumedJSONObject(String eventName, String id, String resource,
       List<String> csvson)
@@ -112,6 +143,15 @@ public class MsgBaseStepDefinition {
     }
   }
 
+  /**
+   * Consume message.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @param resource  the resource
+   * @param keyValue  the key value
+   * @throws InterruptedException the interrupted exception
+   */
   @Given("verify-by-elements (.*) contains (.*) on the (.*)$")
   public void consumeMessage(String eventName, String id, String resource,
       Map<String, String> keyValue)
