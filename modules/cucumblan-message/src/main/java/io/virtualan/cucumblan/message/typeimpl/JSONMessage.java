@@ -41,6 +41,11 @@ public class JSONMessage implements MessageType<Integer, String> {
   }
 
   @Override
+  public JSONObject getMessageAsJson() {
+    return new JSONObject(body);
+  }
+
+  @Override
   public MessageType build(Object messages) {
     String message  =((List<String>)messages).stream().collect(Collectors.joining());
     JSONObject body = new JSONObject(message);

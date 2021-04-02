@@ -94,19 +94,15 @@ public class MsgBaseStepDefinition {
   public void verifyConsumedJSONObject(String eventName, String id, String resource,
       List<String> csvson)
       throws InterruptedException, BadInputDataException {
-    KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
-    client.run();
-    int recheck = 5;
-    Object expectedJson = MessageContext.getEventContextMap(eventName, id);
-    if (expectedJson == null) {
-      expectedJson = KafkaConsumerClient.getEvent(eventName, id, recheck);
-    }
+    MessageType expectedJson = getTypeObject(eventName, id,resource);
     if (expectedJson != null) {
-      scenario.attach(expectedJson.toString(), "application/json", "verifyConsumedJSONObject");
+      scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
+          "verifyConsumedJSONObject");
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext());
-      if (expectedJson instanceof JSONObject) {
-        JSONAssert.assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson,
-            JSONCompareMode.LENIENT);
+      if (expectedJson.getMessageAsJson() instanceof JSONObject) {
+        JSONAssert
+            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson.getMessageAsJson(),
+                JSONCompareMode.LENIENT);
       } else {
         JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
       }
@@ -120,25 +116,33 @@ public class MsgBaseStepDefinition {
   public void consumeMessage(String eventName, String id, String resource,
       Map<String, String> keyValue)
       throws InterruptedException {
-    KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
-    client.run();
-    int recheck = 5;
-    MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
-    if (expectedJson == null) {
-      expectedJson = (MessageType) KafkaConsumerClient.getEvent(eventName, id, recheck);
-    }
+    MessageType expectedJson = getTypeObject(eventName, id,resource);
     if (expectedJson != null) {
-      scenario.attach(expectedJson.getMessage().toString(), "application/json", "verifyConsumedJSONObject");
+      scenario.attach(expectedJson.getMessage().toString(), "application/json",
+          "verifyConsumedJSONObject");
       MessageType finalExpectedJson = expectedJson;
       keyValue.forEach((k, v) -> {
-        Object value = MsgHelper.getJSON(finalExpectedJson.getMessage().toString(), k);
-        Assertions.assertEquals(StepDefinitionHelper.getActualValue((String) v),
+        Object value = MsgHelper.getJSON(finalExpectedJson.getMessageAsJson().toString(), k);
+        Assertions.assertEquals(
+            StepDefinitionHelper.getObjectValue(StepDefinitionHelper.getActualValue((String) v)),
             value, k + " is not failed.");
       });
     } else {
       Assertions.assertTrue(false,
           " Unable to read event name (" + eventName + ") with identifier : " + id);
     }
+  }
+
+  private MessageType getTypeObject(String eventName, String id, String resource)
+      throws InterruptedException {
+    MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
+    int recheck = 5;
+    if (expectedJson == null) {
+      KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
+      client.run();
+      expectedJson = (MessageType) KafkaConsumerClient.getEvent(eventName, id, recheck);
+    }
+    return expectedJson;
   }
 
 }

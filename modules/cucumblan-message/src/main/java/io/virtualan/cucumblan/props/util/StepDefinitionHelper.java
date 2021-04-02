@@ -43,6 +43,22 @@ public class StepDefinitionHelper {
 		}
 		return returnValue;
 	}
+	public static Object getObjectValue(Object value) {
+		String[] arrayValue = value.toString().split("~");
+		if ("i".equals(arrayValue[0])) {
+			return Integer.parseInt(arrayValue[1]);
+		} else if ("b".equals(arrayValue[0])) {
+			return Boolean.parseBoolean(arrayValue[1]);
+		} else if ("d".equals(arrayValue[0])) {
+			return Double.parseDouble(arrayValue[1]);
+		} else if ("l".equals(arrayValue[0])) {
+			return Long.parseLong(arrayValue[1]);
+		} else if ("f".equals(arrayValue[0])) {
+			return Float.parseFloat(arrayValue[1]);
+		} else {
+			return value.toString();
+		}
+	}
 
   /**
    * Build json string string.

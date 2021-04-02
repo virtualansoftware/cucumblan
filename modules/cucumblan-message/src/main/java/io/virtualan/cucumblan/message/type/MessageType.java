@@ -22,6 +22,7 @@ package io.virtualan.cucumblan.message.type;
 
 import java.util.List;
 import org.apache.kafka.common.header.Headers;
+import org.json.JSONObject;
 
 /**
  * The interface Message type.
@@ -53,6 +54,14 @@ public interface MessageType<T, TT> {
      * @return the message
      */
     TT getMessage();
+
+
+    /**
+     * Gets message.
+     *
+     * @return the message
+     */
+    Object getMessageAsJson();
 
     /**
      * Gets message.
