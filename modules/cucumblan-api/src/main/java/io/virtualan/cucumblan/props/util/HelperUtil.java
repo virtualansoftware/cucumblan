@@ -1,15 +1,22 @@
 package io.virtualan.cucumblan.props.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
+import io.virtualan.cucumblan.props.ExcludeConfiguration;
 import io.virtualan.jassert.VirtualJSONAssert;
+import io.virtualan.mapson.Mapson;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -81,11 +88,34 @@ public class HelperUtil {
     }
   }
 
-  private static Object getJSON(String jsonString, String path){
+  public static Object getJSON(String jsonString, String path){
     DocumentContext docCtx = JsonPath.parse(jsonString);
     JsonPath jsonPath = JsonPath.compile(path);
     Object value =docCtx.read(jsonPath);
     return value;
+  }
+
+  public static  void assertJSONObject(String resource, String jsonRequestExpected, String jsonRequestActual){
+    if (jsonRequestExpected != null && jsonRequestActual != null) {
+      Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
+      Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestActual);
+      mapsonExpected.forEach((k, v) -> {
+        if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
+          if (v == null) {
+            if (mapson.get(k) == null) {
+              assertNull(mapson.get(k));
+            } else {
+              assertEquals(" ", mapson.get(k));
+            }
+          } else {
+            assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
+                v, mapson.get(k));
+          }
+        }
+      });
+    } else {
+      assertTrue("JSON missing in the expected or actual  ", false);
+    }
   }
 
   public static void assertJsonpathEqual(List<String> jsonPath, String expectedjson, String actualjson) {

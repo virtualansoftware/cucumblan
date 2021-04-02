@@ -37,7 +37,7 @@ public class ReadTextActionImpl implements Action {
      */
     @Override
     public String getType() {
-        return "GET_TEXT";
+        return "GET_DATA";
     }
 
     /**

@@ -3,15 +3,16 @@ package io.virtualan.cucumblan.props;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
-import lombok.extern.slf4j.Slf4j;
+import java.util.logging.Logger;
 
 /**
  * The type Application configuration.
  *
  * @author Elan Thangamani
  */
-@Slf4j
 public class ApplicationConfiguration {
+  private final static Logger LOGGER = Logger.getLogger(ApplicationConfiguration.class.getName());
+
   private static Properties properties = new Properties();
   static {
     reload();
@@ -26,10 +27,10 @@ public class ApplicationConfiguration {
       if(stream != null) {
         properties.load(stream);
       } else {
-        log.warn("unable to load cucumblan.properties");
+        LOGGER.warning("unable to load cucumblan.properties");
       }
     } catch (Exception e) {
-      log.warn("cucumblan.properties not found");
+      LOGGER.warning("cucumblan.properties not found");
     }
   }
 
@@ -56,9 +57,41 @@ public class ApplicationConfiguration {
    *
    * @return the property
    */
+  public static boolean isProdMode() {
+    return properties.getProperty("prod-mode") != null ?
+        properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
+  }
+
+
+  /**
+   * Gets property.
+   *
+   * @return the property
+   */
   public static String getStandardPackage() {
     return properties.getProperty("standard-package") != null ?
         properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
+  }
+  /**
+
+   /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static String getMessageTypePackage() {
+    return properties.getProperty("message-package") != null ?
+        properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
+  }
+
+  /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static String getActionPackage() {
+    return properties.getProperty("action-package") != null ?
+        properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
   }
   /**
 

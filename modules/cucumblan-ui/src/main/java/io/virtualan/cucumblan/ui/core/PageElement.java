@@ -21,22 +21,28 @@ package io.virtualan.cucumblan.ui.core;
 
 /**
  * The type Page element.
+ *
  * @author Elan Thangamani
- **/
+ */
 public class PageElement {
 
   /**
    * The Page element name.
    */
-  String pageElementName;
+  String name;
   /**
    * The Page element action.
    */
-  String pageElementAction;
+  String action;
   /**
    * The Page element x path.
    */
-  String pageElementXPath;
+  String xPath;
+
+  /**
+   * The Page element x path.
+   */
+  String type;
 
   /**
    * Instantiates a new Page element.
@@ -44,12 +50,15 @@ public class PageElement {
    * @param pageElementName   the page element name
    * @param pageElementAction the page element action
    * @param pageElementXPath  the page element x path
+   * @param type              the type
    */
-  public PageElement(String pageElementName, String pageElementAction, String pageElementXPath) {
+  public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
+      String type) {
     super();
-    this.pageElementName = pageElementName;
-    this.pageElementAction = pageElementAction;
-    this.pageElementXPath = pageElementXPath;
+    this.name = pageElementName;
+    this.action = pageElementAction;
+    this.xPath = pageElementXPath;
+    this.type = type;
   }
 
   /**
@@ -57,17 +66,36 @@ public class PageElement {
    *
    * @return the page element name
    */
-  public String getPageElementName() {
-    return pageElementName;
+  public String getName() {
+    return name;
+  }
+
+
+  /**
+   * Gets type.
+   *
+   * @return the type
+   */
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Sets type.
+   *
+   * @param type the type
+   */
+  public void setType(String type) {
+    this.type = type;
   }
 
   /**
    * Sets page element name.
    *
-   * @param pageElementName the page element name
+   * @param name the page element name
    */
-  public void setPageElementName(String pageElementName) {
-    this.pageElementName = pageElementName;
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
@@ -75,17 +103,17 @@ public class PageElement {
    *
    * @return the page element action
    */
-  public String getPageElementAction() {
-    return pageElementAction;
+  public String getAction() {
+    return action;
   }
 
   /**
    * Sets page element sction.
    *
-   * @param pageElementAction the page element action
+   * @param action the page element action
    */
-  public void setPageElementSction(String pageElementAction) {
-    this.pageElementAction = pageElementAction;
+  public void setAction(String action) {
+    this.action = action;
   }
 
   /**
@@ -93,17 +121,26 @@ public class PageElement {
    *
    * @return the page element x path
    */
-  public String getPageElementXPath() {
-    return pageElementXPath;
+  public String getXPath() {
+    return xPath;
   }
 
   /**
    * Sets page element x path.
    *
-   * @param pageElementXPath the page element x path
+   * @param xPath the page element x path
    */
-  public void setPageElementXPath(String pageElementXPath) {
-    this.pageElementXPath = pageElementXPath;
+  public void setXPath(String xPath) {
+    this.xPath = xPath;
   }
 
+  @Override
+  public String toString() {
+    return "PageElement{" +
+        "pageElementName='" + name + '\'' +
+        ", pageElementAction='" + action + '\'' +
+        ", pageElementXPath='" + xPath + '\'' +
+        ", pageElementType'" + type + '\'' +
+        '}';
+  }
 }

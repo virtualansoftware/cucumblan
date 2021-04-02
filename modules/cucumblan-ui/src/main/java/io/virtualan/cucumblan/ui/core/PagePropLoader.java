@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 /**
@@ -47,7 +48,7 @@ public class PagePropLoader {
    * @throws IOException the io exception
    */
   public static Map<String, PageElement> readPageElement(String resource, String fileName) throws IOException {
-    Map<String, PageElement> pageMap = new LinkedHashMap<String, PageElement>();
+    Map<String, PageElement> pageMap = new TreeMap<>();
     InputStream inputStream = null;
     prop = new Properties();
     String propFileName = "pages/"+resource+"/"+fileName + ".page";
@@ -56,8 +57,8 @@ public class PagePropLoader {
       if(inputStream != null) {
         prop.load(inputStream);
         for (Entry<Object, Object> p : prop.entrySet()) {
-          String[] page = ((String) p.getValue()).split(",");
-          pageMap.put(p.getKey().toString(), new PageElement(page[0], page[1], page[2]));
+          String[] page = ((String) p.getValue()).split("<~~>");
+          pageMap.put(p.getKey().toString(), new PageElement(page[0], page[1], page[2], page[3]));
         }
       } else {
         LOGGER.warning("propFileName is not found >>> " + propFileName );

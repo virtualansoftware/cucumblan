@@ -91,13 +91,9 @@ public class DBBaseStepDefinition {
     this.scenario = scenario;
   }
 
-  @Given("As a sql (.*) user on (.*)$")
-  public void startSql(String dummy, String resource) {
-    //ignore
-
-  }
-
-
+  @Given("perform a (.*) DDL sql on (.*)$")
+  @Given("update the given sql for (.*) on (.*)$")
+  @Given("delete the given sql for (.*) on (.*)$")
   @Given("insert the given sql for (.*) on (.*)$")
   public void insertSql(String dummy, String resource, List<String> sqls) throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
@@ -105,9 +101,9 @@ public class DBBaseStepDefinition {
       try {
         jdbcTemplate.execute(sql);
       } catch (Exception e) {
-        LOGGER.warning("Unable to load this sqls " + sql + " : " + e.getMessage());
-        scenario.log("Unable to load this sqls " + sql + " : " + e.getMessage());
-        Assert.assertTrue("  sqls are not inserted : (" + e.getMessage() + ")", false);
+        LOGGER.warning("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
+        scenario.log("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
+        Assert.assertTrue(dummy+"  sqls are not inserted : (" + e.getMessage() + ")", false);
       }
     }
     Assert.assertTrue(" All sqls are inserted successfully ", true);
@@ -122,39 +118,9 @@ public class DBBaseStepDefinition {
     }
   }
 
-  @Given("update the given sql for (.*) on (.*)$")
-  public void updateSql(String dummy, String resource, List<String> sqls) throws Exception {
-    JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    for (String sql : sqls) {
-      try {
-        jdbcTemplate.execute(sql);
-      } catch (Exception e) {
-        LOGGER.warning("Unable to load this sqls " + sql + " : " + e.getMessage());
-        scenario.log("Unable to load this sqls " + sql + " : " + e.getMessage());
-        Assert.assertTrue("  sqls are not updated : (" + e.getMessage() + ")", false);
-      }
-    }
-    Assert.assertTrue(" All sqls are updated successfully ", true);
-  }
 
-
-  @Given("delete the given sql for (.*) on (.*)$")
-  public void deleteSql(String dummy, String resource, List<String> sqls) throws Exception {
-    JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    for (String sql : sqls) {
-      try {
-        jdbcTemplate.execute(sql);
-      } catch (Exception e) {
-        LOGGER.warning("Unable to load this sqls " + sql + " : " + e.getMessage());
-        scenario.log("Unable to load this sqls " + sql + " : " + e.getMessage());
-        Assert.assertTrue("  sqls are not deleted : (" + e.getMessage() + ")", false);
-      }
-    }
-    Assert.assertTrue(" All sqls are deleted successfully ", true);
-  }
-
-  @Given("select the given sql for (.*) on (.*)$")
-  public void verify(String dummy, String resource, List<String> selectSql)
+  @Given("verify (.*) with the given sql for (.*) on (.*)$")
+  public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
     String json = null;
