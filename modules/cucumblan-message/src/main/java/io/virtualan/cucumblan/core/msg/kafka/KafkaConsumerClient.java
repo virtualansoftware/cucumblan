@@ -74,7 +74,7 @@ public class KafkaConsumerClient {
           consumerRecords = consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
       if (consumerRecords.count() == 0) {
         noMessageFound++;
-        if (noMessageFound > 10)
+        if (noMessageFound > 25)
           // If no message found count is reached to threshold exit loop.
           break;
         else
