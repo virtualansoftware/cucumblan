@@ -78,6 +78,8 @@
 			<modules>
 				<module>samples/cucumblan-apitesting</module>
 				<module>samples/cucumblan-uitesting</module>
+				<module>samples/cucumblan-lakesidemutual-uitesting</module>
+				<module>samples/cucumblan-message-testing</module>
 				<module>samples/cucumblan-soapapitesting</module>
 			</modules>
 		</profile>

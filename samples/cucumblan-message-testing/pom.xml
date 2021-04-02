@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.virtualan</groupId>
-  <artifactId>cucumblan-message</artifactId>
+  <artifactId>cucumblan-message-testing</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>cucumblan-message</name>
+  <name>cucumblan-message-testing</name>
   <properties>
     <mapson.version>1.1.4</mapson.version>
     <kafka-clients.version>2.7.0</kafka-clients.version>
@@ -127,7 +127,11 @@
       <artifactId>kafka-clients</artifactId>
       <version>${kafka-clients.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>cucumblan-message</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
@@ -164,5 +168,12 @@
       <artifactId>json-path</artifactId>
       <version>2.5.0</version>
     </dependency>
+    <dependency>
+      <groupId>net.mguenther.kafka</groupId>
+      <artifactId>kafka-junit</artifactId>
+      <version>2.7.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 </project>
