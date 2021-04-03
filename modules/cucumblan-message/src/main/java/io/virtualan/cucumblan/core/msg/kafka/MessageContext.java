@@ -44,6 +44,14 @@ public class MessageContext {
   private static final List<MessageTypeFactory> messageTypeFactories = new ArrayList<>();
   private static Map<String, Map<String, Object>> messageContext = new HashMap<>();
 
+  static {
+    loadMessageTypeFactories();
+    loadMessageTypes();
+  }
+
+  private MessageContext() {
+  }
+
   /**
    * Gets message type factories.
    *
@@ -60,14 +68,6 @@ public class MessageContext {
    */
   public static Map<String, MessageType> getMessageTypes() {
     return messageTypes;
-  }
-
-  static {
-    loadMessageTypeFactories();
-    loadMessageTypes();
-  }
-
-  private MessageContext() {
   }
 
   /**
@@ -104,7 +104,8 @@ public class MessageContext {
         messageType = x.newInstance();
         messageTypeFactories.add(messageType);
       } catch (InstantiationException | IllegalAccessException e) {
-        log.warn("Unable to process this Message Type Factories (" + x.getName() + ") class: " + messageType);
+        log.warn("Unable to process this Message Type Factories (" + x.getName() + ") class: "
+            + messageType);
       }
     });
   }
@@ -127,15 +128,32 @@ public class MessageContext {
    * @return the event context map
    */
   public static Object getEventContextMap(String eventName, String id) {
-    Map<String, Object> events = new HashMap<>();
     if (isContains(eventName)) {
-      events = messageContext.get(eventName);
-      if (events.containsKey(id)) {
+      Map<String, Object> events = messageContext.get(eventName);
+      if (events != null && events.containsKey(id)) {
         return events.get(id);
       }
     }
     return null;
   }
+
+  /**
+   * Gets event context map.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @return the event context map
+   */
+  public static boolean isEventContextMap(String eventName, String id) {
+    if (isContains(eventName)) {
+      Map<String, Object> events = messageContext.get(eventName);
+      if (events != null && events.containsKey(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   /**
    * Gets context.

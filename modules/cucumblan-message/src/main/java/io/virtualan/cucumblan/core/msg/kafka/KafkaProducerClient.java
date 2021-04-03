@@ -1,7 +1,6 @@
 package io.virtualan.cucumblan.core.msg.kafka;
 
-import java.io.File;
-import java.io.FileInputStream;
+import io.cucumber.java.an.E;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -29,7 +28,8 @@ public class KafkaProducerClient {
   public static <T, TT> Producer<T, TT> createProducer(String resource) {
     Properties props = new Properties();
     try {
-      InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("producer-" + resource + ".properties");
+      InputStream stream = Thread.currentThread().getContextClassLoader()
+          .getResourceAsStream("producer-" + resource + ".properties");
       props.load(stream);
     } catch (IOException e) {
       log.warn("producer-" + resource + ".properties is not loaded");
@@ -49,7 +49,8 @@ public class KafkaProducerClient {
    * @param msg       the msg
    * @param partition the partition
    */
-  public static <T, TT> void sendMessage(String resource, String topic, T key, TT msg, Integer partition) {
+  public static <T, TT> void sendMessage(String resource, String topic, T key, TT msg,
+      Integer partition) {
     ProducerRecord<T, TT> record = null;
     if (key != null && partition != null) {
       record = new ProducerRecord<T, TT>(topic, partition, key, msg);
@@ -58,12 +59,18 @@ public class KafkaProducerClient {
     } else {
       record = new ProducerRecord<T, TT>(topic, msg);
     }
+    Producer<T, TT> producer = null;
     try {
-      RecordMetadata metadata = createProducer(resource).send(
-          (ProducerRecord<Object, Object>) record).get();
+      producer = createProducer(resource);
+      RecordMetadata metadata = producer.send((ProducerRecord<T, TT>) record).get();
       log.info(metadata.topic() + " message posted successfully ");
     } catch (Exception e) {
       log.error("Error in sending record " + e.getMessage());
+    } finally {
+      if (producer != null){
+        producer.flush();
+        producer.close();
+      }
     }
   }
 

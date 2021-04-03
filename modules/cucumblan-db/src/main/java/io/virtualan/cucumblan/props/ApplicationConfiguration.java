@@ -127,4 +127,9 @@ public class ApplicationConfiguration {
     return properties.getProperty(keyName);
   }
 
+
+  public static int getMessageCount() {
+    return properties.getProperty("wait-message-count") != null ?
+        Integer.parseInt(properties.getProperty("wait-message-count")) : 2;
+  }
 }

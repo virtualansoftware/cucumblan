@@ -18,6 +18,7 @@ public class ApplicationConfiguration {
     reload();
   }
 
+
   public static  void reload(){
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cucumblan.properties");
@@ -127,4 +128,8 @@ public class ApplicationConfiguration {
     return properties.getProperty(keyName);
   }
 
+  public static int getMessageCount() {
+    return properties.getProperty("wait-message-count") != null ?
+        Integer.parseInt(properties.getProperty("wait-message-count")) : 2;
+  }
 }

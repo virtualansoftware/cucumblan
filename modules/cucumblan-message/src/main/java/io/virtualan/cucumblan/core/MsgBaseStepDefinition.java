@@ -85,14 +85,18 @@ public class MsgBaseStepDefinition {
             partition);
   }
 
-  /**
-   * Produce message.
-   *
-   * @param eventName the event name
-   * @param resource  the resource
-   * @param type      the type
-   * @param messages  the messages
-   */
+  @Given("pause message process for (.*) milliseconds$")
+  public void produceMessage(long sleep ) throws InterruptedException {
+      Thread.sleep(sleep);
+  }
+      /**
+       * Produce message.
+       *
+       * @param eventName the event name
+       * @param resource  the resource
+       * @param type      the type
+       * @param messages  the messages
+       */
   @Given("send message event (.*) on the (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
       List<String> messages) {
@@ -125,7 +129,8 @@ public class MsgBaseStepDefinition {
   public void verifyConsumedJSONObject(String eventName, String id, String resource,
       List<String> csvson)
       throws InterruptedException, BadInputDataException {
-    MessageType expectedJson = getTypeObject(eventName, id,resource);
+    int recheck = 0;
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id,resource, recheck);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
           "verifyConsumedJSONObject");
@@ -156,7 +161,8 @@ public class MsgBaseStepDefinition {
   public void consumeMessage(String eventName, String id, String resource,
       Map<String, String> keyValue)
       throws InterruptedException {
-    MessageType expectedJson = getTypeObject(eventName, id,resource);
+    int recheck =0;
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id,resource, recheck);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessage().toString(), "application/json",
           "verifyConsumedJSONObject");
@@ -173,16 +179,5 @@ public class MsgBaseStepDefinition {
     }
   }
 
-  private MessageType getTypeObject(String eventName, String id, String resource)
-      throws InterruptedException {
-    MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
-    int recheck = 5;
-    if (expectedJson == null) {
-      KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
-      client.run();
-      expectedJson = (MessageType) KafkaConsumerClient.getEvent(eventName, id, recheck);
-    }
-    return expectedJson;
-  }
 
 }

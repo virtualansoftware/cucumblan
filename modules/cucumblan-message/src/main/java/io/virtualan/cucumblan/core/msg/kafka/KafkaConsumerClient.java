@@ -3,8 +3,8 @@ package io.virtualan.cucumblan.core.msg.kafka;
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.message.type.MessageTypeFactory;
+import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.TopicConfiguration;
-import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
@@ -48,30 +49,20 @@ public class KafkaConsumerClient {
     consumer = new KafkaConsumer(props);
   }
 
-  /**
-   * Gets event.
-   *
-   * @param eventName  the event name
-   * @param identifier the identifier
-   * @param recheck    the recheck
-   * @return the event
-   * @throws InterruptedException the interrupted exception
-   */
-  public static Object getEvent(String eventName, String identifier, int recheck)
+
+  public static MessageType getEvent(String eventName, String id, String resource, int recheck)
       throws InterruptedException {
-    if (recheck > 5) {
-      return null;
+    MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
+    recheck = recheck + 1;
+    if (recheck == 5 || expectedJson != null) {
+      return expectedJson;
     }
     Thread.sleep(1000);
-    Object object = StepDefinitionHelper.getActualValue(identifier) != null ?
-        StepDefinitionHelper.getActualValue(identifier) : identifier;
-    Object event = MessageContext.getEventContextMap(eventName, object.toString());
-    if (event != null) {
-      return event;
-    } else {
-      return getEvent(eventName, identifier, recheck++);
-    }
+    KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
+    client.run(eventName, id);
+    return (MessageType) getEvent(eventName, id, resource, recheck);
   }
+
 
   private List<String> loadTopic(String eventName) {
     String topics = TopicConfiguration.getProperty(eventName);
@@ -85,37 +76,55 @@ public class KafkaConsumerClient {
   /**
    * Run.
    */
-  public void run() {
+  public void run(String currentEventName, String id) {
     this.topic = loadTopic(eventName);
     consumer.subscribe(this.topic);
     LOGGER.info(" Read Received message: " + topic);
     int noMessageFound = 0;
-    while (true) {
-      final ConsumerRecords<String, String>
-          consumerRecords = consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
-      if (consumerRecords.count() == 0) {
-        noMessageFound++;
-        if (noMessageFound > 25)
-          // If no message found count is reached to threshold exit loop.
+    ConsumerRecords<Object, Object>
+        consumerRecords = null;
+    try {
+      while (true) {
+
+        boolean isMessageReceived = MessageContext.isEventContextMap(currentEventName, id);
+        if (isMessageReceived) {
           break;
-        else
-          continue;
-      }
-      consumerRecords.forEach(record -> {
-        //LOGGER.info(record.topic() + " topic " + record.key().toString() + " ::: >>> " + record.value());
-        for (MessageTypeFactory messageType : MessageContext.getMessageTypeFactories()) {
-          try {
-            MessageType obj = messageType.buildMessage(record, record.key(), record.value());
-            MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
-          } catch (MessageNotDefinedException e) {
-            LOGGER.warning(record.key() + " is not defined " + e.getMessage());
+        }
+        consumerRecords = consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
+
+        if (consumerRecords.count() == 0) {
+          noMessageFound++;
+          if (noMessageFound > ApplicationConfiguration.getMessageCount() || isMessageReceived)
+          // If no message found count is reached to threshold exit loop.
+          {
+            break;
+          } else {
+            continue;
           }
         }
-        consumer.commitAsync();
-      });
+        consumerRecords.forEach(record -> {
+          getMessageType(record);
+          consumer.commitAsync();
+        });
+      }
+    }finally {
+      if(consumer != null)
+      consumer.close();
     }
-    consumer.close();
     LOGGER.info("DONE");
 
+  }
+
+  private boolean getMessageType(ConsumerRecord<Object, Object> record) {
+    for (MessageTypeFactory messageType : MessageContext.getMessageTypeFactories()) {
+      try {
+        MessageType obj = messageType.buildMessage(record, record.key(), record.value());
+        MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
+        return true;
+      } catch (MessageNotDefinedException e) {
+        LOGGER.warning(record.key() + " is not defined " + e.getMessage());
+      }
+    }
+    return false;
   }
 }
