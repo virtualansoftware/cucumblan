@@ -20,11 +20,8 @@
 package io.virtualan.cucumblan.core.msg.kafka;
 
 import io.virtualan.cucumblan.message.type.MessageType;
-import io.virtualan.cucumblan.message.type.MessageTypeFactory;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -36,33 +33,32 @@ import org.reflections.scanners.SubTypesScanner;
  *
  * @author Elan Thangamani
  */
-
 @Slf4j
 public class MessageContext {
 
 
   private static final Map<String, MessageType> messageTypes = new HashMap<>();
-  private static final List<MessageTypeFactory> messageTypeFactories = new ArrayList<>();
   private static Map<String, Map<String, Object>> messageContext = new HashMap<>();
 
-  public static List<MessageTypeFactory> getMessageTypeFactories() {
-    return messageTypeFactories;
-  }
-
-  public static Map<String, MessageType> getMessageTypes() {
-    return messageTypes;
-  }
-
   static {
-    loadMessageTypeFactories();
     loadMessageTypes();
   }
 
   private MessageContext() {
   }
 
+
   /**
-   * Load MessageType processors.
+   * Gets message types.
+   *
+   * @return the message types
+   */
+  public static Map<String, MessageType> getMessageTypes() {
+    return messageTypes;
+  }
+
+  /**
+   * Produce message to Load MessageType processors.
    */
   private static void loadMessageTypes() {
     Reflections reflections = new Reflections(ApplicationConfiguration.getMessageTypePackage(),
@@ -82,26 +78,6 @@ public class MessageContext {
 
 
   /**
-   * Load MessageType processors.
-   */
-  private static void loadMessageTypeFactories() {
-    Reflections reflections = new Reflections(ApplicationConfiguration.getMessageTypePackage(),
-        new SubTypesScanner(false));
-    Set<Class<? extends MessageTypeFactory>> buildInClasses = reflections
-        .getSubTypesOf(MessageTypeFactory.class);
-    buildInClasses.forEach(x -> {
-      MessageTypeFactory messageType = null;
-      try {
-        messageType = x.newInstance();
-        messageTypeFactories.add(messageType);
-      } catch (InstantiationException | IllegalAccessException e) {
-        log.warn("Unable to process this Message Type Factories (" + x.getName() + ") class: " + messageType);
-      }
-    });
-  }
-
-
-  /**
    * Has context values boolean.
    *
    * @return the boolean
@@ -110,16 +86,40 @@ public class MessageContext {
     return messageContext != null && !messageContext.isEmpty();
   }
 
+  /**
+   * Gets event context map.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @return the event context map
+   */
   public static Object getEventContextMap(String eventName, String id) {
-    Map<String, Object> events = new HashMap<>();
     if (isContains(eventName)) {
-      events = messageContext.get(eventName);
-      if (events.containsKey(id)) {
+      Map<String, Object> events = messageContext.get(eventName);
+      if (events != null && events.containsKey(id)) {
         return events.get(id);
       }
     }
     return null;
   }
+
+  /**
+   * Gets event context map.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @return the event context map
+   */
+  public static boolean isEventContextMap(String eventName, String id) {
+    if (isContains(eventName)) {
+      Map<String, Object> events = messageContext.get(eventName);
+      if (events != null && events.containsKey(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   /**
    * Gets context.
@@ -141,6 +141,13 @@ public class MessageContext {
     return messageContext.containsKey(key);
   }
 
+  /**
+   * Sets event context map.
+   *
+   * @param eventName  the event name
+   * @param id         the id
+   * @param jsonobject the jsonobject
+   */
   public static void setEventContextMap(String eventName, String id, Object jsonobject) {
     Map<String, Object> events = new HashMap<>();
     if (isContains(eventName)) {
