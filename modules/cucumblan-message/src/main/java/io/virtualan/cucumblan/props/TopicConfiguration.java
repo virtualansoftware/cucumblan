@@ -4,6 +4,24 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+/*
+ *
+ *
+ *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *     in compliance with the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software distributed under the License
+ *     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *     or implied. See the License for the specific language governing permissions and limitations under
+ *     the License.
+ *
+ *
+ *
+ */
 
 /**
  * The type Topic configuration.
@@ -18,6 +36,9 @@ public class TopicConfiguration {
     reload();
   }
 
+  /**
+   * Reload.
+   */
   public static  void reload(){
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("topic.properties");
@@ -37,6 +58,8 @@ public class TopicConfiguration {
   /**
    * Gets properties.
    *
+   * @param key   the key
+   * @param value the value
    */
   public static void setProperty(String key, String value) {
     properties.put(key, value);

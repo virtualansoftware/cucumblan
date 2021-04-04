@@ -1,5 +1,4 @@
-package io.virtualan.cucumblan.message.typeimpl;
-
+package io.virtualan.test.msgtype.impl;
 /*
  *
  *
@@ -18,8 +17,6 @@ package io.virtualan.cucumblan.message.typeimpl;
  *
  *
  */
-
-
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.mapson.Mapson;
@@ -29,15 +26,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.Headers;
 import org.json.JSONObject;
 
 /**
  * The type Json message.
  */
-public class JSONMessage implements MessageType<Integer, String> {
+public class JSONMessage implements MessageType<String, String> {
 
   private String type = "JSON";
-  private Integer id;
+  private String id;
   private String body;
 
   /**
@@ -52,7 +50,7 @@ public class JSONMessage implements MessageType<Integer, String> {
    * @param id   the id
    * @param body the body
    */
-  public JSONMessage(Integer id, String body) {
+  public JSONMessage(String id, String body) {
     this.body = body;
     this.id = id;
   }
@@ -68,7 +66,7 @@ public class JSONMessage implements MessageType<Integer, String> {
   }
 
   @Override
-  public Integer getId() {
+  public String getId() {
     return id;
   }
 
@@ -83,17 +81,17 @@ public class JSONMessage implements MessageType<Integer, String> {
   }
 
   @Override
-  public MessageType buildProducerMessage(Object messages) throws MessageNotDefinedException {
+  public MessageType buildProducerMessage(Object messages) throws  MessageNotDefinedException {
     if (messages instanceof List) {
       String message = ((List<String>) messages).stream().collect(Collectors.joining());
       JSONObject body = new JSONObject(message);
-      return new JSONMessage(body.getInt("id"), message);
+      return new JSONMessage(String.valueOf(body.getInt("id")), message);
     } else {
       String message = null;
       try {
         message = Mapson.buildMAPsonAsJson((Map<String, String>) messages);
         JSONObject body = new JSONObject(message);
-        return new JSONMessage(body.getInt("id"), message);
+        return new JSONMessage(String.valueOf(body.getInt("id")), message);
       } catch (BadInputDataException e) {
         throw new MessageNotDefinedException(e.getMessage());
       }
@@ -102,11 +100,14 @@ public class JSONMessage implements MessageType<Integer, String> {
 
 
   @Override
-  public MessageType buildConsumerMessage(ConsumerRecord<Integer, String> record, Integer key,
-      String body)
+  public MessageType buildConsumerMessage(ConsumerRecord<String, String> record, String key, String body)
       throws MessageNotDefinedException {
-    Integer id = new JSONObject(body).getInt("id");
-    return new JSONMessage(id, body);
+    if ("virtualan-test-event".equalsIgnoreCase(record.topic())) {
+      String id = String.valueOf(new JSONObject(body).getInt("id"));
+      return new JSONMessage(id, body.toString());
+    } else {
+      throw new MessageNotDefinedException(key +" message is not defined");
+    }
   }
 
 

@@ -38,20 +38,18 @@ import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
+import io.virtualan.cucumblan.props.util.ApiHelper;
 import io.virtualan.cucumblan.props.util.HelperUtil;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
-import io.virtualan.jassert.VirtualJSONAssert;
 import io.virtualan.mapson.Mapson;
-import io.virtualan.mapson.exception.BadInputDataException;
 import io.virtualan.util.Helper;
 import java.io.File;
 import java.io.IOException;
@@ -61,15 +59,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 
 /**
@@ -632,9 +629,9 @@ public class BaseStepDefinition {
   @When("^(.*) post (.*) in (.*) resource on (.*)")
   public void createRequest(String dummyString, String acceptContentType, String resource,
       String system) {
-    String url = StepDefinitionHelper.getHostName(resource, system);
+    String url = ApiHelper.getHostName(resource, system);
     acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
-    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    String resourceDetails = ApiHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
     object.put("AcceptContentType", acceptContentType);
@@ -661,9 +658,9 @@ public class BaseStepDefinition {
   @When("^(.*) get (.*) in (.*) resource on (.*)")
   public void readRequest(String dummyString, String acceptContentType, String resource,
       String system) {
-    String url = StepDefinitionHelper.getHostName(resource, system);
+    String url = ApiHelper.getHostName(resource, system);
     String contentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
-    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    String resourceDetails = ApiHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
     object.put("AcceptContentType", contentType);
@@ -672,9 +669,9 @@ public class BaseStepDefinition {
 
     scenario.attach(object.toString()
         , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
-    response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
+    response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
-        .get(StepDefinitionHelper.getActualResource(resource, system));
+        .get(ApiHelper.getActualResource(resource, system));
   }
 
   /**
@@ -688,9 +685,9 @@ public class BaseStepDefinition {
   @When("^(.*) put (.*) in (.*) resource on (.*)")
   public void modifyRequest(String dummyString, String acceptContentType, String resource,
       String system) {
-    String url = StepDefinitionHelper.getHostName(resource, system);
+    String url = ApiHelper.getHostName(resource, system);
     acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
-    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    String resourceDetails = ApiHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
     object.put("AcceptContentType", acceptContentType);
@@ -699,9 +696,9 @@ public class BaseStepDefinition {
 
     scenario.attach(object.toString()
         , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
-    response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
+    response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
-        .put(StepDefinitionHelper.getActualResource(resource, system));
+        .put(ApiHelper.getActualResource(resource, system));
   }
 
   /**
@@ -715,9 +712,9 @@ public class BaseStepDefinition {
   @When("^(.*) patch (.*) in (.*) resource on (.*)")
   public void patchRequest(String dummyString, String acceptContentType, String resource,
       String system) {
-    String url = StepDefinitionHelper.getHostName(resource, system);
+    String url = ApiHelper.getHostName(resource, system);
     acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
-    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    String resourceDetails = ApiHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
     object.put("AcceptContentType", acceptContentType);
@@ -726,9 +723,9 @@ public class BaseStepDefinition {
 
     scenario.attach(object.toString()
         , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
-    response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
+    response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
-        .patch(StepDefinitionHelper.getActualResource(resource, system));
+        .patch(ApiHelper.getActualResource(resource, system));
   }
 
   /**
@@ -742,9 +739,9 @@ public class BaseStepDefinition {
   @When("^(.*) delete (.*) in (.*) resource on (.*)")
   public void deleteById(String dummyString, String acceptContentType, String resource,
       String system) {
-    String url = StepDefinitionHelper.getHostName(resource, system);
+    String url = ApiHelper.getHostName(resource, system);
     acceptContentType = this.acceptContentType != null ? this.acceptContentType : acceptContentType;
-    String resourceDetails = StepDefinitionHelper.getActualResource(resource, system);
+    String resourceDetails = ApiHelper.getActualResource(resource, system);
     JSONObject object = new JSONObject();
     object.put("url", url);
     object.put("AcceptContentType", acceptContentType);
@@ -752,9 +749,9 @@ public class BaseStepDefinition {
     object.put("context", new JSONObject(ScenarioContext.getPrintableContextObject()));
     scenario.attach(object.toString()
         , "application/json", "requestData :  " + scenario.getName()+" : " + (sequence++));
-    response = request.baseUri(StepDefinitionHelper.getHostName(resource, system)).when()
+    response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
         .log().all().accept(acceptContentType)
-        .delete(StepDefinitionHelper.getActualResource(resource, system));
+        .delete(ApiHelper.getActualResource(resource, system));
   }
 
 
@@ -919,19 +916,8 @@ public class BaseStepDefinition {
     });
   }
 
-  @Then("Verify (.*) response csvson includes in the response")
-  public void validateCsvonJson(List<String> csvline) throws BadInputDataException {
-    JSONArray jsonArray = Csvson.buildCSVson(csvline , ScenarioContext.getContext());
-    scenario.attach(jsonArray.toString(2), "application/json", "CSVson");
-    Assert.assertTrue(VirtualJSONAssert
-        .jAssertObject(jsonArray.optJSONObject(0),
-            new JSONObject(validatableResponse.extract().body().asString()),
-            JSONCompareMode.STRICT));
-  }
-
-
   /**
-   *  single response.
+   * Mock single response.
    *
    * @param resource  the resource
    * @param xmlString the xml string
@@ -942,11 +928,7 @@ public class BaseStepDefinition {
     attachResponse(validatableResponse);
     String listString = xmlString.stream().map(Object::toString)
         .collect(Collectors.joining());
-    if(response.getContentType().contains("xml")) {
-      HelperUtil.assertXMLEquals(listString, response.asString());
-    } else {
-      HelperUtil.assertJSONObject(resource, listString, response.asString());
-    }
+    HelperUtil.assertXMLEquals(listString, response.asString());
   }
 
   /**

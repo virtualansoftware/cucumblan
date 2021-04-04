@@ -30,6 +30,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+/**
+ * The type Helper util.
+ */
 @Slf4j
 public class HelperUtil {
 
@@ -53,6 +56,12 @@ public class HelperUtil {
     }
   }
 
+  /**
+   * Read file as string string.
+   *
+   * @param fileBody the file body
+   * @return the string
+   */
   public static String readFileAsString(String fileBody) {
     String body = null;
     InputStream stream = Thread.currentThread().getContextClassLoader()
@@ -78,6 +87,14 @@ public class HelperUtil {
     return doc;
   }
 
+  /**
+   * Assert xpaths equal.
+   *
+   * @param xpaths      the xpaths
+   * @param expectedXML the expected xml
+   * @param actualXML   the actual xml
+   * @throws Exception the exception
+   */
   public static void assertXpathsEqual(List<String> xpaths, String expectedXML, String actualXML)
       throws Exception {
     Document expectedDoc = getDocument(expectedXML);
@@ -88,6 +105,13 @@ public class HelperUtil {
     }
   }
 
+  /**
+   * Get json object.
+   *
+   * @param jsonString the json string
+   * @param path       the path
+   * @return the object
+   */
   public static Object getJSON(String jsonString, String path){
     DocumentContext docCtx = JsonPath.parse(jsonString);
     JsonPath jsonPath = JsonPath.compile(path);
@@ -95,6 +119,13 @@ public class HelperUtil {
     return value;
   }
 
+  /**
+   * Assert json object.
+   *
+   * @param resource            the resource
+   * @param jsonRequestExpected the json request expected
+   * @param jsonRequestActual   the json request actual
+   */
   public static  void assertJSONObject(String resource, String jsonRequestExpected, String jsonRequestActual){
     if (jsonRequestExpected != null && jsonRequestActual != null) {
       Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
@@ -118,6 +149,13 @@ public class HelperUtil {
     }
   }
 
+  /**
+   * Assert jsonpath equal.
+   *
+   * @param jsonPath     the json path
+   * @param expectedjson the expectedjson
+   * @param actualjson   the actualjson
+   */
   public static void assertJsonpathEqual(List<String> jsonPath, String expectedjson, String actualjson) {
     for (String jpath : jsonPath) {
      Object expected = getJSON(expectedjson, jpath);
@@ -132,6 +170,13 @@ public class HelperUtil {
     }
   }
 
+  /**
+   * Assert xml equals.
+   *
+   * @param expectedXML the expected xml
+   * @param actualXML   the actual xml
+   * @throws Exception the exception
+   */
   public static void assertXMLEquals(String expectedXML, String actualXML) throws Exception {
     XMLUnit.setIgnoreWhitespace(true);
     XMLUnit.setIgnoreAttributeOrder(true);
