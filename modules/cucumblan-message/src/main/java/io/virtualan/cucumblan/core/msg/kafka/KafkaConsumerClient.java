@@ -151,9 +151,11 @@ public class KafkaConsumerClient {
     if (messageType != null) {
       try {
         obj = messageType.buildConsumerMessage(record, record.key(), record.value());
-        if (obj != null) {
-          MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
+        if (obj != null && obj.getId() != null) {
+          MessageContext.setEventContextMap(eventName, obj.getId().toString(), obj);
           return true;
+        }  else if(obj != null){
+          throw  new MessageNotDefinedException(  "Id is not defined ");
         }
       } catch (MessageNotDefinedException e) {
         LOGGER.warning(record.key() + " is not defined " + e.getMessage());
