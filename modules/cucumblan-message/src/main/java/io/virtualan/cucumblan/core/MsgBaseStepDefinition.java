@@ -74,6 +74,7 @@ public class MsgBaseStepDefinition {
    * @param resource  the resource
    * @param type      the type
    * @param messages  the messages
+   * @throws MessageNotDefinedException the message not defined exception
    */
   @Given("send message event (.*) in partition (.*) on (.*) with type (.*)$")
   public void produceMessageWithPartition(String eventName, Integer partition, String resource,
@@ -92,6 +93,12 @@ public class MsgBaseStepDefinition {
     }
   }
 
+  /**
+   * Produce message.
+   *
+   * @param sleep the sleep
+   * @throws InterruptedException the interrupted exception
+   */
   @Given("pause message process for (.*) milliseconds$")
   public void produceMessage(long sleep) throws InterruptedException {
     Thread.sleep(sleep);
@@ -104,6 +111,7 @@ public class MsgBaseStepDefinition {
    * @param resource  the resource
    * @param type      the type
    * @param messages  the messages
+   * @throws MessageNotDefinedException the message not defined exception
    */
   @Given("send message event (.*) on (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
@@ -134,6 +142,7 @@ public class MsgBaseStepDefinition {
    * @param resource  the resource
    * @param type      the type
    * @param messages  the messages
+   * @throws MessageNotDefinedException the message not defined exception
    */
   @Given("send inline message event (.*) on (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
@@ -164,6 +173,7 @@ public class MsgBaseStepDefinition {
    * @param resource  the resource
    * @param type      the type
    * @param messages  the messages
+   * @throws MessageNotDefinedException the message not defined exception
    */
   @Given("send mapson message event (.*) on (.*) with type (.*)$")
   public void produceMessageMapson(String eventName, String resource, String type,
@@ -195,9 +205,11 @@ public class MsgBaseStepDefinition {
    * @param eventName the event name
    * @param id        the id
    * @param resource  the resource
+   * @param type      the type
    * @param csvson    the csvson
-   * @throws InterruptedException  the interrupted exception
-   * @throws BadInputDataException bad input data exception
+   * @throws InterruptedException       the interrupted exception
+   * @throws BadInputDataException      bad input data exception
+   * @throws MessageNotDefinedException the message not defined exception
    */
   @Given("verify (.*) contains (.*) on (.*) with type (.*)$")
   public void verifyConsumedJSONObject(String eventName, String id, String resource, String type,
@@ -228,8 +240,10 @@ public class MsgBaseStepDefinition {
    * @param eventName the event name
    * @param id        the id
    * @param resource  the resource
+   * @param type      the type
    * @param keyValue  the key value
-   * @throws InterruptedException interrupted exception
+   * @throws InterruptedException       interrupted exception
+   * @throws MessageNotDefinedException the message not defined exception
    */
   @Given("verify-by-elements (.*) contains (.*) on (.*) with type (.*)$")
   public void consumeMessage(String eventName, String id, String resource, String type,
