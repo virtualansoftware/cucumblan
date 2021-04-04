@@ -6,7 +6,7 @@
   <name>cucumblan-db</name>
   <version>0.1.1-SNAPSHOT</version>
   <properties>
-    <junit.version>5.5.2</junit.version>
+    <junit.version>5.7.1</junit.version>
     <mapson.version>1.1.4</mapson.version>
     <cucumber.version>6.8.2</cucumber.version>
   </properties>
