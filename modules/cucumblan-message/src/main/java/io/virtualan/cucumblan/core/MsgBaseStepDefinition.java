@@ -70,12 +70,12 @@ public class MsgBaseStepDefinition {
    * Produce message with partition.
    *
    * @param eventName the event name
-   * @param partition the partition
+   * @param partition partition
    * @param resource  the resource
    * @param type      the type
    * @param messages  the messages
    */
-  @Given("send message event (.*) in partition (.*) on the (.*) with type (.*)$")
+  @Given("send message event (.*) in partition (.*) on (.*) with type (.*)$")
   public void produceMessageWithPartition(String eventName, Integer partition, String resource,
       String type, Object messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
@@ -105,7 +105,7 @@ public class MsgBaseStepDefinition {
    * @param type      the type
    * @param messages  the messages
    */
-  @Given("send message event (.*) on the (.*) with type (.*)$")
+  @Given("send message event (.*) on (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
       DataTable messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
@@ -135,7 +135,7 @@ public class MsgBaseStepDefinition {
    * @param type      the type
    * @param messages  the messages
    */
-  @Given("send inline message event (.*) on the (.*) with type (.*)$")
+  @Given("send inline message event (.*) on (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
       List<String> messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
@@ -165,7 +165,7 @@ public class MsgBaseStepDefinition {
    * @param type      the type
    * @param messages  the messages
    */
-  @Given("send mapson message event (.*) on the (.*) with type (.*)$")
+  @Given("send mapson message event (.*) on (.*) with type (.*)$")
   public void produceMessageMapson(String eventName, String resource, String type,
       Map<String, String> messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
@@ -197,9 +197,9 @@ public class MsgBaseStepDefinition {
    * @param resource  the resource
    * @param csvson    the csvson
    * @throws InterruptedException  the interrupted exception
-   * @throws BadInputDataException the bad input data exception
+   * @throws BadInputDataException bad input data exception
    */
-  @Given("verify (.*) contains (.*) on the (.*) with type (.*)$")
+  @Given("verify (.*) contains (.*) on (.*) with type (.*)$")
   public void verifyConsumedJSONObject(String eventName, String id, String resource, String type,
       List<String> csvson)
       throws InterruptedException, BadInputDataException, MessageNotDefinedException {
@@ -229,9 +229,9 @@ public class MsgBaseStepDefinition {
    * @param id        the id
    * @param resource  the resource
    * @param keyValue  the key value
-   * @throws InterruptedException the interrupted exception
+   * @throws InterruptedException interrupted exception
    */
-  @Given("verify-by-elements (.*) contains (.*) on the (.*)  with type (.*)$")
+  @Given("verify-by-elements (.*) contains (.*) on (.*) with type (.*)$")
   public void consumeMessage(String eventName, String id, String resource, String type,
       Map<String, String> keyValue)
       throws InterruptedException, MessageNotDefinedException {

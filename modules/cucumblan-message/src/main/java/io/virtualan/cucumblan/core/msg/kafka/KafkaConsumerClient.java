@@ -84,7 +84,7 @@ public class KafkaConsumerClient {
     }
     Thread.sleep(1000);
     KafkaConsumerClient client = new KafkaConsumerClient(resource);
-    client.run(type, eventName, id);
+    client.run(eventName, type, id);
     return (MessageType) getEvent(eventName, type, id, resource, recheck);
   }
 
@@ -129,7 +129,8 @@ public class KafkaConsumerClient {
           }
         }
         for (ConsumerRecord<Object, Object> record : consumerRecords) {
-          getRecord(eventName, type, record);
+          getMessageType(eventName, type, record);
+          consumer.commitAsync();
         }
       }
     } finally {
@@ -141,13 +142,9 @@ public class KafkaConsumerClient {
 
   }
 
-  private void getRecord(String eventName, String type, ConsumerRecord<Object, Object> record)
-      throws MessageNotDefinedException {
-    getMessageType(eventName, type, record);
-    consumer.commitAsync();
-  }
 
-  private boolean getMessageType(String eventName, String type, ConsumerRecord<Object, Object> record)
+  private boolean getMessageType(String eventName, String type,
+      ConsumerRecord<Object, Object> record)
       throws MessageNotDefinedException {
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     MessageType obj = null;
@@ -156,12 +153,15 @@ public class KafkaConsumerClient {
         obj = messageType.buildConsumerMessage(record, record.key(), record.value());
         if (obj != null) {
           MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
+          return true;
         }
       } catch (MessageNotDefinedException e) {
         LOGGER.warning(record.key() + " is not defined " + e.getMessage());
         throw e;
       }
+    } else {
+      throw new MessageNotDefinedException(type + " message type is not defined ");
     }
-    throw new MessageNotDefinedException(type + " message type is not defined ");
+    return false;
   }
 }
