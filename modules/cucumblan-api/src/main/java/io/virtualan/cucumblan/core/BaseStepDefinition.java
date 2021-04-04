@@ -863,6 +863,7 @@ public class BaseStepDefinition {
   @Then("^Verify the status code is (\\d+)")
   public void verifyStatusCode(int statusCode) {
     if (!this.skipScenario) {
+      ScenarioContext.setContext("CONTEXT_API_STATUS_CODE", String.valueOf(statusCode));
       validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
       LOGGER.info(ScenarioContext.getContext().toString());
       LOGGER.info(validatableResponse.extract().body().asString());
