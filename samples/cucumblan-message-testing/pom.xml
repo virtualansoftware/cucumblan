@@ -1,20 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.virtualan</groupId>
-  <artifactId>cucumblan-ui</artifactId>
-  <version>1.0.6-SNAPSHOT</version>
+  <artifactId>cucumblan-message-testing</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>cucumblan-ui</name>
+  <name>cucumblan-message-testing</name>
   <properties>
+    <cucumblan-message.version>0.0.3-SNAPSHOT</cucumblan-message.version>
     <mapson.version>1.1.4</mapson.version>
-    <selenium.version>3.141.59</selenium.version>
+    <kafka-clients.version>2.7.0</kafka-clients.version>
     <junit.version>5.5.2</junit.version>
     <cucumber.version>6.7.0</cucumber.version>
+    <virtualan.version>1.0.6</virtualan.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>
-    Cucumblan-ui is a cucumber and selenium based test automation framework that supports Behavior Driven Development (BDD),
-    allowing users to create feature using predefined step definition with low code for UI. I
+    Cucumblan-message is a cucumber and selenium based test automation framework that supports Behavior Driven Development (BDD),
+    allowing users to create feature using predefined step definition with low code for messaging. I
     t works based on the Gherkin Domain Specific Language (DSL). This simple but powerful api
     framework while keeping it comprehensible to even non-technical(product owner, business analyst and domain
     experts) users.
@@ -122,10 +124,12 @@
     </plugins>
   </build>
   <dependencies>
+
+    <!-- CUCUMBLAN MESSAGE KAFKA BDD TESTING CONFIGURATION -->
     <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>0.9.12</version>
+      <groupId>io.virtualan</groupId>
+      <artifactId>cucumblan-message</artifactId>
+      <version>${cucumblan-message.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -133,19 +137,9 @@
       <version>${junit.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
       <groupId>io.virtualan</groupId>
       <artifactId>mapson</artifactId>
       <version>${mapson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
@@ -158,5 +152,137 @@
       <artifactId>cucumber-java</artifactId>
       <version>${cucumber.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.12</version>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <version>2.5.0</version>
+    </dependency>
+
+    <!-- KAFKA LOCAL TESTING CONFIGURATION -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.12.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>2.12.2</version>
+    </dependency>
+
+
+
+    <dependency>
+      <groupId>net.masterthought</groupId>
+      <artifactId>cucumber-reporting</artifactId>
+      <version>5.5.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-spring</artifactId>
+      <version>${cucumber.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>2.2.1.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+      <version>2.3.0.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-kafka</artifactId>
+      <version>3.2.0.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
+      <version>5.2.8.RELEASE</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-integration</artifactId>
+      <version>2.3.1.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.10</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--SpringFox dependencies -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <!-- Bean Validation API support -->
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>2.0.0.Final</version>
+    </dependency>
+    <!-- START Virtual Service API support -->
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>virtualization</artifactId>
+      <version>${virtualan.version}</version>
+    </dependency>
+
+    <!-- HyperSQL DB -->
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.5.0</version>
+    </dependency>
+    <!-- END Virtual Service API support -->
+
+    <!-- Start embedded kafka -->
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka-test</artifactId>
+      <version>2.2.2.RELEASE</version>
+    </dependency>
+
+
+    <!-- End -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>2.2.5.RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+
+
   </dependencies>
 </project>

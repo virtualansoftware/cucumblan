@@ -1,26 +1,9 @@
-/*
- *
- *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
- *
- *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *     in compliance with the License. You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *     Unless required by applicable law or agreed to in writing, software distributed under the License
- *     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *     or implied. See the License for the specific language governing permissions and limitations under
- *     the License.
- *
- *
- *
- */
-
 package io.virtualan.cucumblan.props.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.json.JSONException;
 
 /**
  * The type Scenario context.
@@ -59,6 +42,16 @@ public class ScenarioContext {
         scenarioContext.put(key, value);
     }
 
+    public static Map<String, String> getPrintableContextObject() throws JSONException {
+        Map<String, String> resultValues = getContext().entrySet().stream()
+            .collect(
+                Collectors.toMap( entry -> entry.getKey(),
+                    entry -> entry.getKey().contains("password") ? "xxxxxxxxxxxx" : entry.getValue()));
+
+        return resultValues;
+    }
+
+
     /**
      * Gets context.
      *
@@ -66,7 +59,7 @@ public class ScenarioContext {
      * @return the context
      */
     public static Object getContext(String key) {
-        return scenarioContext.get(key);
+        return scenarioContext.get(key.toString());
     }
 
     /**

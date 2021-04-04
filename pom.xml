@@ -9,7 +9,7 @@
 	<artifactId>cucumblan-project</artifactId>
 	<packaging>pom</packaging>
 	<name>cucumblan-project</name>
-	<version>1.1.6-SNAPSHOT</version>
+	<version>1.1.9-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
 	  <connection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</connection>
@@ -78,6 +78,8 @@
 			<modules>
 				<module>samples/cucumblan-apitesting</module>
 				<module>samples/cucumblan-uitesting</module>
+				<module>samples/cucumblan-lakesidemutual-uitesting</module>
+				<module>samples/cucumblan-message-testing</module>
 				<module>samples/cucumblan-soapapitesting</module>
 			</modules>
 		</profile>

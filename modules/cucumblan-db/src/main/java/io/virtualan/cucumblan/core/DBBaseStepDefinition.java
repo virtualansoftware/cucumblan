@@ -41,21 +41,47 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+
+/*
+ *
+ *
+ *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *     in compliance with the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software distributed under the License
+ *     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *     or implied. See the License for the specific language governing permissions and limitations under
+ *     the License.
+ *
+ *
+ *
+ */
+
+
 /**
  * The type JDBC base step definition.
  *
  * @author Elan Thangamani
  */
-
 public class DBBaseStepDefinition {
 
   private final static Logger LOGGER = Logger.getLogger(DBBaseStepDefinition.class.getName());
+  /**
+   * The Jdbc template map.
+   */
   static Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<String, JdbcTemplate>();
 
   static {
     loadAllDataSource();
   }
 
+  /**
+   * The Scenario.
+   */
   Scenario scenario;
 
   private static void loadAllDataSource() {
@@ -86,11 +112,24 @@ public class DBBaseStepDefinition {
     }
   }
 
+  /**
+   * Before.
+   *
+   * @param scenario the scenario
+   */
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
   }
 
+  /**
+   * Insert sql.
+   *
+   * @param dummy    the dummy
+   * @param resource the resource
+   * @param sqls     the sqls
+   * @throws Exception the exception
+   */
   @Given("perform a (.*) DDL sql on (.*)$")
   @Given("update the given sql for (.*) on (.*)$")
   @Given("delete the given sql for (.*) on (.*)$")
@@ -119,6 +158,15 @@ public class DBBaseStepDefinition {
   }
 
 
+  /**
+   * Verify.
+   *
+   * @param dummy1    the dummy 1
+   * @param dummy     the dummy
+   * @param resource  the resource
+   * @param selectSql the select sql
+   * @throws Exception the exception
+   */
   @Given("verify (.*) with the given sql for (.*) on (.*)$")
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {

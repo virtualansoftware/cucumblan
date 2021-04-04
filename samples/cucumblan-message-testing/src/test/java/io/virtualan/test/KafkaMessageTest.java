@@ -1,4 +1,4 @@
-package io.virtualan;
+package io.virtualan.test;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
@@ -11,8 +11,9 @@ import org.junit.runner.RunWith;
 @CucumberOptions(features = "classpath:features",
     glue = {"io.virtualan.cucumblan.core"},
     plugin = {"pretty",
-        "json:target/cucumber-report.json"})
+        "json:target/cucumber-report.json",
+        "html:target/cucumber-reports.html" })
 
-public class DemoTest {
+public class KafkaMessageTest {
 
 }
