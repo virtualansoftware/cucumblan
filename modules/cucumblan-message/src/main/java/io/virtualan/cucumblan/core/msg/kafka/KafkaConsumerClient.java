@@ -20,7 +20,6 @@ package io.virtualan.cucumblan.core.msg.kafka;
 
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import io.virtualan.cucumblan.message.type.MessageType;
-import io.virtualan.cucumblan.message.type.MessageTypeFactory;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.TopicConfiguration;
 import java.io.IOException;
@@ -43,19 +42,16 @@ public class KafkaConsumerClient {
   private final static Logger LOGGER = Logger.getLogger(KafkaConsumerClient.class.getName());
 
   private final KafkaConsumer consumer;
-  private final String eventName;
   private List<String> topic;
 
 
   /**
    * Instantiates a new Kafka consumer client.
    *
-   * @param eventName the event name
-   * @param resource  the resource
+   * @param resource the resource
    */
-  public KafkaConsumerClient(String eventName, String resource) {
+  public KafkaConsumerClient(String resource) {
     Properties props = new Properties();
-    this.eventName = eventName;
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader()
           .getResourceAsStream("consumer-" + resource + ".properties");
@@ -78,17 +74,18 @@ public class KafkaConsumerClient {
    * @return the event
    * @throws InterruptedException the interrupted exception
    */
-  public static MessageType getEvent(String eventName, String id, String resource, int recheck)
-      throws InterruptedException {
+  public static MessageType getEvent(String eventName, String type, String id, String resource,
+      int recheck)
+      throws InterruptedException, MessageNotDefinedException {
     MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
     recheck = recheck + 1;
     if (recheck == 5 || expectedJson != null) {
       return expectedJson;
     }
     Thread.sleep(1000);
-    KafkaConsumerClient client = new KafkaConsumerClient(eventName, resource);
-    client.run(eventName, id);
-    return (MessageType) getEvent(eventName, id, resource, recheck);
+    KafkaConsumerClient client = new KafkaConsumerClient(resource);
+    client.run(type, eventName, id);
+    return (MessageType) getEvent(eventName, type, id, resource, recheck);
   }
 
 
@@ -104,10 +101,9 @@ public class KafkaConsumerClient {
   /**
    * Run.
    *
-   * @param currentEventName the current event name
-   * @param id               the id
+   * @param id the id
    */
-  public void run(String currentEventName, String id) {
+  public void run(String eventName, String type, String id) throws MessageNotDefinedException {
     this.topic = loadTopic(eventName);
     consumer.subscribe(this.topic);
     LOGGER.info(" Read Received message: " + topic);
@@ -116,8 +112,7 @@ public class KafkaConsumerClient {
         consumerRecords = null;
     try {
       while (true) {
-
-        boolean isMessageReceived = MessageContext.isEventContextMap(currentEventName, id);
+        boolean isMessageReceived = MessageContext.isEventContextMap(eventName, id);
         if (isMessageReceived) {
           break;
         }
@@ -133,29 +128,40 @@ public class KafkaConsumerClient {
             continue;
           }
         }
-        consumerRecords.forEach(record -> {
-          getMessageType(record);
-          consumer.commitAsync();
-        });
+        for (ConsumerRecord<Object, Object> record : consumerRecords) {
+          getRecord(eventName, type, record);
+        }
       }
-    }finally {
-      if(consumer != null)
-      consumer.close();
+    } finally {
+      if (consumer != null) {
+        consumer.close();
+      }
     }
     LOGGER.info("DONE");
 
   }
 
-  private boolean getMessageType(ConsumerRecord<Object, Object> record) {
-    for (MessageTypeFactory messageType : MessageContext.getMessageTypeFactories()) {
+  private void getRecord(String eventName, String type, ConsumerRecord<Object, Object> record)
+      throws MessageNotDefinedException {
+    getMessageType(eventName, type, record);
+    consumer.commitAsync();
+  }
+
+  private boolean getMessageType(String eventName, String type, ConsumerRecord<Object, Object> record)
+      throws MessageNotDefinedException {
+    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    MessageType obj = null;
+    if (messageType != null) {
       try {
-        MessageType obj = messageType.buildMessage(record, record.key(), record.value());
-        MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
-        return true;
+        obj = messageType.buildConsumerMessage(record, record.key(), record.value());
+        if (obj != null) {
+          MessageContext.setEventContextMap(eventName, String.valueOf(obj.getId()), obj);
+        }
       } catch (MessageNotDefinedException e) {
         LOGGER.warning(record.key() + " is not defined " + e.getMessage());
+        throw e;
       }
     }
-    return false;
+    throw new MessageNotDefinedException(type + " message type is not defined ");
   }
 }

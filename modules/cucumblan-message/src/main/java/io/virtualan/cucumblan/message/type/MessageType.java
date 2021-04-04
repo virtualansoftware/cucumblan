@@ -21,10 +21,13 @@ package io.virtualan.cucumblan.message.type;
 
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import java.util.List;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
+import org.json.JSONObject;
 
 /**
- * The interface Message type.
+ * This helps to define application specific kafka message user application needs and Easy to
+ * customizable
  *
  * @param <T>  the type parameter
  * @param <TT> the type parameter
@@ -32,51 +35,67 @@ import org.apache.kafka.common.header.Header;
  */
 public interface MessageType<T, TT> {
 
-    /**
-     * Gets type.
-     *
-     * @return the type
-     */
-    String getType();
+  /**
+   * define a unique type of the message would be used.
+   *
+   * @return the type
+   */
+  String getType();
 
-    /**
-     * Gets id.
-     *
-     * @return the id
-     */
-    T getId();
-
-
-    /**
-     * Gets message.
-     *
-     * @return the message
-     */
-    TT getMessage();
+  /**
+   * Gets Kafka message key for kafka
+   *
+   * @return the id
+   */
+  T getId();
 
 
-    /**
-     * Gets message.
-     *
-     * @return the message
-     */
-    Object getMessageAsJson();
+  /**
+   * Gets Kafka message to be used for Kafka
+   *
+   * @return the message
+   */
+  TT getMessage();
 
 
-    /**
-     * Gets message.
-     *
-     * @return the message
-     */
-    List<Header> getHeaders();
+  /**
+   * Mandatory JSON Should be defined and Used for Verification process.
+   *  this should be either org.json.JSONArray or org.json.JSONObject
+   *
+   * @return the JsonArray or  message
+   */
+  Object getMessageAsJson();
 
 
-    /**
-     * Build message type.
-     *
-     * @param tt the tt
-     * @return the message type
-     */
-    MessageType build(Object tt) throws MessageNotDefinedException;
+  /**
+   * Kafka message headers to be added to produce messages
+   *
+   * @return the kafka headers
+   */
+  List<Header> getHeaders();
+
+
+  /**
+   * Build message object build logic for the application specific need. Build and produce events
+   * for your specific needs Refer io.virtualan.cucumblan.message.typeimpl.JSONMessage
+   *
+   * @param tt the tt
+   * @return the message type
+   */
+  MessageType buildProducerMessage(Object tt) throws MessageNotDefinedException;
+
+  /**
+   * Build message while consuming the message
+   * for your specific needs Refer io.virtualan.cucumblan.message.typeimpl.JSONMessage
+   *
+   * @param record ConsumerRecord<T, TT> object available in the context
+   * @param key    the kafka message key
+   * @param value  the kafka message object
+   * @return the message type used for Pre defined verification steps
+   * @throws MessageNotDefinedException the message not defined exception
+   */
+  MessageType buildConsumerMessage(ConsumerRecord<T, TT> record, T key, TT value)
+      throws MessageNotDefinedException;
+
 
 }

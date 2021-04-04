@@ -20,11 +20,8 @@
 package io.virtualan.cucumblan.core.msg.kafka;
 
 import io.virtualan.cucumblan.message.type.MessageType;
-import io.virtualan.cucumblan.message.type.MessageTypeFactory;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -41,25 +38,15 @@ public class MessageContext {
 
 
   private static final Map<String, MessageType> messageTypes = new HashMap<>();
-  private static final List<MessageTypeFactory> messageTypeFactories = new ArrayList<>();
   private static Map<String, Map<String, Object>> messageContext = new HashMap<>();
 
   static {
-    loadMessageTypeFactories();
     loadMessageTypes();
   }
 
   private MessageContext() {
   }
 
-  /**
-   * Gets message type factories.
-   *
-   * @return the message type factories
-   */
-  public static List<MessageTypeFactory> getMessageTypeFactories() {
-    return messageTypeFactories;
-  }
 
   /**
    * Gets message types.
@@ -71,7 +58,7 @@ public class MessageContext {
   }
 
   /**
-   * Load MessageType processors.
+   * Produce message to Load MessageType processors.
    */
   private static void loadMessageTypes() {
     Reflections reflections = new Reflections(ApplicationConfiguration.getMessageTypePackage(),
@@ -85,27 +72,6 @@ public class MessageContext {
         messageTypes.put(messageType.getType(), messageType);
       } catch (InstantiationException | IllegalAccessException e) {
         log.warn("Unable to process this messageType (" + x.getName() + ") class: " + messageType);
-      }
-    });
-  }
-
-
-  /**
-   * Load MessageType processors.
-   */
-  private static void loadMessageTypeFactories() {
-    Reflections reflections = new Reflections(ApplicationConfiguration.getMessageTypePackage(),
-        new SubTypesScanner(false));
-    Set<Class<? extends MessageTypeFactory>> buildInClasses = reflections
-        .getSubTypesOf(MessageTypeFactory.class);
-    buildInClasses.forEach(x -> {
-      MessageTypeFactory messageType = null;
-      try {
-        messageType = x.newInstance();
-        messageTypeFactories.add(messageType);
-      } catch (InstantiationException | IllegalAccessException e) {
-        log.warn("Unable to process this Message Type Factories (" + x.getName() + ") class: "
-            + messageType);
       }
     });
   }

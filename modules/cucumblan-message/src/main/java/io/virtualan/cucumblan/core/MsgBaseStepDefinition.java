@@ -81,7 +81,7 @@ public class MsgBaseStepDefinition {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.build(messages);
+      MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
 
       KafkaProducerClient
@@ -111,7 +111,7 @@ public class MsgBaseStepDefinition {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.build(messages);
+      MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
       if (builtMessage.getId() != null) {
         KafkaProducerClient
@@ -141,7 +141,7 @@ public class MsgBaseStepDefinition {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.build(messages);
+      MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
       if (builtMessage.getId() != null) {
         KafkaProducerClient
@@ -171,7 +171,7 @@ public class MsgBaseStepDefinition {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.build(messages);
+      MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
       if (builtMessage.getId() != null) {
         KafkaProducerClient
@@ -199,12 +199,12 @@ public class MsgBaseStepDefinition {
    * @throws InterruptedException  the interrupted exception
    * @throws BadInputDataException the bad input data exception
    */
-  @Given("verify (.*) contains (.*) on the (.*)$")
-  public void verifyConsumedJSONObject(String eventName, String id, String resource,
+  @Given("verify (.*) contains (.*) on the (.*) with type (.*)$")
+  public void verifyConsumedJSONObject(String eventName, String id, String resource, String type,
       List<String> csvson)
-      throws InterruptedException, BadInputDataException {
+      throws InterruptedException, BadInputDataException, MessageNotDefinedException {
     int recheck = 0;
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id, resource, recheck);
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, type, id, resource, recheck);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
           "verifyConsumedJSONObject");
@@ -231,12 +231,12 @@ public class MsgBaseStepDefinition {
    * @param keyValue  the key value
    * @throws InterruptedException the interrupted exception
    */
-  @Given("verify-by-elements (.*) contains (.*) on the (.*)$")
-  public void consumeMessage(String eventName, String id, String resource,
+  @Given("verify-by-elements (.*) contains (.*) on the (.*)  with type (.*)$")
+  public void consumeMessage(String eventName, String id, String resource, String type,
       Map<String, String> keyValue)
-      throws InterruptedException {
+      throws InterruptedException, MessageNotDefinedException {
     int recheck = 0;
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id, resource, recheck);
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, type, id, resource, recheck);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessage().toString(), "application/json",
           "verifyConsumedJSONObject");

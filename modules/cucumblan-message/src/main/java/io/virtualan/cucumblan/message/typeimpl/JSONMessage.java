@@ -27,6 +27,7 @@ import io.virtualan.mapson.exception.BadInputDataException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
 import org.json.JSONObject;
 
@@ -82,7 +83,7 @@ public class JSONMessage implements MessageType<Integer, String> {
   }
 
   @Override
-  public MessageType build(Object messages) throws  MessageNotDefinedException {
+  public MessageType buildProducerMessage(Object messages) throws MessageNotDefinedException {
     if (messages instanceof List) {
       String message = ((List<String>) messages).stream().collect(Collectors.joining());
       JSONObject body = new JSONObject(message);
@@ -98,6 +99,16 @@ public class JSONMessage implements MessageType<Integer, String> {
       }
     }
   }
+
+
+  @Override
+  public MessageType buildConsumerMessage(ConsumerRecord<Integer, String> record, Integer key,
+      String body)
+      throws MessageNotDefinedException {
+    Integer id = new JSONObject(body).getInt("id");
+    return new JSONMessage(id, body);
+  }
+
 
   @Override
   public String toString() {
