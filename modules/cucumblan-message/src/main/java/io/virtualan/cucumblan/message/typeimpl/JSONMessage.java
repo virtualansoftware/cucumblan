@@ -73,6 +73,11 @@ public class JSONMessage implements MessageType<Integer, String> {
   }
 
   @Override
+  public Integer getKey() {
+    return id;
+  }
+
+  @Override
   public String getMessage() {
     return body;
   }

@@ -43,11 +43,18 @@ public interface MessageType<T, TT> {
   String getType();
 
   /**
+   * Gets unique identifier of the message
+   *
+   * @return the id
+   */
+  Object getId();
+
+  /**
    * Gets Kafka message key for kafka
    *
    * @return the id
    */
-  T getId();
+  T getKey();
 
 
   /**

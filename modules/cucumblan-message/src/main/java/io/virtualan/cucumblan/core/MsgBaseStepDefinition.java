@@ -86,7 +86,7 @@ public class MsgBaseStepDefinition {
       scenario.log(builtMessage.toString());
 
       KafkaProducerClient
-          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+          .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
               partition, builtMessage.getHeaders());
     } else {
       Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
@@ -121,9 +121,9 @@ public class MsgBaseStepDefinition {
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
-      if (builtMessage.getId() != null) {
+      if (builtMessage.getKey() != null) {
         KafkaProducerClient
-            .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
                 null, builtMessage.getHeaders());
       } else {
         KafkaProducerClient
@@ -152,9 +152,9 @@ public class MsgBaseStepDefinition {
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
-      if (builtMessage.getId() != null) {
+      if (builtMessage.getKey() != null) {
         KafkaProducerClient
-            .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
                 null, builtMessage.getHeaders());
       } else {
         KafkaProducerClient
@@ -183,9 +183,9 @@ public class MsgBaseStepDefinition {
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
-      if (builtMessage.getId() != null) {
+      if (builtMessage.getKey() != null) {
         KafkaProducerClient
-            .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
                 null, builtMessage.getHeaders());
       } else {
         KafkaProducerClient
