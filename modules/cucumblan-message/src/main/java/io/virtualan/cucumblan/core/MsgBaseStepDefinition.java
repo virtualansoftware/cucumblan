@@ -35,7 +35,6 @@ import io.virtualan.cucumblan.props.util.MsgHelper;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.exception.BadInputDataException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -81,17 +80,21 @@ public class MsgBaseStepDefinition {
       String type, Object messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
-    MessageType builtMessage = messageType.build(messages);
-    scenario.log(builtMessage.toString());
+    if (topic != null && messageType != null) {
+      MessageType builtMessage = messageType.build(messages);
+      scenario.log(builtMessage.toString());
 
-    KafkaProducerClient
-        .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
-            partition, builtMessage.getHeaders());
+      KafkaProducerClient
+          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+              partition, builtMessage.getHeaders());
+    } else {
+      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
+    }
   }
 
   @Given("pause message process for (.*) milliseconds$")
-  public void produceMessage(long sleep ) throws InterruptedException {
-      Thread.sleep(sleep);
+  public void produceMessage(long sleep) throws InterruptedException {
+    Thread.sleep(sleep);
   }
 
   /**
@@ -107,16 +110,20 @@ public class MsgBaseStepDefinition {
       DataTable messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
-    MessageType builtMessage = messageType.build(messages);
-    scenario.log(builtMessage.toString());
-    if (builtMessage.getId() != null) {
-      KafkaProducerClient
-          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
-              null, builtMessage.getHeaders());
+    if (topic != null && messageType != null) {
+      MessageType builtMessage = messageType.build(messages);
+      scenario.log(builtMessage.toString());
+      if (builtMessage.getId() != null) {
+        KafkaProducerClient
+            .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+                null, builtMessage.getHeaders());
+      } else {
+        KafkaProducerClient
+            .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                null, builtMessage.getHeaders());
+      }
     } else {
-      KafkaProducerClient
-          .sendMessage(resource, topic, null, builtMessage.getMessage(),
-              null, builtMessage.getHeaders());
+      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
   }
 
@@ -133,16 +140,20 @@ public class MsgBaseStepDefinition {
       List<String> messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
-    MessageType builtMessage = messageType.build(messages);
-    scenario.log(builtMessage.toString());
-    if (builtMessage.getId() != null) {
-      KafkaProducerClient
-          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
-              null, builtMessage.getHeaders());
+    if (topic != null && messageType != null) {
+      MessageType builtMessage = messageType.build(messages);
+      scenario.log(builtMessage.toString());
+      if (builtMessage.getId() != null) {
+        KafkaProducerClient
+            .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+                null, builtMessage.getHeaders());
+      } else {
+        KafkaProducerClient
+            .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                null, builtMessage.getHeaders());
+      }
     } else {
-      KafkaProducerClient
-          .sendMessage(resource, topic, null, builtMessage.getMessage(),
-              null, builtMessage.getHeaders());
+      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
   }
 
@@ -155,20 +166,26 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    */
   @Given("send mapson message event (.*) on the (.*) with type (.*)$")
-  public void produceMessageMapson(String eventName, String resource, String type, Map<String, String> messages) throws MessageNotDefinedException {
+  public void produceMessageMapson(String eventName, String resource, String type,
+      Map<String, String> messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
-    MessageType builtMessage = messageType.build(messages);
-    scenario.log(builtMessage.toString());
-    if (builtMessage.getId() != null) {
-      KafkaProducerClient
-          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
-              null, builtMessage.getHeaders());
+    if (topic != null && messageType != null) {
+      MessageType builtMessage = messageType.build(messages);
+      scenario.log(builtMessage.toString());
+      if (builtMessage.getId() != null) {
+        KafkaProducerClient
+            .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+                null, builtMessage.getHeaders());
+      } else {
+        KafkaProducerClient
+            .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                null, builtMessage.getHeaders());
+      }
     } else {
-      KafkaProducerClient
-          .sendMessage(resource, topic, null, builtMessage.getMessage(),
-              null, builtMessage.getHeaders());
+      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
+
   }
 
 
@@ -187,7 +204,7 @@ public class MsgBaseStepDefinition {
       List<String> csvson)
       throws InterruptedException, BadInputDataException {
     int recheck = 0;
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id,resource, recheck);
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id, resource, recheck);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
           "verifyConsumedJSONObject");
@@ -218,8 +235,8 @@ public class MsgBaseStepDefinition {
   public void consumeMessage(String eventName, String id, String resource,
       Map<String, String> keyValue)
       throws InterruptedException {
-    int recheck =0;
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id,resource, recheck);
+    int recheck = 0;
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, id, resource, recheck);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessage().toString(), "application/json",
           "verifyConsumedJSONObject");

@@ -42,15 +42,4 @@ public interface  MessageTypeFactory<T, TT> {
    */
   MessageType buildMessage(Object record, T key, TT value) throws MessageNotDefinedException;
 
-  /**
-   * Build message type message type.
-   *
-   * @param type  the type
-   * @param key   the key
-   * @param value the value
-   * @return the message type
-   * @throws MessageNotDefinedException the message not defined exception
-   */
-  MessageType buildMessageType(String type, T key, TT value) throws MessageNotDefinedException;
-
 }

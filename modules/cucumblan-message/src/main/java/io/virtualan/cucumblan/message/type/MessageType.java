@@ -19,12 +19,9 @@ package io.virtualan.cucumblan.message.type;
  *
  */
 
-
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import java.util.List;
 import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.header.Headers;
-import org.json.JSONObject;
 
 /**
  * The interface Message type.
