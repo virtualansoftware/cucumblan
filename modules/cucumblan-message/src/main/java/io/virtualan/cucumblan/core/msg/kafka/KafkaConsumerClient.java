@@ -50,6 +50,16 @@ public class KafkaConsumerClient {
   }
 
 
+  /**
+   * Gets event.
+   *
+   * @param eventName the event name
+   * @param id        the id
+   * @param resource  the resource
+   * @param recheck   the recheck
+   * @return the event
+   * @throws InterruptedException the interrupted exception
+   */
   public static MessageType getEvent(String eventName, String id, String resource, int recheck)
       throws InterruptedException {
     MessageType expectedJson = (MessageType) MessageContext.getEventContextMap(eventName, id);
@@ -75,6 +85,9 @@ public class KafkaConsumerClient {
 
   /**
    * Run.
+   *
+   * @param currentEventName the current event name
+   * @param id               the id
    */
   public void run(String currentEventName, String id) {
     this.topic = loadTopic(eventName);

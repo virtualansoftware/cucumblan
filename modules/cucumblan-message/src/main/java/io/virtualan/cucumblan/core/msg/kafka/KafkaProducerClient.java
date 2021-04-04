@@ -3,12 +3,14 @@ package io.virtualan.cucumblan.core.msg.kafka;
 import io.cucumber.java.an.E;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.header.Header;
 
 /**
  * The type Kafka producer client.
@@ -50,18 +52,20 @@ public class KafkaProducerClient {
    * @param partition the partition
    */
   public static <T, TT> void sendMessage(String resource, String topic, T key, TT msg,
-      Integer partition) {
+      Integer partition, List<Header> headers) {
     ProducerRecord<T, TT> record = null;
     if (key != null && partition != null) {
-      record = new ProducerRecord<T, TT>(topic, partition, key, msg);
+      record = new ProducerRecord<T, TT>(topic, partition, key, msg, headers);
     } else if (key != null) {
-      record = new ProducerRecord<T, TT>(topic, key, msg);
+      record = new ProducerRecord<T, TT>(topic, null, key, msg, headers);
     } else {
-      record = new ProducerRecord<T, TT>(topic, msg);
+      record = new ProducerRecord<T, TT>(topic, null, null, msg, headers);
+
     }
     Producer<T, TT> producer = null;
     try {
       producer = createProducer(resource);
+
       RecordMetadata metadata = producer.send((ProducerRecord<T, TT>) record).get();
       log.info(metadata.topic() + " message posted successfully ");
     } catch (Exception e) {

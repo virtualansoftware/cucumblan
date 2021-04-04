@@ -20,7 +20,9 @@ package io.virtualan.cucumblan.message.type;
  */
 
 
+import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import java.util.List;
+import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.json.JSONObject;
 
@@ -69,7 +71,7 @@ public interface MessageType<T, TT> {
      *
      * @return the message
      */
-    Headers getHeaders();
+    List<Header> getHeaders();
 
 
     /**
@@ -78,6 +80,6 @@ public interface MessageType<T, TT> {
      * @param tt the tt
      * @return the message type
      */
-    MessageType build(Object tt);
+    MessageType build(Object tt) throws MessageNotDefinedException;
 
 }

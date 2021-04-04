@@ -20,6 +20,7 @@
 package io.virtualan.cucumblan.core;
 
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
@@ -27,12 +28,14 @@ import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaConsumerClient;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaProducerClient;
 import io.virtualan.cucumblan.core.msg.kafka.MessageContext;
+import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.props.TopicConfiguration;
 import io.virtualan.cucumblan.props.util.MsgHelper;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.exception.BadInputDataException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -75,31 +78,33 @@ public class MsgBaseStepDefinition {
    */
   @Given("send message event (.*) in partition (.*) on the (.*) with type (.*)$")
   public void produceMessageWithPartition(String eventName, Integer partition, String resource,
-      String type, List<String> messages) {
+      String type, Object messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     MessageType builtMessage = messageType.build(messages);
     scenario.log(builtMessage.toString());
+
     KafkaProducerClient
         .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
-            partition);
+            partition, builtMessage.getHeaders());
   }
 
   @Given("pause message process for (.*) milliseconds$")
   public void produceMessage(long sleep ) throws InterruptedException {
       Thread.sleep(sleep);
   }
-      /**
-       * Produce message.
-       *
-       * @param eventName the event name
-       * @param resource  the resource
-       * @param type      the type
-       * @param messages  the messages
-       */
+
+  /**
+   * Produce message.
+   *
+   * @param eventName the event name
+   * @param resource  the resource
+   * @param type      the type
+   * @param messages  the messages
+   */
   @Given("send message event (.*) on the (.*) with type (.*)$")
   public void produceMessage(String eventName, String resource, String type,
-      List<String> messages) {
+      DataTable messages) throws MessageNotDefinedException {
     String topic = TopicConfiguration.getProperty(eventName);
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     MessageType builtMessage = messageType.build(messages);
@@ -107,13 +112,65 @@ public class MsgBaseStepDefinition {
     if (builtMessage.getId() != null) {
       KafkaProducerClient
           .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
-              null);
+              null, builtMessage.getHeaders());
     } else {
       KafkaProducerClient
           .sendMessage(resource, topic, null, builtMessage.getMessage(),
-              null);
+              null, builtMessage.getHeaders());
     }
   }
+
+  /**
+   * Produce message.
+   *
+   * @param eventName the event name
+   * @param resource  the resource
+   * @param type      the type
+   * @param messages  the messages
+   */
+  @Given("send inline message event (.*) on the (.*) with type (.*)$")
+  public void produceMessage(String eventName, String resource, String type,
+      List<String> messages) throws MessageNotDefinedException {
+    String topic = TopicConfiguration.getProperty(eventName);
+    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    MessageType builtMessage = messageType.build(messages);
+    scenario.log(builtMessage.toString());
+    if (builtMessage.getId() != null) {
+      KafkaProducerClient
+          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+              null, builtMessage.getHeaders());
+    } else {
+      KafkaProducerClient
+          .sendMessage(resource, topic, null, builtMessage.getMessage(),
+              null, builtMessage.getHeaders());
+    }
+  }
+
+  /**
+   * Produce message.
+   *
+   * @param eventName the event name
+   * @param resource  the resource
+   * @param type      the type
+   * @param messages  the messages
+   */
+  @Given("send mapson message event (.*) on the (.*) with type (.*)$")
+  public void produceMessageMapson(String eventName, String resource, String type, Map<String, String> messages) throws MessageNotDefinedException {
+    String topic = TopicConfiguration.getProperty(eventName);
+    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    MessageType builtMessage = messageType.build(messages);
+    scenario.log(builtMessage.toString());
+    if (builtMessage.getId() != null) {
+      KafkaProducerClient
+          .sendMessage(resource, topic, builtMessage.getId(), builtMessage.getMessage(),
+              null, builtMessage.getHeaders());
+    } else {
+      KafkaProducerClient
+          .sendMessage(resource, topic, null, builtMessage.getMessage(),
+              null, builtMessage.getHeaders());
+    }
+  }
+
 
   /**
    * Verify consumed json object.

@@ -1,8 +1,13 @@
 package io.virtualan.test.msgtype.impl;
 
+import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import io.virtualan.cucumblan.message.type.MessageType;
+import io.virtualan.mapson.Mapson;
+import io.virtualan.mapson.exception.BadInputDataException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.json.JSONObject;
 
@@ -38,7 +43,7 @@ public class JSONMessage implements MessageType<String, String> {
   }
 
   @Override
-  public Headers getHeaders() {
+  public List<Header> getHeaders() {
     return null;
   }
 
@@ -58,10 +63,21 @@ public class JSONMessage implements MessageType<String, String> {
   }
 
   @Override
-  public MessageType build(Object messages) {
-    String message  =((List<String>)messages).stream().collect(Collectors.joining());
-    JSONObject body = new JSONObject(message);
-    return new JSONMessage(String.valueOf(body.getInt("id")), message);
+  public MessageType build(Object messages) throws  MessageNotDefinedException {
+    if (messages instanceof List) {
+      String message = ((List<String>) messages).stream().collect(Collectors.joining());
+      JSONObject body = new JSONObject(message);
+      return new JSONMessage(String.valueOf(body.getInt("id")), message);
+    } else {
+      String message = null;
+      try {
+        message = Mapson.buildMAPsonAsJson((Map<String, String>) messages);
+        JSONObject body = new JSONObject(message);
+        return new JSONMessage(String.valueOf(body.getInt("id")), message);
+      } catch (BadInputDataException e) {
+        throw new MessageNotDefinedException(e.getMessage());
+      }
+    }
   }
 
   @Override
