@@ -65,6 +65,12 @@ public class JSONMessage implements MessageType<String, String> {
     return null;
   }
 
+
+  @Override
+  public String getKey() {
+    return null;
+  }
+
   @Override
   public String getId() {
     return id;

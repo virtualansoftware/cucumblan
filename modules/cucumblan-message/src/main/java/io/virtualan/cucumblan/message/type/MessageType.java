@@ -43,11 +43,18 @@ public interface MessageType<T, TT> {
   String getType();
 
   /**
+   * Gets unique identifier of the message
+   *
+   * @return the id
+   */
+  Object getId();
+
+  /**
    * Gets Kafka message key for kafka
    *
    * @return the id
    */
-  T getId();
+  T getKey();
 
 
   /**
@@ -88,7 +95,7 @@ public interface MessageType<T, TT> {
    * Build message while consuming the message
    * for your specific needs Refer io.virtualan.cucumblan.message.typeimpl.JSONMessage
    *
-   * @param record ConsumerRecord<T, TT> object available in the context
+   * @param record ConsumerRecord object available in the context
    * @param key    the kafka message key
    * @param value  the kafka message object
    * @return the message type used for Pre defined verification steps

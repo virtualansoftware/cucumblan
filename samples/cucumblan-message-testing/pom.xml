@@ -6,6 +6,7 @@
   <packaging>jar</packaging>
   <name>cucumblan-message-testing</name>
   <properties>
+    <cucumblan-message.version>0.0.3-SNAPSHOT</cucumblan-message.version>
     <mapson.version>1.1.4</mapson.version>
     <kafka-clients.version>2.7.0</kafka-clients.version>
     <junit.version>5.5.2</junit.version>
@@ -128,7 +129,7 @@
     <dependency>
       <groupId>io.virtualan</groupId>
       <artifactId>cucumblan-message</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>${cucumblan-message.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
