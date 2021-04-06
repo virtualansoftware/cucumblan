@@ -1086,7 +1086,8 @@ public class BaseStepDefinition {
   public void verifySingleResponse(String resource, String context) {
     if (!this.skipScenario) {
       attachResponse(validatableResponse);
-      assertEquals(context, validatableResponse.extract().body().asString());
+      String output = validatableResponse.extract().body().asString() != null ? validatableResponse.extract().body().asString().trim() : null;
+      assertEquals(context.trim(), output.trim());
     }
   }
 
