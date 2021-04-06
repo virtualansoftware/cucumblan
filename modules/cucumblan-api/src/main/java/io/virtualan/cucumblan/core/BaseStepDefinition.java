@@ -844,7 +844,6 @@ public class BaseStepDefinition {
     }
   }
 
-
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
@@ -852,8 +851,6 @@ public class BaseStepDefinition {
     this.acceptContentType = null;
     this.skipScenario = false;
   }
-
-
 
   /**
    * Verify status code
@@ -863,7 +860,7 @@ public class BaseStepDefinition {
   @Then("^Verify the status code is (\\d+)")
   public void verifyStatusCode(int statusCode) {
     if (!this.skipScenario) {
-      ScenarioContext.setContext("CONTEXT_API_STATUS_CODE", String.valueOf(statusCode));
+      ScenarioContext.setContext("STATUS_CODE", String.valueOf(response.getStatusCode()));
       validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
       LOGGER.info(ScenarioContext.getContext().toString());
       LOGGER.info(validatableResponse.extract().body().asString());
