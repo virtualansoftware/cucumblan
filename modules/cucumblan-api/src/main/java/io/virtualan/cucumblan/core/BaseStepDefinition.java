@@ -21,11 +21,9 @@ package io.virtualan.cucumblan.core;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.And;
@@ -60,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
@@ -131,7 +128,7 @@ public class BaseStepDefinition {
    */
   @Given("^(.*) with an path param (.*) of (.*)")
   public void readRequestByPathParam(String dummy, String identifier, String value) {
-    if(!this.skipScenario){
+    if (!this.skipScenario) {
       request = given().pathParam(identifier, StepDefinitionHelper.getActualValue(value));
     }
   }
@@ -145,7 +142,7 @@ public class BaseStepDefinition {
    */
   @Given("^enable cert for (.*) of (.*)")
   public void cert(String identifier, String value) {
-    if(!this.skipScenario) {
+    if (!this.skipScenario) {
       RestAssured.authentication = RestAssured.certificate(identifier, value);
     }
   }
@@ -228,6 +225,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Read request.
    *
@@ -281,7 +279,7 @@ public class BaseStepDefinition {
    */
   @Given("^Provided all the feature level parameters from file$")
   public void loadGlobalParamFromFile() throws IOException {
-    if(!this.skipScenario) {
+    if (!this.skipScenario) {
       Properties properties = new Properties();
       InputStream stream = ApplicationConfiguration.class.getClassLoader()
           .getResourceAsStream("cucumblan-env.properties");
@@ -363,8 +361,9 @@ public class BaseStepDefinition {
    */
   @Given("^perform the (.*) condition to skip scenario")
   public void modifyBooleanVariable(String condition) throws IOException {
-    skipScenario = (Boolean) ExcelAndMathHelper.evaluateWithVariables(Boolean.class, condition,ScenarioContext.getContext());
-    scenario.log("condition :" + condition + " : is Skipped : " + skipScenario );
+    skipScenario = (Boolean) ExcelAndMathHelper
+        .evaluateWithVariables(Boolean.class, condition, ScenarioContext.getContext());
+    scenario.log("condition :" + condition + " : is Skipped : " + skipScenario);
   }
 
 
@@ -398,6 +397,7 @@ public class BaseStepDefinition {
           Helper.getActualValueForAll(responseValue, ScenarioContext.getContext()).toString());
     }
   }
+
   /**
    * Load as global param.
    *
@@ -424,6 +424,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Read request.
    *
@@ -448,7 +449,8 @@ public class BaseStepDefinition {
    * @param parameterMap the parameter map
    */
   @Given("^add (.*) with (.*) given form params$")
-  public void readMultiParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
+  public void readMultiParamsRequest(String nameIgnore, String contentType,
+      Map<String, String> parameterMap) {
     if (!this.skipScenario) {
       request = request.config(RestAssured.config()
           .encoderConfig(EncoderConfig.encoderConfig()
@@ -460,6 +462,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Read request.
    *
@@ -467,7 +470,8 @@ public class BaseStepDefinition {
    * @param parameterMap the parameter map
    */
   @Given("^add (.*) with (.*) given multipart-form params$")
-  public void readPathParamsRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
+  public void readPathParamsRequest(String nameIgnore, String contentType,
+      Map<String, String> parameterMap) {
     if (!this.skipScenario) {
       request = request.config(RestAssured.config()
           .encoderConfig(EncoderConfig.encoderConfig()
@@ -497,6 +501,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Read request.
    *
@@ -513,6 +518,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Read request.
    *
@@ -548,6 +554,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Load request.
    *
@@ -599,6 +606,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Create request.
    *
@@ -634,11 +642,11 @@ public class BaseStepDefinition {
   @Given("^Create (.*) with contentType (.*) given input$")
   public void createRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
       throws Exception {
-    if(!this.skipScenario){
+    if (!this.skipScenario) {
       jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext.getContext());
-    scenario.attach(jsonBody
-        , contentType, "requestData :  " + scenario.getName()+" : " + (sequence++));
-    request = request.contentType(contentType).body(jsonBody);
+      scenario.attach(jsonBody
+          , contentType, "requestData :  " + scenario.getName() + " : " + (sequence++));
+      request = request.contentType(contentType).body(jsonBody);
     }
   }
 
@@ -728,6 +736,7 @@ public class BaseStepDefinition {
           .post(resourceDetails);
     }
   }
+
   /**
    * Read request.
    *
@@ -757,6 +766,7 @@ public class BaseStepDefinition {
           .get(ApiHelper.getActualResource(resource, system));
     }
   }
+
   /**
    * Modify request.
    *
@@ -786,6 +796,7 @@ public class BaseStepDefinition {
           .put(ApiHelper.getActualResource(resource, system));
     }
   }
+
   /**
    * Pathch request.
    *
@@ -815,6 +826,7 @@ public class BaseStepDefinition {
           .patch(ApiHelper.getActualResource(resource, system));
     }
   }
+
   /**
    * Delete by id.
    *
@@ -868,16 +880,21 @@ public class BaseStepDefinition {
           "PreDefinedDataSet :  " + scenario.getName() + " : " + (sequence++));
     }
   }
+
   private void attachResponse(ValidatableResponse validatableResponse) {
     if (validatableResponse != null && validatableResponse.extract().body() != null) {
-      String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-      scenario.attach(validatableResponse.extract().body().asString(), xmlType, "actual-response " + scenario.getName()+" : " + (sequence++));
+      String xmlType =
+          response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+      scenario.attach(validatableResponse.extract().body().asString(), xmlType,
+          "actual-response " + scenario.getName() + " : " + (sequence++));
     }
   }
 
   private void attachActualResponse(String actual) {
-    String xmlType = response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-    scenario.attach(actual, xmlType, "expected-response " + scenario.getName()+" : " + (sequence++));
+    String xmlType =
+        response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+    scenario
+        .attach(actual, xmlType, "expected-response " + scenario.getName() + " : " + (sequence++));
   }
 
   /**
@@ -905,22 +922,8 @@ public class BaseStepDefinition {
 
           if (jsonRequestExpected != null && jsonRequestActual != null) {
             Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
-            Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestActual);
-            mapsonExpected.forEach((k, v) -> {
-              if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-                if (v == null) {
-                  if (mapson.get(k) == null) {
-                    assertNull(mapson.get(k));
-                  } else {
-                    assertEquals(" ", mapson.get(k));
-                  }
-                } else {
-                  LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
-                  assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
-                      v, mapson.get(k));
-                }
-              }
-            });
+            Map<String, String> mapsonActual = Mapson.buildMAPsonFromJson(jsonRequestActual);
+            Assert.assertTrue(areEqualKeyValues(resource, mapson, mapsonActual));
           } else {
             assertTrue("Standard " + type + " has no response validation ", false);
           }
@@ -957,21 +960,7 @@ public class BaseStepDefinition {
           if (jsonRequestExpected != null && jsonRequestActual != null) {
             Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
             Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestActual);
-            mapsonExpected.forEach((k, v) -> {
-              if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-                if (v == null) {
-                  if (mapson.get(k) == null) {
-                    assertNull(mapson.get(k));
-                  } else {
-                    assertEquals(" ", mapson.get(k));
-                  }
-                } else {
-                  LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
-                  assertEquals("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k),
-                      v, mapson.get(k));
-                }
-              }
-            });
+            Assert.assertTrue(areEqualKeyValues(resource, mapsonExpected, mapson));
           } else {
             assertTrue("Standard " + type + " has no response validation ", false);
           }
@@ -995,24 +984,35 @@ public class BaseStepDefinition {
   public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
     if (!this.skipScenario) {
       attachResponse(validatableResponse);
-      data.asMap(String.class, String.class).forEach((k, v) -> {
-        if (!ExcludeConfiguration.shouldSkip(resource, (String) k)) {
-          Map<String, String> mapson = Mapson.buildMAPsonFromJson(
-              validatableResponse.extract().body().asString());
-          if (v == null) {
-            if (mapson.get(k) == null) {
-              assertNull(mapson.get(k));
-            } else {
-              assertEquals(" ", mapson.get(k));
-            }
-          } else {
-            LOGGER.info("Key: " + k + "  Expected : " + v + " ==> Actual " + mapson.get(k));
-            assertEquals(v, mapson.get(k));
-          }
-        }
-      });
+      Map<String, String> mapson = Mapson.buildMAPsonFromJson(
+          validatableResponse.extract().body().asString());
+      Assert.assertTrue(areEqualKeyValues(resource,
+          data.asMap(String.class, String.class), mapson));
     }
   }
+
+  private boolean areEqualKeyValues(
+      String resource, Map<String, String> first,
+      Map<String, String> second) {
+    Map<String, String> result = first.entrySet().stream()
+        .filter(y -> (!ExcludeConfiguration.shouldSkip(resource, y.getKey())))
+        .filter(e ->
+            !((e.getValue() != null && StepDefinitionHelper.getActualValue(e.getValue().trim())
+                .equals(second.get(e.getKey()).trim()))
+                || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || ""
+                .equals(second.get(e.getKey()))))))
+
+        .collect(Collectors.toMap(e -> e.getKey(),
+            e -> "Expected: " + (e.getValue() != null ? StepDefinitionHelper
+                .getActualValue(e.getValue().trim()) : null) + " > Actual :" + second
+                .get(e.getKey())));
+    if (!result.isEmpty()) {
+      scenario.attach(result.toString(), "text/plain", "Unmatched info:");
+    }
+    return result.isEmpty();
+  }
+
+
   /**
    * Mock single response.
    *
@@ -1076,6 +1076,7 @@ public class BaseStepDefinition {
       }
     }
   }
+
   /**
    * Mock single response.
    *
@@ -1086,7 +1087,9 @@ public class BaseStepDefinition {
   public void verifySingleResponse(String resource, String context) {
     if (!this.skipScenario) {
       attachResponse(validatableResponse);
-      String output = validatableResponse.extract().body().asString() != null ? validatableResponse.extract().body().asString().trim() : null;
+      String output =
+          validatableResponse.extract().body().asString() != null ? validatableResponse.extract()
+              .body().asString().trim() : null;
       assertEquals(context.trim(), output.trim());
     }
   }
