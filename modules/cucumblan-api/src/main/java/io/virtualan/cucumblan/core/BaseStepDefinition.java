@@ -997,11 +997,10 @@ public class BaseStepDefinition {
     Map<String, String> result = first.entrySet().stream()
         .filter(y -> (!ExcludeConfiguration.shouldSkip(resource, y.getKey())))
         .filter(e ->
-            !((e.getValue() != null && StepDefinitionHelper.getActualValue(e.getValue().trim())
+            !((e.getValue() != null  && second.get(e.getKey()) != null && StepDefinitionHelper.getActualValue(e.getValue().trim())
                 .equals(second.get(e.getKey()).trim()))
                 || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || ""
                 .equals(second.get(e.getKey()))))))
-
         .collect(Collectors.toMap(e -> e.getKey(),
             e -> "Expected: " + (e.getValue() != null ? StepDefinitionHelper
                 .getActualValue(e.getValue().trim()) : null) + " > Actual :" + second

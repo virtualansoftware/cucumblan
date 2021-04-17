@@ -14,9 +14,6 @@ public class ApplicationConfiguration {
   private final static Logger LOGGER = Logger.getLogger(ApplicationConfiguration.class.getName());
 
   private static Properties properties = new Properties();
-  static {
-    reload();
-  }
 
 
   public static  void reload(){
@@ -49,6 +46,7 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static boolean getInline() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("data-inline") != null ?
         properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
   }
@@ -59,6 +57,7 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static boolean isProdMode() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("prod-mode") != null ?
         properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
   }
@@ -70,6 +69,7 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getStandardPackage() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("standard-package") != null ?
         properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
   }
@@ -81,6 +81,7 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getMessageTypePackage() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("message-package") != null ?
         properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
   }
@@ -91,6 +92,7 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getActionPackage() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("action-package") != null ?
         properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
   }
@@ -104,6 +106,7 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static boolean getBoolean(String keyName) {
+    ApplicationConfiguration.reload();
     return properties.getProperty(keyName) != null ?
         properties.getProperty(keyName).equalsIgnoreCase("true") : false;
   }
@@ -115,6 +118,8 @@ public class ApplicationConfiguration {
    * @return the properties
    */
   public static Map<String, String> getProperties() {
+
+    ApplicationConfiguration.reload();
     return (Map)properties;
   }
 
@@ -125,10 +130,13 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getProperty(String keyName) {
+
+    ApplicationConfiguration.reload();
     return properties.getProperty(keyName);
   }
 
   public static int getMessageCount() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("wait-message-count") != null ?
         Integer.parseInt(properties.getProperty("wait-message-count")) : 2;
   }
