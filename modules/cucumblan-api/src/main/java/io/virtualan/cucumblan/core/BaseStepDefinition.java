@@ -53,6 +53,7 @@ import io.virtualan.util.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.xmlbeans.impl.util.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
@@ -994,7 +996,7 @@ public class BaseStepDefinition {
   private boolean areEqualKeyValues(
       String resource, Map<String, String> first,
       Map<String, String> second) {
-    Map<String, String> result = first.entrySet().stream()
+    Map<String, JSONObject> result = first.entrySet().stream()
         .filter(y -> (!ExcludeConfiguration.shouldSkip(resource, y.getKey())))
         .filter(e ->
             !((e.getValue() != null  && second.get(e.getKey()) != null && StepDefinitionHelper.getActualValue(e.getValue().trim())
@@ -1002,11 +1004,13 @@ public class BaseStepDefinition {
                 || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || ""
                 .equals(second.get(e.getKey()))))))
         .collect(Collectors.toMap(e -> e.getKey(),
-            e -> "Expected: " + (e.getValue() != null ? StepDefinitionHelper
-                .getActualValue(e.getValue().trim()) : null) + " > Actual :" + second
-                .get(e.getKey())));
+            e -> { JSONObject object = new JSONObject(); object.put("expected", e.getValue() != null ? StepDefinitionHelper
+                .getActualValue(e.getValue().trim()) : null); object.put("actual" , second
+                .get(e.getKey())); return object;}));
     if (!result.isEmpty()) {
-      scenario.attach(result.toString(), "text/plain", "Unmatched info:");
+      JSONArray array = new JSONArray();
+      result.entrySet().forEach(x -> {JSONObject object = new JSONObject(); object.put(x.getKey(), x.getValue()); array.put(object);});
+      scenario.attach(array.toString(), "application/json", "Comparison Failure");
     }
     return result.isEmpty();
   }
