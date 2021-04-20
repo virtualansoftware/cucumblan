@@ -53,7 +53,6 @@ import io.virtualan.util.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ import org.reflections.scanners.SubTypesScanner;
 
 
 /**
- * The type Base step definition.
+ * The type Base step definition for api.
  *
  * @author Elan Thangamani
  */
@@ -925,7 +924,7 @@ public class BaseStepDefinition {
           if (jsonRequestExpected != null && jsonRequestActual != null) {
             Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
             Map<String, String> mapsonActual = Mapson.buildMAPsonFromJson(jsonRequestActual);
-            Assert.assertTrue(areEqualKeyValues(resource, mapson, mapsonActual));
+            Assert.assertTrue(areEqualKeyValues(resource,  mapsonActual, mapson, true));
           } else {
             assertTrue("Standard " + type + " has no response validation ", false);
           }
@@ -962,7 +961,7 @@ public class BaseStepDefinition {
           if (jsonRequestExpected != null && jsonRequestActual != null) {
             Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
             Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestActual);
-            Assert.assertTrue(areEqualKeyValues(resource, mapsonExpected, mapson));
+            Assert.assertTrue(areEqualKeyValues(resource, mapson, mapsonExpected,  true));
           } else {
             assertTrue("Standard " + type + " has no response validation ", false);
           }
@@ -989,13 +988,15 @@ public class BaseStepDefinition {
       Map<String, String> mapson = Mapson.buildMAPsonFromJson(
           validatableResponse.extract().body().asString());
       Assert.assertTrue(areEqualKeyValues(resource,
-          data.asMap(String.class, String.class), mapson));
+          data.asMap(String.class, String.class), mapson, false));
     }
   }
 
   private boolean areEqualKeyValues(
       String resource, Map<String, String> first,
-      Map<String, String> second) {
+      Map<String, String> second, boolean isActual) {
+    String actual= isActual? "expected" : "actual";
+    String expected = isActual? "actual": "expected";
     Map<String, JSONObject> result = first.entrySet().stream()
         .filter(y -> (!ExcludeConfiguration.shouldSkip(resource, y.getKey())))
         .filter(e ->
@@ -1004,8 +1005,9 @@ public class BaseStepDefinition {
                 || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || ""
                 .equals(second.get(e.getKey()))))))
         .collect(Collectors.toMap(e -> e.getKey(),
-            e -> { JSONObject object = new JSONObject(); object.put("expected", e.getValue() != null ? StepDefinitionHelper
-                .getActualValue(e.getValue().trim()) : null); object.put("actual" , second
+            e -> { JSONObject object = new JSONObject(); object.put(
+                expected, e.getValue() != null ? StepDefinitionHelper
+                .getActualValue(e.getValue().trim()) : null); object.put(actual, second
                 .get(e.getKey())); return object;}));
     if (!result.isEmpty()) {
       JSONArray array = new JSONArray();

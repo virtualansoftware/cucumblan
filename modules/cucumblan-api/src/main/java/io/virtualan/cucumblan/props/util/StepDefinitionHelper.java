@@ -16,7 +16,6 @@ public class StepDefinitionHelper {
 
   private final static Logger LOGGER = Logger.getLogger(StepDefinitionHelper.class.getName());
 
-
   /**
    * Gets actual value.
    *
@@ -68,18 +67,19 @@ public class StepDefinitionHelper {
         StringBuffer keys = new StringBuffer();
         for (String token : key.split(",")) {
           if (!ScenarioContext.getContext().containsKey(token)) {
-            System.out.println("Value missing...");
+            return object;
           }
           keys.append(ScenarioContext.getContext().get(token)).append(",");
         }
         returnValue = keys.toString().substring(0, keys.toString().length() - 1);
       }
-    } else {
-      if (!ScenarioContext.getContext().containsKey(key)) {
-        System.out.println("Value missing...");
-        return object;
-      } else {
-        returnValue = ScenarioContext.getContext().get(key);
+      else {
+        if (!ScenarioContext.getContext().containsKey(key)) {
+          LOGGER.warning(object +" has Value missing... for the key : " + key);
+          return object;
+        } else {
+          returnValue = ScenarioContext.getContext().get(key);
+        }
       }
     }
     String response = ((String) object).replace("[" + key + "]", returnValue);
@@ -105,7 +105,6 @@ public class StepDefinitionHelper {
     }
   }
 
-
   /**
    * Gets object value.
    *
@@ -128,6 +127,5 @@ public class StepDefinitionHelper {
       return value.toString();
     }
   }
-
 
 }
