@@ -993,8 +993,12 @@ public class BaseStepDefinition {
             attachResponse(validatableResponse);
             Map<String, String> mapson = Mapson.buildMAPsonFromJson(
                     validatableResponse.extract().body().asString());
-            Assert.assertTrue(areEqualKeyValues(resource,
-                    data.asMap(String.class, String.class), mapson, false));
+            if(areEqualKeyValues(resource,
+                data.asMap(String.class, String.class), mapson, false)) {
+                Assert.assertTrue("Comparison success", true );
+            } else {
+                Assert.assertTrue("Comparison failed refer unmatched info", true );
+            }
         }
     }
 
@@ -1020,14 +1024,22 @@ public class BaseStepDefinition {
                                     .get(e.getKey()));
                             return object;
                         }));
-        if (!result.isEmpty()) {
-            JSONArray array = new JSONArray();
-            result.entrySet().forEach(x -> {
-                JSONObject object = new JSONObject();
-                object.put(x.getKey(), x.getValue());
-                array.put(object);
-            });
-            scenario.attach(array.toString(), "application/json", "Comparison Failure");
+        if (!result.isEmpty() ) {
+            List<JSONObject> values = result.values().stream()
+                .filter(x -> !(x.optString("expected").replace("\\r", "\r")
+                    .equals(x.optString("actual")))).collect(Collectors.toList());
+            if (!values.isEmpty()) {
+                JSONArray array = new JSONArray();
+                result.entrySet().forEach(x -> {
+                    JSONObject object = new JSONObject();
+                    object.put(x.getKey(), x.getValue());
+                    array.put(object);
+                });
+                scenario.attach(array.toString(), "application/json", "Comparison Failure");
+
+            } else {
+                return values.isEmpty();
+            }
         }
         return result.isEmpty();
     }
