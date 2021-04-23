@@ -128,4 +128,16 @@ public class StepDefinitionHelper {
     }
   }
 
+  public static Object getJSON(String json) {
+    try {
+      return new JSONObject(json);
+    } catch (JSONException err) {
+      try {
+        return new JSONArray(json);
+      } catch (Exception e) {
+       LOGGER.warning("invalid JSON > " + json);
+      }
+    }
+    return null;
+  }
 }

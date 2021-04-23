@@ -1118,14 +1118,27 @@ public class BaseStepDefinition {
     public void verify(String dummy, List<String> csvson)
             throws Exception {
         JSONArray expectedArray = Csvson.buildCSVson(csvson, ScenarioContext.getContext());
-        JSONArray actualArray = new JSONArray(validatableResponse.extract().body().asString());
-        JSONCompareResult result = JSONCompare.compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
-        scenario.attach(actualArray.toString(), "application/json", "Actual json");
+        Object objJson = StepDefinitionHelper.getJSON(validatableResponse.extract().body().asString());
+        JSONCompareResult result = null;
         scenario.attach(expectedArray.toString(), "application/json", "Expected json");
-        if (result.failed()) {
-            scenario.attach(result.getMessage(), "plain/text", "Unmatched csvson");
+        if(objJson instanceof JSONArray){
+            JSONArray actualArray = new JSONArray(validatableResponse.extract().body().asString());
+            result = JSONCompare.compareJSON(expectedArray, actualArray,  JSONCompareMode.LENIENT);
+            scenario.attach(actualArray.toString(), "application/json", "Actual json");
+        } else if(objJson instanceof JSONObject){
+            JSONObject actualArray = new JSONObject(validatableResponse.extract().body().asString());
+            result = JSONCompare.compareJSON( expectedArray.getJSONObject(0), actualArray, JSONCompareMode.LENIENT);
+            scenario.attach(actualArray.toString(), "application/json", "Actual json");
         }
-        assertTrue("Cvsson record matches", result.passed());
+
+        if (result == null){
+            Assert.assertTrue("Actual input is not a valid JSON Object", false);
+        } else if (result.failed()) {
+            scenario.attach(result.getMessage(), "text/plain", "Unmatched csvson");
+            assertTrue("Csvson record does not match", result.passed());
+        } else {
+            assertTrue("Csvson record matches", result.passed());
+        }
     }
 
 
