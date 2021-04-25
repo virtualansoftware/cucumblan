@@ -930,7 +930,12 @@ public class BaseStepDefinition {
                     if (jsonRequestExpected != null && jsonRequestActual != null) {
                         Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
                         Map<String, String> mapsonActual = Mapson.buildMAPsonFromJson(jsonRequestActual);
-                        Assert.assertTrue(areEqualKeyValues(resource, mapsonActual, mapson, true));
+                        if(areEqualKeyValues(resource, mapsonActual, mapson, true)){
+                            Assert.assertTrue("Comparison success", true );
+                        } else {
+                            Assert.assertTrue("Comparison failed refer Comparison Failure", false );
+                        }
+
                     } else {
                         assertTrue("Standard " + type + " has no response validation ", false);
                     }
@@ -967,7 +972,11 @@ public class BaseStepDefinition {
                     if (jsonRequestExpected != null && jsonRequestActual != null) {
                         Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
                         Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestActual);
-                        Assert.assertTrue(areEqualKeyValues(resource, mapson, mapsonExpected, true));
+                        if(areEqualKeyValues(resource, mapson, mapsonExpected, true)){
+                            Assert.assertTrue("Comparison success", true );
+                        } else {
+                            Assert.assertTrue("Comparison failed refer Comparison Failure", false );
+                        }
                     } else {
                         assertTrue("Standard " + type + " has no response validation ", false);
                     }
@@ -997,7 +1006,7 @@ public class BaseStepDefinition {
                 data.asMap(String.class, String.class), mapson, false)) {
                 Assert.assertTrue("Comparison success", true );
             } else {
-                Assert.assertTrue("Comparison failed refer unmatched info", true );
+                Assert.assertTrue("Comparison failed refer Comparison Failure", false );
             }
         }
     }
