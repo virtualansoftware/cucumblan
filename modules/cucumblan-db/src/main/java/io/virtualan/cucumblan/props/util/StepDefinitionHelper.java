@@ -1,28 +1,10 @@
 package io.virtualan.cucumblan.props.util;
 
 import java.util.logging.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-/*
- *
- *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
- *
- *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *     in compliance with the License. You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *     Unless required by applicable law or agreed to in writing, software distributed under the License
- *     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *     or implied. See the License for the specific language governing permissions and limitations under
- *     the License.
- *
- *
- *
- */
 
 
 /**
@@ -31,8 +13,8 @@ import org.json.JSONTokener;
  * @author Elan Thangamani
  */
 public class StepDefinitionHelper {
-	private final static Logger LOGGER = Logger.getLogger(StepDefinitionHelper.class.getName());
 
+	private final static Logger LOGGER = Logger.getLogger(StepDefinitionHelper.class.getName());
 
 	/**
 	 * Gets actual value.
@@ -40,7 +22,7 @@ public class StepDefinitionHelper {
 	 * @param value the value
 	 * @return the actual value
 	 */
-	public static Object getActualValue( String value) {
+	public static Object replace(String value) {
 		String returnValue = value;
 		if (value.contains("[") && value.contains("]")) {
 			String key = value.substring(value.indexOf("[") + 1, value.lastIndexOf("]"));
@@ -65,6 +47,46 @@ public class StepDefinitionHelper {
 	}
 
 	/**
+	 * Gets actual value.
+	 *
+	 * @param object the object
+	 * @return the actual value
+	 */
+	public static Object getActualValue(Object object) {
+		if (object == null) {
+			return object;
+		}
+		if (object instanceof JSONArray) {
+			return object;
+		}
+		String returnValue = (String) object;
+		String key = "";
+		if (returnValue.contains("[") && returnValue.contains("]")) {
+			key = returnValue.substring(returnValue.indexOf("[") + 1, returnValue.indexOf("]"));
+			if (key.contains(",")) {
+				StringBuffer keys = new StringBuffer();
+				for (String token : key.split(",")) {
+					if (!ScenarioContext.getContext().containsKey(token)) {
+						return object;
+					}
+					keys.append(ScenarioContext.getContext().get(token)).append(",");
+				}
+				returnValue = keys.toString().substring(0, keys.toString().length() - 1);
+			}
+			else {
+				if (!ScenarioContext.getContext().containsKey(key)) {
+					LOGGER.warning(object +" has Value missing... for the key : " + key);
+					return object;
+				} else {
+					returnValue = ScenarioContext.getContext().get(key);
+				}
+			}
+		}
+		String response = ((String) object).replace("[" + key + "]", returnValue);
+		return response.indexOf("[") != -1 ? replace(response) : response;
+	}
+
+	/**
 	 * Build json string string.
 	 *
 	 * @param fileName  the file name
@@ -82,7 +104,6 @@ public class StepDefinitionHelper {
 			throw new Exception("Validate " + fileName + " has correct Json format?? " + e.getMessage());
 		}
 	}
-
 
 	/**
 	 * Gets object value.
@@ -107,5 +128,16 @@ public class StepDefinitionHelper {
 		}
 	}
 
-
+	public static Object getJSON(String json) {
+		try {
+			return new JSONObject(json);
+		} catch (JSONException err) {
+			try {
+				return new JSONArray(json);
+			} catch (Exception e) {
+				LOGGER.warning("invalid JSON > " + json);
+			}
+		}
+		return null;
+	}
 }
