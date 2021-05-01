@@ -49,7 +49,12 @@ public class KafkaProducerClient {
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader()
           .getResourceAsStream("producer-" + resource + ".properties");
-      props.load(stream);
+      if(stream != null) {
+        props.load(stream);
+      } else {
+        log.warn("producer-" + resource + ".properties is not found");
+        System.exit(1);
+      }
     } catch (IOException e) {
       log.warn("producer-" + resource + ".properties is not loaded");
       System.exit(1);

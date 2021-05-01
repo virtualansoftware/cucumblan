@@ -25,6 +25,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.virtualan.csvson.Csvson;
+import io.virtualan.cucumblan.props.util.EventRequest;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaConsumerClient;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaProducerClient;
 import io.virtualan.cucumblan.core.msg.kafka.MessageContext;
@@ -76,11 +77,13 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send message event (.*) in partition (.*) on (.*) with type (.*)$")
-  public void produceMessageWithPartition(String eventName, Integer partition, String resource,
+  @Given("send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
+  public void produceMessageWithPartition(String dummy, String eventName, Integer partition, String resource,
       String type, Object messages) throws MessageNotDefinedException {
-    String topic = TopicConfiguration.getProperty(eventName);
-    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
+    String topic = TopicConfiguration.getProperty(eventNameInput);
+    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
@@ -99,8 +102,8 @@ public class MsgBaseStepDefinition {
    * @param sleep the sleep
    * @throws InterruptedException the interrupted exception
    */
-  @Given("pause message process for (.*) milliseconds$")
-  public void produceMessage(long sleep) throws InterruptedException {
+  @Given("pause message (.*) for process for (.*) milliseconds$")
+  public void produceMessage(String dummy, long sleep) throws InterruptedException {
     Thread.sleep(sleep);
   }
 
@@ -110,9 +113,10 @@ public class MsgBaseStepDefinition {
    * @param eventName the eventName
    * @throws InterruptedException the interrupted exception
    */
-  @Given("clear the consumed message for the event (.*)$")
-  public void clearMessage(String eventName) throws InterruptedException {
-    MessageContext.removeEventContextMap(eventName);
+  @Given("clear the consumed message (.*) for the event (.*)$")
+  public void clearMessage(String dummy, String eventName) throws InterruptedException {
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    MessageContext.removeEventContextMap(eventNameInput);
   }
 
   /**
@@ -124,11 +128,13 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send message event (.*) on (.*) with type (.*)$")
-  public void produceMessage(String eventName, String resource, String type,
+  @Given("send message (.*) for event (.*) on (.*) with type (.*)$")
+  public void produceMessage(String dummy, String eventName, String resource, String type,
       DataTable messages) throws MessageNotDefinedException {
-    String topic = TopicConfiguration.getProperty(eventName);
-    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
+    String topic = TopicConfiguration.getProperty(eventNameInput);
+    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
@@ -155,11 +161,13 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send inline message event (.*) on (.*) with type (.*)$")
-  public void produceMessage(String eventName, String resource, String type,
+  @Given("send inline message (.*) for event (.*) on (.*) with type (.*)$")
+  public void produceMessage(String dummy, String eventName, String resource, String type,
       List<String> messages) throws MessageNotDefinedException {
-    String topic = TopicConfiguration.getProperty(eventName);
-    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
+    String topic = TopicConfiguration.getProperty(eventNameInput);
+    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
@@ -186,11 +194,13 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send mapson message event (.*) on (.*) with type (.*)$")
-  public void produceMessageMapson(String eventName, String resource, String type,
+  @Given("send mapson message (.*) for event (.*) on (.*) with type (.*)$")
+  public void produceMessageMapson(String dummy, String eventName, String resource, String type,
       Map<String, String> messages) throws MessageNotDefinedException {
-    String topic = TopicConfiguration.getProperty(eventName);
-    MessageType messageType = MessageContext.getMessageTypes().get(type);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
+    String topic = TopicConfiguration.getProperty(eventNameInput);
+    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
@@ -222,15 +232,25 @@ public class MsgBaseStepDefinition {
    * @throws BadInputDataException      bad input data exception
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("verify (.*) contains (.*) on (.*) with type (.*)$")
-  public void verifyConsumedJSONObject(String eventName, String id, String resource, String type,
+  @Given("Verify (.*) for event (.*) contains (.*) on (.*) with type (.*)$")
+  public void verifyConsumedJSONObject(String dummy, String eventName, String id, String resource, String type,
       List<String> csvson)
       throws InterruptedException, BadInputDataException, MessageNotDefinedException {
     int recheck = 0;
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, type, id, resource, recheck);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
+    String idInput = StepDefinitionHelper.getActualValue(id).toString();
+    EventRequest eventRequest = new EventRequest();
+    eventRequest.setRecheck(recheck);
+    eventRequest.setEventName(eventNameInput);
+    eventRequest.setType(typeInput);
+    eventRequest.setId(idInput);
+    eventRequest.setResource(resource);
+
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
-          "verifyConsumedJSONObject");
+          "ActualResponse:");
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext());
       if (expectedJson.getMessageAsJson() instanceof JSONObject) {
         JSONAssert
@@ -256,15 +276,25 @@ public class MsgBaseStepDefinition {
    * @throws InterruptedException       interrupted exception
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("verify-by-elements (.*) contains (.*) on (.*) with type (.*)$")
-  public void consumeMessage(String eventName, String id, String resource, String type,
+  @Given("Verify-by-elements (.*) for event (.*) contains (.*) on (.*) with type (.*)$")
+  public void consumeMessage(String dummy, String eventName, String id, String resource, String type,
       Map<String, String> keyValue)
       throws InterruptedException, MessageNotDefinedException {
     int recheck = 0;
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventName, type, id, resource, recheck);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
+    String idInput = StepDefinitionHelper.getActualValue(id).toString();
+    EventRequest eventRequest = new EventRequest();
+    eventRequest.setRecheck(recheck);
+    eventRequest.setEventName(eventNameInput);
+    eventRequest.setType(typeInput);
+    eventRequest.setId(idInput);
+    eventRequest.setResource(resource);
+
+    MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
     if (expectedJson != null) {
       scenario.attach(expectedJson.getMessage().toString(), "application/json",
-          "verifyConsumedJSONObject");
+          "ActualResponse");
       MessageType finalExpectedJson = expectedJson;
       keyValue.forEach((k, v) -> {
         Object value = MsgHelper.getJSON(finalExpectedJson.getMessageAsJson().toString(), k);

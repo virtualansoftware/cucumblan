@@ -130,22 +130,22 @@ public class DBBaseStepDefinition {
    * @param sqls     the sqls
    * @throws Exception the exception
    */
-  @Given("perform a (.*) DDL sql on (.*)$")
-  @Given("update the given sql for (.*) on (.*)$")
-  @Given("delete the given sql for (.*) on (.*)$")
-  @Given("insert the given sql for (.*) on (.*)$")
+  @Given("Perform a (.*) DDL sql on (.*)$")
+  @Given("Update the given sql for (.*) on (.*)$")
+  @Given("Delete the given sql for (.*) on (.*)$")
+  @Given("Insert the given sql for (.*) on (.*)$")
   public void insertSql(String dummy, String resource, List<String> sqls) throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
     for (String sql : sqls) {
       try {
-        jdbcTemplate.execute(sql);
+        jdbcTemplate.execute(StepDefinitionHelper.getActualValue(sql).toString());
       } catch (Exception e) {
         LOGGER.warning("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
         scenario.log("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
         Assert.assertTrue(dummy+"  sqls are not inserted : (" + e.getMessage() + ")", false);
       }
     }
-    Assert.assertTrue(" All sqls are inserted successfully ", true);
+    Assert.assertTrue("All sqls are executed successfully", true);
   }
 
   private JdbcTemplate getJdbcTemplate(String resource) throws Exception {
@@ -167,18 +167,22 @@ public class DBBaseStepDefinition {
    * @param selectSql the select sql
    * @throws Exception the exception
    */
-  @Given("verify (.*) with the given sql for (.*) on (.*)$")
+  @Given("Verify (.*) with the given sql for (.*) on (.*)$")
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
     String json = null;
     if (selectSql.size() >= 1) {
-      json = getJson(resource,
-          StepDefinitionHelper.getActualValue(selectSql.get(0)).toString());
+      try {
+        json = getJson(resource,
+            StepDefinitionHelper.getActualValue(selectSql.get(0)).toString());
+      }catch (Exception e){
+        Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
+      }
     } else {
       Assert.assertTrue(" select sqls missing ", false);
     }
-
+    scenario.attach(json, "application/json", "ActualSqlResponse");
     if (selectSql.size() == 1) {
       Assert.assertNull(json);
     } else {
