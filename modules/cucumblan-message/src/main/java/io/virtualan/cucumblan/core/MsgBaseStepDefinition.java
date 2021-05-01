@@ -68,6 +68,16 @@ public class MsgBaseStepDefinition {
 
 
   /**
+   * given sql.
+   *
+   * @param dummy    the dummy
+   * @throws Exception the exception
+   */
+  @Given("As a user perform message (.*) action$")
+  public void dummyGiven(String dummy) throws Exception {
+  }
+
+  /**
    * Produce message with partition.
    *
    * @param eventName the event name
@@ -77,7 +87,7 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
+  @Given("Send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
   public void produceMessageWithPartition(String dummy, String eventName, Integer partition, String resource,
       String type, Object messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
@@ -102,7 +112,7 @@ public class MsgBaseStepDefinition {
    * @param sleep the sleep
    * @throws InterruptedException the interrupted exception
    */
-  @Given("pause message (.*) for process for (.*) milliseconds$")
+  @Given("Pause message (.*) for process for (.*) milliseconds$")
   public void produceMessage(String dummy, long sleep) throws InterruptedException {
     Thread.sleep(sleep);
   }
@@ -113,7 +123,7 @@ public class MsgBaseStepDefinition {
    * @param eventName the eventName
    * @throws InterruptedException the interrupted exception
    */
-  @Given("clear the consumed message (.*) for the event (.*)$")
+  @Given("Clear the consumed message (.*) for the event (.*)$")
   public void clearMessage(String dummy, String eventName) throws InterruptedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
     MessageContext.removeEventContextMap(eventNameInput);
@@ -128,7 +138,7 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send message (.*) for event (.*) on (.*) with type (.*)$")
+  @Given("Send message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessage(String dummy, String eventName, String resource, String type,
       DataTable messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
@@ -161,7 +171,7 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send inline message (.*) for event (.*) on (.*) with type (.*)$")
+  @Given("Send inline message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessage(String dummy, String eventName, String resource, String type,
       List<String> messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
@@ -194,7 +204,7 @@ public class MsgBaseStepDefinition {
    * @param messages  the messages
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("send mapson message (.*) for event (.*) on (.*) with type (.*)$")
+  @Given("Send mapson message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessageMapson(String dummy, String eventName, String resource, String type,
       Map<String, String> messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();

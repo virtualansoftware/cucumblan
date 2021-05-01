@@ -123,17 +123,27 @@ public class DBBaseStepDefinition {
   }
 
   /**
-   * Insert sql.
+   * given sql.
    *
    * @param dummy    the dummy
-   * @param resource the resource
-   * @param sqls     the sqls
    * @throws Exception the exception
    */
-  @Given("Perform a (.*) DDL sql on (.*)$")
-  @Given("Update the given sql for (.*) on (.*)$")
-  @Given("Delete the given sql for (.*) on (.*)$")
-  @Given("Insert the given sql for (.*) on (.*)$")
+  @Given("As a user perform sql (.*) action$")
+  public void dummyGiven(String dummy) throws Exception {
+  }
+
+    /**
+     * Insert sql.
+     *
+     * @param dummy    the dummy
+     * @param resource the resource
+     * @param sqls     the sqls
+     * @throws Exception the exception
+     */
+  @Given("Execute DDL for the given sql for (.*) on (.*)$")
+  @Given("Execute UPDATE for the given sql for (.*) on (.*)$")
+  @Given("Execute DELETE for the given sql for (.*) on (.*)$")
+  @Given("Execute INSERT for the given sql for (.*) on (.*)$")
   public void insertSql(String dummy, String resource, List<String> sqls) throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
     for (String sql : sqls) {
