@@ -105,6 +105,17 @@ public class MsgBaseStepDefinition {
   }
 
   /**
+   * eventName to Produce message.
+   *
+   * @param eventName the eventName
+   * @throws InterruptedException the interrupted exception
+   */
+  @Given("clear the consumed message for the event (.*)$")
+  public void clearMessage(String eventName) throws InterruptedException {
+    MessageContext.removeEventContextMap(eventName);
+  }
+
+  /**
    * Produce message.
    *
    * @param eventName the event name
