@@ -140,10 +140,10 @@ public class DBBaseStepDefinition {
      * @param sqls     the sqls
      * @throws Exception the exception
      */
-  @Given("Execute DDL for the given sql for (.*) on (.*)$")
-  @Given("Execute UPDATE for the given sql for (.*) on (.*)$")
-  @Given("Execute DELETE for the given sql for (.*) on (.*)$")
-  @Given("Execute INSERT for the given sql for (.*) on (.*)$")
+  @Given("Execute DDL for the given sql (.*) on (.*)$")
+  @Given("Execute UPDATE for the given sql (.*) on (.*)$")
+  @Given("Execute DELETE for the given sql (.*) on (.*)$")
+  @Given("Execute INSERT for the given sql (.*) on (.*)$")
   public void insertSql(String dummy, String resource, List<String> sqls) throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
     for (String sql : sqls) {
@@ -177,7 +177,7 @@ public class DBBaseStepDefinition {
    * @param selectSql the select sql
    * @throws Exception the exception
    */
-  @Given("Verify (.*) with the given sql for (.*) on (.*)$")
+  @Given("Verify (.*) with the given sql (.*) on (.*)$")
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
