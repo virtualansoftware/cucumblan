@@ -259,14 +259,18 @@ public class MsgBaseStepDefinition {
 
     MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
     if (expectedJson != null) {
-      scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
-          "ActualResponse:");
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext());
+      scenario.attach(csvobject.toString(4), "application/json",
+          "ExpectedResponse:");
       if (expectedJson.getMessageAsJson() instanceof JSONObject) {
+        scenario.attach(((JSONObject)expectedJson.getMessageAsJson()).toString(4), "application/json",
+            "ActualResponse:");
         JSONAssert
             .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson.getMessageAsJson(),
                 JSONCompareMode.LENIENT);
       } else {
+        scenario.attach(((JSONArray)expectedJson.getMessageAsJson()).toString(4), "application/json",
+            "ActualResponse:");
         JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
       }
     } else {

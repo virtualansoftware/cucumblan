@@ -1044,7 +1044,7 @@ public class BaseStepDefinition {
                     object.put(x.getKey(), x.getValue());
                     array.put(object);
                 });
-                scenario.attach(array.toString(), "application/json", "Comparison Failure");
+                scenario.attach(array.toString(4), "application/json", "Comparison Failure");
 
             } else {
                 return values.isEmpty();
