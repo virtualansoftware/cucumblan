@@ -723,6 +723,7 @@ public class BaseStepDefinition {
     @When("^(.*) post (.*) in (.*) resource on (.*)")
     public void createRequest(String dummyString, String acceptContentType, String resource,
                               String system) {
+        resource = StepDefinitionHelper.getActualValue(resource).toString();
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =
@@ -755,6 +756,7 @@ public class BaseStepDefinition {
     @When("^(.*) get (.*) in (.*) resource on (.*)")
     public void readRequest(String dummyString, String acceptContentType, String resource,
                             String system) {
+        resource = StepDefinitionHelper.getActualValue(resource).toString();
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             String contentType =
@@ -785,6 +787,7 @@ public class BaseStepDefinition {
     @When("^(.*) put (.*) in (.*) resource on (.*)")
     public void modifyRequest(String dummyString, String acceptContentType, String resource,
                               String system) {
+        resource = StepDefinitionHelper.getActualValue(resource).toString();
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =
@@ -815,6 +818,7 @@ public class BaseStepDefinition {
     @When("^(.*) patch (.*) in (.*) resource on (.*)")
     public void patchRequest(String dummyString, String acceptContentType, String resource,
                              String system) {
+        resource = StepDefinitionHelper.getActualValue(resource).toString();
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =
@@ -845,6 +849,7 @@ public class BaseStepDefinition {
     @When("^(.*) delete (.*) in (.*) resource on (.*)")
     public void deleteById(String dummyString, String acceptContentType, String resource,
                            String system) {
+        resource = StepDefinitionHelper.getActualValue(resource).toString();
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =

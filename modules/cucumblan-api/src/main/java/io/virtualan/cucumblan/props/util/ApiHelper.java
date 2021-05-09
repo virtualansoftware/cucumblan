@@ -16,6 +16,7 @@ public class ApiHelper {
    * @return the actual resource
    */
   public static String getHostName(String resourceKey, String system) {
+
     if (ApplicationConfiguration.getProperty("service.api." + system) == null) {
       if( ApplicationConfiguration.getProperty("service.api") != null){
           return ApplicationConfiguration.getProperty("service.api");
@@ -47,7 +48,7 @@ public class ApiHelper {
     }
     String url = ApplicationConfiguration.getProperty("service.api." + system)
         + (props != null && props.getProperty(resourceKey) != null ? props.getProperty(resourceKey) : resourceKey);
-    return url;
+    return StepDefinitionHelper.getActualValue(url).toString();
   }
 
 }
