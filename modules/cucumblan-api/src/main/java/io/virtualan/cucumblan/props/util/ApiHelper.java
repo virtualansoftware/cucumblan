@@ -16,18 +16,14 @@ public class ApiHelper {
    * @return the actual resource
    */
   public static String getHostName(String resourceKey, String system) {
-    Properties props = EndpointConfiguration.getInstance().getProperty(system);
     if (ApplicationConfiguration.getProperty("service.api." + system) == null) {
       if( ApplicationConfiguration.getProperty("service.api") != null){
-        String url = ApplicationConfiguration.getProperty("service.api");
-        return url;
+          return ApplicationConfiguration.getProperty("service.api");
       } else {
-        log.warn("service.api : configuration is missing.. Unable to proceed");
-        System.exit(-1);
+        return resourceKey;
       }
     }
-    String url = ApplicationConfiguration.getProperty("service.api." + system);
-    return url;
+    return ApplicationConfiguration.getProperty("service.api." + system);
   }
 
   /**

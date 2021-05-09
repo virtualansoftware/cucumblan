@@ -104,6 +104,21 @@ public class MessageContext {
   }
 
   /**
+   * remove event context map.
+   *
+   * @param eventName the event name
+   * @return the event context map
+   */
+  public static Object removeEventContextMap(String eventName) {
+    if ("ALL".equalsIgnoreCase(eventName)) {
+      messageContext.clear();
+    } else if(isContains(eventName)){
+      messageContext.remove(eventName);
+    }
+    return null;
+  }
+
+  /**
    * Gets event context map.
    *
    * @param eventName the event name

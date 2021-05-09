@@ -4,11 +4,11 @@
   <artifactId>cucumblan-api</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-api</name>
-  <version>1.1.9-SNAPSHOT</version>
+  <version>1.1.14-SNAPSHOT</version>
   <properties>
     <mapson.version>1.1.4</mapson.version>
-    <cucumber.version>6.7.0</cucumber.version>
     <junit.version>5.7.1</junit.version>
+    <junit.version>5.5.2</junit.version>
   </properties>
   <description>
     Cucumblan is a test automation framework that supports Behavior Driven Development (BDD),
