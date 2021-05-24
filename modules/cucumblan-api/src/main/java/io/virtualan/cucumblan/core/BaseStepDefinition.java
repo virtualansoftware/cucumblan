@@ -396,7 +396,7 @@ public class BaseStepDefinition {
      * @param condition the response value excel based
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) condition fails$")
+    @Given("^evaluate the (.*) condition fail$")
     public void evaluateVariableFail(String condition) throws IOException {
         if (!this.skipScenario) {
             boolean flag = (Boolean) ExcelAndMathHelper
