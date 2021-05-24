@@ -15,7 +15,7 @@
 		<virtualan.version>1.0.7</virtualan.version>
 		<cucumber.version>6.7.0</cucumber.version>
 		<spring.boot.version>2.4.3</spring.boot.version>
-		<hsqldb.version>2.5.1</hsqldb.version>
+		<hsqldb.version>2.6.0</hsqldb.version>
 		<springfox.version>2.9.2</springfox.version>
 		<groovy.version>2.4.7</groovy.version>
 	</properties>
