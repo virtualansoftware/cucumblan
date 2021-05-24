@@ -21,6 +21,7 @@ package io.virtualan.cucumblan.core;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import io.cucumber.datatable.DataTable;
@@ -373,6 +374,37 @@ public class BaseStepDefinition {
         scenario.log("condition :" + condition + " : is Skipped : " + skipScenario);
     }
 
+    /**
+     * perform the success met
+     *
+     * @param condition the response value excel based
+     * @throws IOException the io exception
+     */
+    @Given("^evaluate the (.*) condition success$")
+    public void evaluateVariable(String condition) throws IOException {
+        if (!this.skipScenario) {
+            boolean flag = (Boolean) ExcelAndMathHelper
+                .evaluateWithVariables(Boolean.class, condition, ScenarioContext.getContext());
+            scenario.log("Success condition :" + condition + " >>> status " + flag);
+            assertTrue("Valid success" + condition + " is met ", flag);
+        }
+
+    }
+    /**
+     * perform the failure met
+     *
+     * @param condition the response value excel based
+     * @throws IOException the io exception
+     */
+    @Given("^evaluate the (.*) condition fails$")
+    public void evaluateVariableFail(String condition) throws IOException {
+        if (!this.skipScenario) {
+            boolean flag = (Boolean) ExcelAndMathHelper
+                .evaluateWithVariables(Boolean.class, condition, ScenarioContext.getContext());
+            scenario.log("Failure condition :" + condition + " >>> status " + flag);
+            assertTrue("Valid Failure" + condition + " is met ", flag);
+        }
+    }
 
     /**
      * Modify variable.
