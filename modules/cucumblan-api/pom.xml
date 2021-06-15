@@ -4,10 +4,10 @@
   <artifactId>cucumblan-api</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-api</name>
-  <version>1.1.14-SNAPSHOT</version>
+  <version>1.2.3-SNAPSHOT</version>
   <properties>
+    <cucumber.version>6.10.1</cucumber.version>
     <mapson.version>1.1.4</mapson.version>
-    <junit.version>5.7.1</junit.version>
     <junit.version>5.7.1</junit.version>
   </properties>
   <description>
@@ -140,7 +140,7 @@
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
-      <version>2.5.0</version>
+      <version>2.6.0</version>
     </dependency>
 
     <dependency>

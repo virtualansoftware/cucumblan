@@ -49,7 +49,16 @@ public class ExcludeConfiguration {
     }
   }
 
-    private static boolean findMatch(String actual) {
+  private static boolean findMatch(Map<String,String> excludeProperties, String actual) {
+    for (Map.Entry entry : excludeProperties.entrySet()) {
+      if (actual.matches(entry.getKey().toString())){
+        return entry.getValue().toString().equalsIgnoreCase("IGNORE");
+      }
+    }
+    return false;
+  }
+
+  private static boolean findMatch(String actual) {
     for (Map.Entry entry : excludeProperties.entrySet()) {
       if (actual.matches(entry.getKey().toString())){
         return entry.getValue().toString().equalsIgnoreCase("IGNORE");
@@ -78,6 +87,35 @@ public class ExcludeConfiguration {
       return true;
     }
     return false;
+  }
+
+  public static boolean shouldSkip(Map<String,String> excludeProperties, String resource, String keyName) {
+    String excludes = excludeProperties.get(resource);
+    if (excludes != null && excludes.equalsIgnoreCase("IGNORE")) {
+      LOGGER.info(" Skipping response comparison for resource : " + resource);
+      return true;
+    } else if (excludes != null && keyName != null && !excludes.trim().isEmpty()) {
+      List<String> excludeList = (List)Stream.of(excludes.split(",")).collect(Collectors.toList());
+      return excludeList.contains(keyName) || excludeList.stream().anyMatch((x) -> {
+        return keyName.contains(x);
+      });
+    } else if (excludes == null && findMatch(excludeProperties, resource)) {
+      LOGGER.info(" Skipping comparison for resource based on pattern : " + resource);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  /**
+   * Gets properties.
+   *
+   * @return the properties
+   */
+  public static Map<String, String> getProperties() {
+    ExcludeConfiguration.reload();
+    return (Map)excludeProperties;
   }
 
 }
