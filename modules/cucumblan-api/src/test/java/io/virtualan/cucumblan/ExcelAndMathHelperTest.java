@@ -22,4 +22,14 @@ public class ExcelAndMathHelperTest {
     Assert.assertEquals(1628.21, ExcelAndMathHelper.evaluateWithVariables(Double.class,"SUM([P],[I])", contextObject));
   }
 
+
+
+  @Test
+  public void evaluate() throws IOException {
+    Map<String, String> contextObject = new HashMap<>();
+    contextObject.put("condition", "100");
+    Assert.assertEquals(false,
+        ExcelAndMathHelper.evaluateWithVariables(Boolean.class,"[condition]< 100", contextObject));
+  }
+
 }
