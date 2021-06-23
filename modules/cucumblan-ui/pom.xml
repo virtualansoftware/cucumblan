@@ -9,7 +9,7 @@
     <mapson.version>1.1.4</mapson.version>
     <selenium.version>3.141.59</selenium.version>
     <junit.version>5.7.2</junit.version>
-    <cucumber.version>6.7.0</cucumber.version>
+    <cucumber.version>6.10.4</cucumber.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>
@@ -145,7 +145,7 @@
     <dependency>
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
