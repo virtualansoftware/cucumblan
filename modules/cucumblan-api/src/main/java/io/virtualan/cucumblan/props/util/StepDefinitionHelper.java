@@ -29,18 +29,18 @@ public class StepDefinitionHelper {
       if (key.contains(",")) {
         StringBuffer keys = new StringBuffer();
         for (String token : key.split(",")) {
-          if (!ScenarioContext.getContext().containsKey(token)) {
+          if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(token)) {
             System.out.println("Value missing...");
           }
-          keys.append(ScenarioContext.getContext().get(token)).append(",");
+          keys.append(ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).get(token)).append(",");
         }
         returnValue = keys.toString().substring(0, keys.toString().length() - 1);
 
       } else {
-        if (!ScenarioContext.getContext().containsKey(key)) {
+        if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(key)) {
           System.out.println("Value missing...");
         }
-        returnValue = ScenarioContext.getContext().get(key);
+        returnValue = ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).get(key);
       }
     }
     return returnValue;
@@ -66,19 +66,19 @@ public class StepDefinitionHelper {
       if (key.contains(",")) {
         StringBuffer keys = new StringBuffer();
         for (String token : key.split(",")) {
-          if (!ScenarioContext.getContext().containsKey(token)) {
+          if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(token)) {
             return object;
           }
-          keys.append(ScenarioContext.getContext().get(token)).append(",");
+          keys.append(ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).get(token)).append(",");
         }
         returnValue = keys.toString().substring(0, keys.toString().length() - 1);
       }
       else {
-        if (!ScenarioContext.getContext().containsKey(key)) {
+        if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(key)) {
           LOGGER.warning(object +" has Value missing... for the key : " + key);
           return object;
         } else {
-          returnValue = ScenarioContext.getContext().get(key);
+          returnValue = ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).get(key);
         }
       }
     }

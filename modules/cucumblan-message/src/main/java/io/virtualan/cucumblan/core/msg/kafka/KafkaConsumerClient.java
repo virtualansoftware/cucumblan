@@ -30,6 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -59,6 +60,9 @@ public class KafkaConsumerClient {
           .getResourceAsStream("consumer-" + resource + ".properties");
       if (stream != null) {
         props.load(stream);
+        if(!props.containsKey("group.id")){
+          props.put("group.id",  eventName +"_"+resource +"_"+ UUID.randomUUID());
+        }
       } else {
         LOGGER.warning("consumer-" + resource + ".properties is not found");
         System.exit(1);
