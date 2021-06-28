@@ -75,16 +75,13 @@ public class DBBaseStepDefinition {
    */
   static Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<String, JdbcTemplate>();
 
-  static {
-    loadAllDataSource();
-  }
 
   /**
    * The Scenario.
    */
   Scenario scenario;
 
-  private static void loadAllDataSource() {
+  public static void loadAllDataSource() {
     try {
       for (String key : ApplicationConfiguration.getProperties().keySet()) {
         if (key.contains(".cucumblan.jdbc.driver-class-name")) {
@@ -120,6 +117,9 @@ public class DBBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    if(jdbcTemplateMap.isEmpty()){
+      loadAllDataSource();
+    }
   }
 
   /**
@@ -197,7 +197,7 @@ public class DBBaseStepDefinition {
       Assert.assertNull(json);
     } else {
       List<String> csvons = selectSql.subList(1, selectSql.size());
-      JSONArray expectedArray = Csvson.buildCSVson(csvons, ScenarioContext.getContext());
+      JSONArray expectedArray = Csvson.buildCSVson(csvons, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
       JSONArray actualArray = new JSONArray(json);
       JSONCompareResult result = JSONCompare.compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
       if(result.failed()){

@@ -1,28 +1,10 @@
 package io.virtualan.cucumblan.props.util;
 
-/*
- *
- *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
- *
- *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *     in compliance with the License. You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *     Unless required by applicable law or agreed to in writing, software distributed under the License
- *     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *     or implied. See the License for the specific language governing permissions and limitations under
- *     the License.
- *
- *
- *
- */
+import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.json.JSONException;
 
 /**
  * The type Scenario context.
@@ -30,7 +12,13 @@ import org.json.JSONException;
  */
 public class ScenarioContext {
 
-    private static Map<String, String> scenarioContext = new HashMap<>();
+
+
+    private static Map<String, Map<String, String>> parentScenarioContext = new HashMap<>();
+
+    public static Map<String, String> getScenarioContext(String id) {
+        return parentScenarioContext.get(id);
+    }
 
 
     /**
@@ -38,8 +26,8 @@ public class ScenarioContext {
      *
      * @return the boolean
      */
-    public static boolean hasContextValues() {
-        return scenarioContext != null && !scenarioContext.isEmpty();
+    public static boolean hasContextValues(String id) {
+        return getScenarioContext(id) != null && !getScenarioContext(id).isEmpty();
     }
 
     /**
@@ -47,8 +35,12 @@ public class ScenarioContext {
      *
      * @param globalParams the global params
      */
-    public static void setContext(Map<String, String> globalParams) {
-        scenarioContext.putAll(globalParams);
+    public static void setContext(String id, Map<String, String> globalParams) {
+        if(getScenarioContext(id) != null) {
+            getScenarioContext(id).putAll(globalParams);
+        }else {
+            parentScenarioContext.put(id, globalParams);
+        }
     }
 
     /**
@@ -57,12 +49,12 @@ public class ScenarioContext {
      * @param key   the key
      * @param value the value
      */
-    public static void setContext(String key, String value) {
-        scenarioContext.put(key, value);
+    public static void setContext(String id, String key, String value) {
+        getScenarioContext(id).put(key, value);
     }
 
-    public static Map<String, String> getPrintableContextObject() throws JSONException {
-        Map<String, String> resultValues = getContext().entrySet().stream()
+    public static Map<String, String> getPrintableContextObject(String id) throws JSONException {
+        Map<String, String> resultValues = getScenarioContext(id).entrySet().stream()
             .collect(
                 Collectors.toMap( entry -> entry.getKey(),
                     entry -> entry.getKey().contains("password") ? "xxxxxxxxxxxx" : entry.getValue()));
@@ -77,8 +69,8 @@ public class ScenarioContext {
      * @param key the key
      * @return the context
      */
-    public static Object getContext(String key) {
-        return scenarioContext.get(key.toString());
+    public static Object getContext(String id, String key) {
+        return getScenarioContext(id).get(key.toString());
     }
 
     /**
@@ -86,9 +78,21 @@ public class ScenarioContext {
      *
      * @return the context
      */
-    public static Map<String, String> getContext() {
-        return scenarioContext;
+    public static Map<String, String> getContext(String id) {
+        return getScenarioContext(id);
     }
+
+
+    /**
+     * Gets context.
+     *
+     * @return the context
+     */
+    public static Map<String, String> remove(String id) {
+        return parentScenarioContext.remove(id);
+    }
+
+
 
     /**
      * Is contains boolean.
@@ -96,8 +100,8 @@ public class ScenarioContext {
      * @param key the key
      * @return the boolean
      */
-    public static Boolean isContains(String key) {
-        return scenarioContext.containsKey(key);
+    public static Boolean isContains(String id, String key) {
+        return getScenarioContext(id).containsKey(key);
     }
 
 }
