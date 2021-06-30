@@ -84,7 +84,7 @@ public class StepDefinitionHelper {
       }
     }
     String response = ((String) object).replace("[" + key + "]", returnValue);
-    return response.indexOf("[") != -1 ? replace(response) : response;
+    return response.indexOf("[") != -1 ? getActualValue(response) : response;
   }
 
   /**
