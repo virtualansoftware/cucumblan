@@ -32,8 +32,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import io.virtualan.mapson.Mapson;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -75,6 +78,7 @@ public class DBBaseStepDefinition {
    */
   static Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<String, JdbcTemplate>();
 
+  String sqlJson = null;
 
   /**
    * The Scenario.
@@ -117,6 +121,7 @@ public class DBBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    this.sqlJson = null;
     if(jdbcTemplateMap.isEmpty()){
       loadAllDataSource();
     }
@@ -168,6 +173,19 @@ public class DBBaseStepDefinition {
   }
 
 
+  @Given("^Store-sql's (.*) value of the key as (.*)")
+  public void storeSqlResponseAskey(String responseKey, String key) throws JSONException {
+    if (sqlJson != null) {
+      Map<String, String> mapson = Mapson.buildMAPsonFromJson(sqlJson);
+      if(mapson.get(responseKey) != null) {
+        ScenarioContext
+                .setContext(String.valueOf(Thread.currentThread().getId()), key, mapson.get(responseKey));
+      } else {
+        Assert.assertTrue(responseKey + " not found in the sql " , false);
+      }
+    }
+  }
+
   /**
    * Verify.
    *
@@ -181,10 +199,9 @@ public class DBBaseStepDefinition {
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    String json = null;
     if (selectSql.size() >= 1) {
       try {
-        json = getJson(resource,
+        sqlJson = getJson(resource,
             StepDefinitionHelper.getActualValue(selectSql.get(0)).toString());
       }catch (Exception e){
         Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
@@ -192,14 +209,15 @@ public class DBBaseStepDefinition {
     } else {
       Assert.assertTrue(" select sqls missing ", false);
     }
-    scenario.attach(json, "application/json", "ActualSqlResponse");
+    scenario.attach(sqlJson, "application/json", "ActualSqlResponse");
     if (selectSql.size() == 1) {
-      Assert.assertNull(json);
+      Assert.assertNull(sqlJson);
     } else {
       List<String> csvons = selectSql.subList(1, selectSql.size());
       JSONArray expectedArray = Csvson.buildCSVson(csvons, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
-      JSONArray actualArray = new JSONArray(json);
+      JSONArray actualArray = new JSONArray(sqlJson);
       JSONCompareResult result = JSONCompare.compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
+      scenario.attach(expectedArray.toString(), "application/json", "ExpectedCvsonResponse");
       if(result.failed()){
         scenario.log(result.getMessage());
       }

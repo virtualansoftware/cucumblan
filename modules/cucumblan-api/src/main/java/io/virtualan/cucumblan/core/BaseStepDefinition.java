@@ -465,7 +465,7 @@ public class BaseStepDefinition {
      * @param key         the key
      */
     @Given("^Store the (.*) value of the key as (.*)")
-    public void loadAsGlobalParam(String responseKey, String key) {
+    public void storeResponseAskey(String responseKey, String key) {
         if (!this.skipScenario) {
             String value = validatableResponse.extract().body().jsonPath().getString(responseKey);
             if (value != null) {
@@ -480,7 +480,7 @@ public class BaseStepDefinition {
             } else if (response.getHeader(responseKey) != null) {
                 ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key, response.getCookie(responseKey));
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key, response.getHeader(responseKey));
             } else {
                 LOGGER.warning(responseKey + " :  for " + key + " not found");
                 scenario.log(responseKey + " :  for " + key + " not found");
@@ -727,8 +727,14 @@ public class BaseStepDefinition {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
-            scenario.attach(jsonBody
-                    , "application/json", "requestData :  ");
+
+            if(StepDefinitionHelper.getJSON(jsonBody) instanceof  JSONArray){
+                scenario.attach(new JSONArray(jsonBody).toString(4)
+                        , "application/json", "requestData :  ");
+            } else {
+                scenario.attach(new JSONObject(jsonBody).toString(4)
+                        , "application/json", "requestData :  ");
+            }
             request = request.contentType("application/json").body(jsonBody);
         }
     }
@@ -796,7 +802,7 @@ public class BaseStepDefinition {
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
-            scenario.attach(object.toString()
+            scenario.attach(object.toString(4)
                     , "application/json", "requestData :  ");
 
             response = request.baseUri(url).when()
@@ -830,7 +836,7 @@ public class BaseStepDefinition {
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
-            scenario.attach(object.toString()
+            scenario.attach(object.toString(4)
                     , "application/json", "requestData :  ");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
@@ -862,7 +868,7 @@ public class BaseStepDefinition {
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
-            scenario.attach(object.toString()
+            scenario.attach(object.toString(4)
                     , "application/json", "requestData :  ");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
@@ -894,7 +900,7 @@ public class BaseStepDefinition {
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
-            scenario.attach(object.toString()
+            scenario.attach(object.toString(4)
                     , "application/json", "requestData :  ");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
@@ -925,7 +931,7 @@ public class BaseStepDefinition {
             object.put("resource", resourceDetails);
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
-            scenario.attach(object.toString()
+            scenario.attach(object.toString(4)
                     , "application/json", "requestData :  ");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
@@ -956,9 +962,10 @@ public class BaseStepDefinition {
             LOGGER.info(ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())).toString());
             LOGGER.info(validatableResponse.extract().body().asString());
-            scenario.attach(ScenarioContext
-                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId())).toString(), "text/plain",
-                    "PreDefinedDataSet :  ");
+            scenario.attach(
+                    new JSONObject(ScenarioContext.getPrintableContextObject(
+                            String.valueOf(Thread.currentThread().getId()))).toString(4), "application/json",
+                    "contextual-dataset ");
         }
     }
 
