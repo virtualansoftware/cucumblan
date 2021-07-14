@@ -92,7 +92,7 @@ public class MsgBaseStepDefinition {
       String type, Object messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
     String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput)).toString();
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -143,7 +143,7 @@ public class MsgBaseStepDefinition {
       DataTable messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
     String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput)).toString();
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -176,7 +176,7 @@ public class MsgBaseStepDefinition {
       List<String> messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
     String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput)).toString();
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -209,7 +209,7 @@ public class MsgBaseStepDefinition {
       Map<String, String> messages) throws MessageNotDefinedException {
     String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
     String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput)).toString();
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);

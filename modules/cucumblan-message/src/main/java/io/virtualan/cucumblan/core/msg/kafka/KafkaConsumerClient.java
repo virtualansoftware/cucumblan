@@ -23,6 +23,7 @@ import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.TopicConfiguration;
 import io.virtualan.cucumblan.props.util.EventRequest;
+import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -106,7 +107,7 @@ public class KafkaConsumerClient {
 
 
   private List<String> loadTopic(String eventName) {
-    String topics = TopicConfiguration.getProperty(eventName);
+    String topics = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventName)).toString();
     if (topics == null) {
       LOGGER.warning(eventName + " - Topic is not configured.");
       System.exit(1);

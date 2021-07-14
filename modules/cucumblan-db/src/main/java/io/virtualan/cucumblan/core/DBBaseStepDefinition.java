@@ -93,14 +93,14 @@ public class DBBaseStepDefinition {
           if (!jdbcTemplateMap.containsKey(source)) {
             BasicDataSource dataSource = new BasicDataSource();
             dataSource.setDriverClassName(
-                ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.driver-class-name"));
+                StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.driver-class-name")).toString());
             dataSource
                 .setUsername(
-                    ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.username"));
+                    StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.username")).toString());
             dataSource
                 .setPassword(
-                    ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.password"));
-            dataSource.setUrl(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.url"));
+                    StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.password")).toString());
+            dataSource.setUrl(StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.url")).toString());
             dataSource.setMaxIdle(5);
             dataSource.setInitialSize(5);
             JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
