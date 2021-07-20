@@ -107,7 +107,7 @@ public class KafkaConsumerClient {
 
 
   private List<String> loadTopic(String eventName) {
-    String topics = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventName)).toString();
+    String topics = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventName));
     if (topics == null) {
       LOGGER.warning(eventName + " - Topic is not configured.");
       System.exit(1);
