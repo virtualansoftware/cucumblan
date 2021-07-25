@@ -189,12 +189,29 @@
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
       <version>5.0.0</version>
+      <exclusions>
+				<exclusion>
+          <groupId>org.apache.pdfbox</groupId>
+          <artifactId>pdfbox</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>5.0.0</version>
+      <exclusions>
+				<exclusion>
+          <groupId>org.apache.pdfbox</groupId>
+          <artifactId>pdfbox</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+       <version>2.0.24</version>        
+     </dependency>
     <dependency>
       <groupId>io.virtualan</groupId>
       <artifactId>mapson</artifactId>
