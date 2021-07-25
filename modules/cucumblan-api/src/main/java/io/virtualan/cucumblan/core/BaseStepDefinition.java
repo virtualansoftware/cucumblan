@@ -54,6 +54,7 @@ import io.virtualan.util.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import org.apache.xmlbeans.impl.util.Base64;
+;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -162,8 +162,8 @@ public class BaseStepDefinition {
     @Given("^basic authentication with (.*) and (.*)")
     public void auth(String username, String password) {
         if (!this.skipScenario) {
-            byte[] authBasic = Base64.encode(String
-                    .format("%s:%s", StepDefinitionHelper.getActualValue(username),
+            byte[] authBasic = Base64.getEncoder().encode(String
+                .format("%s:%s", StepDefinitionHelper.getActualValue(username),
                             StepDefinitionHelper.getActualValue(password)).getBytes());
             request.header("Authorization", String.format("Basic %s", new String(authBasic)));
         }
