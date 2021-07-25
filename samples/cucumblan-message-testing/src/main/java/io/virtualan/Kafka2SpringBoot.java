@@ -12,19 +12,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import io.virtualan.message.core.MessagingApplication;
+
 
 @EnableKafka
 @SpringBootApplication
 @ComponentScan(basePackages = {"io.virtualan"})
-@EmbeddedKafka(partitions = 1, controlledShutdown = false, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@EmbeddedKafka(partitions = 1, controlledShutdown = false, brokerProperties = {
+    "listeners=PLAINTEXT://localhost:9092", "port=9092",
+    "log.dir=target/kafka-logs"})
 public class Kafka2SpringBoot {
+
+    @Autowired
+    private Config config;
 
     public static void main(String[] args) {
         new SpringApplication(Kafka2SpringBoot.class).run(args);
     }
-
-    @Autowired
-    private Config config;
 
 
     @Autowired
@@ -46,6 +50,7 @@ public class Kafka2SpringBoot {
 
             EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(1, false) ;
             embeddedKafkaBroker.kafkaPorts(this.kafkaPort);
+            embeddedKafkaBroker.brokerProperty("log.dir", "target/kafka-logs");
             return embeddedKafkaBroker;
 
         }

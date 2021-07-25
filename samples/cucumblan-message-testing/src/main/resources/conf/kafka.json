@@ -3,10 +3,10 @@
     {
       "broker" : "localhost:9092",
       "topics": [
-          "virtualan.input", "virtualan.output", "virtualan-test-event"
+          "virtualan.input", "virtualan.output"
       ],
-      "consumer" : "consumer.properties",
-      "producer" : "producer.properties"
+      "consumer" : "consumer-pet.properties",
+      "producer" : "producer-pet.properties"
     }
   ]
 }
