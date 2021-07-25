@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.header.Headers;
 import org.json.JSONObject;
 
 /**
@@ -108,7 +107,7 @@ public class JSONMessage implements MessageType<String, String> {
   @Override
   public MessageType buildConsumerMessage(ConsumerRecord<String, String> record, String key, String body)
       throws MessageNotDefinedException {
-    if ("virtualan-test-event".equalsIgnoreCase(record.topic())) {
+    if ("virtualan.output".equalsIgnoreCase(record.topic())) {
       String id = String.valueOf(new JSONObject(body).getInt("id"));
       return new JSONMessage(id, body.toString());
     } else {
