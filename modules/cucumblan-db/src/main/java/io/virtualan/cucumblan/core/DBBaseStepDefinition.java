@@ -93,14 +93,14 @@ public class DBBaseStepDefinition {
           if (!jdbcTemplateMap.containsKey(source)) {
             BasicDataSource dataSource = new BasicDataSource();
             dataSource.setDriverClassName(
-                ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.driver-class-name"));
+                StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.driver-class-name")));
             dataSource
                 .setUsername(
-                    ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.username"));
+                    StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.username")));
             dataSource
                 .setPassword(
-                    ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.password"));
-            dataSource.setUrl(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.url"));
+                    StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.password")));
+            dataSource.setUrl(StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.url")));
             dataSource.setMaxIdle(5);
             dataSource.setInitialSize(5);
             JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -153,7 +153,7 @@ public class DBBaseStepDefinition {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
     for (String sql : sqls) {
       try {
-        jdbcTemplate.execute(StepDefinitionHelper.getActualValue(sql).toString());
+        jdbcTemplate.execute(StepDefinitionHelper.getActualValue(sql));
       } catch (Exception e) {
         LOGGER.warning("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
         scenario.log("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
@@ -202,7 +202,7 @@ public class DBBaseStepDefinition {
     if (selectSql.size() >= 1) {
       try {
         sqlJson = getJson(resource,
-            StepDefinitionHelper.getActualValue(selectSql.get(0)).toString());
+            StepDefinitionHelper.getActualValue(selectSql.get(0)));
       }catch (Exception e){
         Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
       }

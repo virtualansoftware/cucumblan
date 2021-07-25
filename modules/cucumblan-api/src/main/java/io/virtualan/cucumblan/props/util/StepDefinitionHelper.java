@@ -1,10 +1,11 @@
 package io.virtualan.cucumblan.props.util;
 
-import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.util.logging.Logger;
 
 
 /**
@@ -52,13 +53,15 @@ public class StepDefinitionHelper {
    * @param object the object
    * @return the actual value
    */
-  public static Object getActualValue(Object object) {
+  public static String getActualValue(Object object) {
     if (object == null) {
-      return object;
+      return null;
     }
-    if (object instanceof JSONArray) {
-      return object;
-    }
+    //TODO validate
+//    if (object instanceof JSONArray) {
+//      return object;
+//    }
+
     String returnValue = (String) object;
     String key = "";
     if (returnValue.contains("[") && returnValue.contains("]")) {
@@ -67,7 +70,7 @@ public class StepDefinitionHelper {
         StringBuffer keys = new StringBuffer();
         for (String token : key.split(",")) {
           if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(token)) {
-            return object;
+            return object.toString();
           }
           keys.append(ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).get(token)).append(",");
         }
@@ -76,7 +79,7 @@ public class StepDefinitionHelper {
       else {
         if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(key)) {
           LOGGER.warning(object +" has Value missing... for the key : " + key);
-          return object;
+          return object.toString();
         } else {
           returnValue = ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).get(key);
         }
@@ -135,7 +138,7 @@ public class StepDefinitionHelper {
       try {
         return new JSONArray(json);
       } catch (Exception e) {
-       LOGGER.warning("invalid JSON > " + json);
+        LOGGER.warning("invalid JSON > " + json);
       }
     }
     return null;
