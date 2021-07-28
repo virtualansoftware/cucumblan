@@ -32,4 +32,14 @@ public class ExcelAndMathHelperTest {
         ExcelAndMathHelper.evaluateWithVariables(Boolean.class,"[condition]< 100", contextObject));
   }
 
+  @Test
+  public void evaluateDate() throws IOException {
+    Map<String, String> contextObject = new HashMap<>();
+    contextObject.put("cdate", "05/15/2021");
+    Assert.assertEquals("15/05/2021",
+        ExcelAndMathHelper.evaluateWithVariables(String.class,"TEXT(\"[cdate]\", \"dd/mm/yyyy\")", contextObject));
+  }
+
+
+
 }
