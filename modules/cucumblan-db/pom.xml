@@ -4,7 +4,7 @@
   <artifactId>cucumblan-db</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-db</name>
-  <version>1.2.6-SNAPSHOT</version>
+  <version>1.2.6</version>
   <properties>
     <junit.version>5.5.2</junit.version>
     <cucumber.version>6.10.4</cucumber.version>
@@ -30,7 +30,7 @@
     <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git
     </developerConnection>
     <url>https://github.com/virtualansoftware/cucumblan.git</url>
-    <tag>cucumblan-project-1.0.6</tag>
+    <tag>v1.3.6.1</tag>
   </scm>
   <developers>
     <!-- original author of the project -->
