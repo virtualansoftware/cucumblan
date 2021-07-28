@@ -2,6 +2,9 @@ package io.virtualan.cucumblan;
 
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
@@ -38,6 +41,15 @@ public class ExcelAndMathHelperTest {
     contextObject.put("cdate", "05/15/2021");
     Assert.assertEquals("15/05/2021",
         ExcelAndMathHelper.evaluateWithVariables(String.class,"TEXT(\"[cdate]\", \"dd/mm/yyyy\")", contextObject));
+  }
+
+  @Test
+  public void evaluateTodayDate() throws IOException {
+    Map<String, String> contextObject = new HashMap<>();
+    DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    Date date = new Date();
+    Assert.assertEquals(dateFormat.format(date),
+        ExcelAndMathHelper.evaluateWithVariables(String.class,"TEXT(TODAY(),\"mm/dd/yyyy\")", contextObject));
   }
 
 
