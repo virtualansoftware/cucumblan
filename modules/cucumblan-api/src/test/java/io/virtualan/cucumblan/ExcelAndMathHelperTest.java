@@ -46,10 +46,10 @@ public class ExcelAndMathHelperTest {
   @Test
   public void evaluateTodayDate() throws IOException {
     Map<String, String> contextObject = new HashMap<>();
-    DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date date = new Date();
     Assert.assertEquals(dateFormat.format(date),
-        ExcelAndMathHelper.evaluateWithVariables(String.class,"TEXT(TODAY(),\"mm/dd/yyyy\")", contextObject));
+        ExcelAndMathHelper.evaluateWithVariables(String.class,"TEXT(TODAY(),\"yyyy-mm-dd\")", contextObject));
   }
 
 
