@@ -1,21 +1,46 @@
 package io.virtualan.cucumblan.props.util;
 
-import org.json.JSONException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.json.JSONException;
 
 /**
  * The type Scenario context.
+ *
  * @author Elan Thangamani
  */
 public class ScenarioContext {
 
 
-
     private static Map<String, Map<String, String>> parentScenarioContext = new HashMap<>();
 
+
+    /**
+     * Gets parent scenario context.
+     *
+     * @return the parent scenario context
+     */
+    public static Map<String, Map<String, String>> getParentScenarioContext() {
+        return parentScenarioContext;
+    }
+
+    /**
+     * Sets parent scenario context.
+     *
+     * @param parentScenarioContext the parent scenario context
+     */
+    public static void setParentScenarioContext(
+        Map<String, Map<String, String>> parentScenarioContext) {
+        ScenarioContext.parentScenarioContext = parentScenarioContext;
+    }
+
+    /**
+     * Gets scenario context.
+     *
+     * @param id the id
+     * @return the scenario context
+     */
     public static Map<String, String> getScenarioContext(String id) {
         return parentScenarioContext.get(id);
     }
@@ -24,6 +49,7 @@ public class ScenarioContext {
     /**
      * Has context values boolean.
      *
+     * @param id the id
      * @return the boolean
      */
     public static boolean hasContextValues(String id) {
@@ -33,6 +59,7 @@ public class ScenarioContext {
     /**
      * Sets context.
      *
+     * @param id           the id
      * @param globalParams the global params
      */
     public static void setContext(String id, Map<String, String> globalParams) {
@@ -46,6 +73,7 @@ public class ScenarioContext {
     /**
      * Sets context.
      *
+     * @param id    the id
      * @param key   the key
      * @param value the value
      */
@@ -53,6 +81,13 @@ public class ScenarioContext {
         getScenarioContext(id).put(key, value);
     }
 
+    /**
+     * Gets printable context object.
+     *
+     * @param id the id
+     * @return the printable context object
+     * @throws JSONException the json exception
+     */
     public static Map<String, String> getPrintableContextObject(String id) throws JSONException {
         Map<String, String> resultValues = getScenarioContext(id).entrySet().stream()
             .collect(
@@ -66,6 +101,7 @@ public class ScenarioContext {
     /**
      * Gets context.
      *
+     * @param id  the id
      * @param key the key
      * @return the context
      */
@@ -76,6 +112,7 @@ public class ScenarioContext {
     /**
      * Gets context.
      *
+     * @param id the id
      * @return the context
      */
     public static Map<String, String> getContext(String id) {
@@ -86,6 +123,7 @@ public class ScenarioContext {
     /**
      * Gets context.
      *
+     * @param id the id
      * @return the context
      */
     public static Map<String, String> remove(String id) {
@@ -93,10 +131,10 @@ public class ScenarioContext {
     }
 
 
-
     /**
      * Is contains boolean.
      *
+     * @param id  the id
      * @param key the key
      * @return the boolean
      */

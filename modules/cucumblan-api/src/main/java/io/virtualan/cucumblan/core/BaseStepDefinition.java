@@ -54,6 +54,7 @@ import io.virtualan.util.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import org.apache.xmlbeans.impl.util.Base64;
+;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -162,8 +162,8 @@ public class BaseStepDefinition {
     @Given("^basic authentication with (.*) and (.*)")
     public void auth(String username, String password) {
         if (!this.skipScenario) {
-            byte[] authBasic = Base64.encode(String
-                    .format("%s:%s", StepDefinitionHelper.getActualValue(username),
+            byte[] authBasic = Base64.getEncoder().encode(String
+                .format("%s:%s", StepDefinitionHelper.getActualValue(username),
                             StepDefinitionHelper.getActualValue(password)).getBytes());
             request.header("Authorization", String.format("Basic %s", new String(authBasic)));
         }
@@ -225,7 +225,7 @@ public class BaseStepDefinition {
         if (!this.skipScenario) {
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 if ("Accept".equalsIgnoreCase(params.getKey())) {
-                    acceptContentType = StepDefinitionHelper.getActualValue(params.getValue()).toString();
+                    acceptContentType = StepDefinitionHelper.getActualValue(params.getValue());
                 }
                 request = request
                         .header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -245,7 +245,7 @@ public class BaseStepDefinition {
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request.cookie(new
                         Cookie.Builder(params.getKey(),
-                        StepDefinitionHelper.getActualValue(params.getValue()).toString()).build());
+                        StepDefinitionHelper.getActualValue(params.getValue())).build());
             }
         }
     }
@@ -373,6 +373,24 @@ public class BaseStepDefinition {
                                     .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
         }
     }
+
+    /**
+     * Modify variable.
+     *
+     * @param responseValue the response value
+     * @param key           the key
+     * @throws IOException the io exception
+     */
+    @Given("^evaluate the (.*) function value of the key as (.*)")
+    public void modifyfunctionVariable(String responseValue, String key) throws IOException {
+        if (!this.skipScenario) {
+            ScenarioContext
+                .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(String.class,
+                    responseValue, ScenarioContext
+                        .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
+        }
+    }
+
 
     /**
      * perform the skip scenario
@@ -543,7 +561,7 @@ public class BaseStepDefinition {
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 if (params.getKey().contains("MULTI-PART")) {
                     if (params.getValue() != null) {
-                        String fileAndType = StepDefinitionHelper.getActualValue(params.getValue()).toString();
+                        String fileAndType = StepDefinitionHelper.getActualValue(params.getValue());
                         if (params.getKey().split("=").length == 2 && fileAndType.split("=").length == 2) {
                             request = request
                                     .multiPart(params.getKey().split("=")[1],
@@ -789,7 +807,7 @@ public class BaseStepDefinition {
     @When("^(.*) post (.*) in (.*) resource on (.*)")
     public void createRequest(String dummyString, String acceptContentType, String resource,
                               String system) {
-        resource = StepDefinitionHelper.getActualValue(resource).toString();
+        resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =
@@ -823,7 +841,7 @@ public class BaseStepDefinition {
     @When("^(.*) get (.*) in (.*) resource on (.*)")
     public void readRequest(String dummyString, String acceptContentType, String resource,
                             String system) {
-        resource = StepDefinitionHelper.getActualValue(resource).toString();
+        resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             String contentType =
@@ -855,7 +873,7 @@ public class BaseStepDefinition {
     @When("^(.*) put (.*) in (.*) resource on (.*)")
     public void modifyRequest(String dummyString, String acceptContentType, String resource,
                               String system) {
-        resource = StepDefinitionHelper.getActualValue(resource).toString();
+        resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =
@@ -887,7 +905,7 @@ public class BaseStepDefinition {
     @When("^(.*) patch (.*) in (.*) resource on (.*)")
     public void patchRequest(String dummyString, String acceptContentType, String resource,
                              String system) {
-        resource = StepDefinitionHelper.getActualValue(resource).toString();
+        resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =
@@ -919,7 +937,7 @@ public class BaseStepDefinition {
     @When("^(.*) delete (.*) in (.*) resource on (.*)")
     public void deleteById(String dummyString, String acceptContentType, String resource,
                            String system) {
-        resource = StepDefinitionHelper.getActualValue(resource).toString();
+        resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
             acceptContentType =

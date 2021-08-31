@@ -48,7 +48,7 @@ public class ApiHelper {
     }
     String url = ApplicationConfiguration.getProperty("service.api." + system)
         + (props != null && props.getProperty(resourceKey) != null ? props.getProperty(resourceKey) : resourceKey);
-    return StepDefinitionHelper.getActualValue(url).toString();
+    return StepDefinitionHelper.getActualValue(url);
   }
 
 }

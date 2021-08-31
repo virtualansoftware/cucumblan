@@ -90,9 +90,9 @@ public class MsgBaseStepDefinition {
   @Given("Send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
   public void produceMessageWithPartition(String dummy, String eventName, Integer partition, String resource,
       String type, Object messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
-    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+    String typeInput = StepDefinitionHelper.getActualValue(type);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -125,7 +125,7 @@ public class MsgBaseStepDefinition {
    */
   @Given("Clear the consumed message (.*) for the event (.*)$")
   public void clearMessage(String dummy, String eventName) throws InterruptedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
     MessageContext.removeEventContextMap(eventNameInput);
   }
 
@@ -141,9 +141,9 @@ public class MsgBaseStepDefinition {
   @Given("Send message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessage(String dummy, String eventName, String resource, String type,
       DataTable messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
-    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+    String typeInput = StepDefinitionHelper.getActualValue(type);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -174,9 +174,9 @@ public class MsgBaseStepDefinition {
   @Given("Send inline message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessage(String dummy, String eventName, String resource, String type,
       List<String> messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
-    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+    String typeInput = StepDefinitionHelper.getActualValue(type);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -207,9 +207,9 @@ public class MsgBaseStepDefinition {
   @Given("Send mapson message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessageMapson(String dummy, String eventName, String resource, String type,
       Map<String, String> messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
-    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String topic = TopicConfiguration.getProperty(eventNameInput);
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+    String typeInput = StepDefinitionHelper.getActualValue(type);
+    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
@@ -247,9 +247,9 @@ public class MsgBaseStepDefinition {
       List<String> csvson)
       throws InterruptedException, BadInputDataException, MessageNotDefinedException {
     int recheck = 0;
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
-    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String idInput = StepDefinitionHelper.getActualValue(id).toString();
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+    String typeInput = StepDefinitionHelper.getActualValue(type);
+    String idInput = StepDefinitionHelper.getActualValue(id);
     EventRequest eventRequest = new EventRequest();
     eventRequest.setRecheck(recheck);
     eventRequest.setEventName(eventNameInput);
@@ -295,9 +295,9 @@ public class MsgBaseStepDefinition {
       Map<String, String> keyValue)
       throws InterruptedException, MessageNotDefinedException {
     int recheck = 0;
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName).toString();
-    String typeInput = StepDefinitionHelper.getActualValue(type).toString();
-    String idInput = StepDefinitionHelper.getActualValue(id).toString();
+    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+    String typeInput = StepDefinitionHelper.getActualValue(type);
+    String idInput = StepDefinitionHelper.getActualValue(id);
     EventRequest eventRequest = new EventRequest();
     eventRequest.setRecheck(recheck);
     eventRequest.setEventName(eventNameInput);
