@@ -375,6 +375,24 @@ public class BaseStepDefinition {
     }
 
     /**
+     * Modify variable.
+     *
+     * @param responseValue the response value
+     * @param key           the key
+     * @throws IOException the io exception
+     */
+    @Given("^evaluate the (.*) function value of the key as (.*)")
+    public void modifyfunctionVariable(String responseValue, String key) throws IOException {
+        if (!this.skipScenario) {
+            ScenarioContext
+                .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(String.class,
+                    responseValue, ScenarioContext
+                        .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
+        }
+    }
+
+
+    /**
      * perform the skip scenario
      *
      * @param condition the response value excel based
