@@ -960,7 +960,7 @@ public class BaseStepDefinition {
     @Before
     public void before(Scenario scenario) {
         this.scenario = scenario;
-        System.out.println("scenario ID:: " + scenario.getId());
+        LOGGER.info("scenario ID:: " + scenario.getId());
         this.sequence = 1;
         this.acceptContentType = null;
         this.skipScenario = false;
@@ -976,6 +976,9 @@ public class BaseStepDefinition {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()),"STATUS_CODE", String.valueOf(response.getStatusCode()));
+            if(response.getStatusCode() != statusCode){
+                scenario.log(response.asPrettyString());
+            }
             validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
             LOGGER.info(ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())).toString());
@@ -1281,9 +1284,9 @@ public class BaseStepDefinition {
             data.asMap(String.class, String.class).forEach((k, v) -> {
                 LOGGER
                         .info(
-                                v + " : " + validatableResponse.extract().body().jsonPath().getString((String) k));
+                                v + " : " + validatableResponse.extract().body().jsonPath().getString(StepDefinitionHelper.getActualValue((String) k)));
                 assertEquals(StepDefinitionHelper.getActualValue((String) v),
-                        validatableResponse.extract().body().jsonPath().getString((String) k));
+                        validatableResponse.extract().body().jsonPath().getString(StepDefinitionHelper.getActualValue((String) k)));
             });
         }
     }
