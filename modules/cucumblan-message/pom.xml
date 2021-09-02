@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.virtualan</groupId>
   <artifactId>cucumblan-message</artifactId>
-  <version>1.2.8-SNAPSHOT</version>
+  <version>1.2.9-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>cucumblan-message</name>
   <properties>
-    <mapson.version>1.1.7</mapson.version>
+    <mapson.version>1.1.8</mapson.version>
     <kafka-clients.version>2.7.0</kafka-clients.version>
     <junit.version>5.5.2</junit.version>
     <cucumber.version>6.7.0</cucumber.version>
