@@ -527,6 +527,7 @@ public class BaseStepDefinition {
      * Read request.
      *
      * @param nameIgnore   the name ignore
+     * @param contentType  the content type
      * @param parameterMap the parameter map
      */
     @Given("^add (.*) with (.*) given form params$")
@@ -548,6 +549,7 @@ public class BaseStepDefinition {
      * Read request.
      *
      * @param nameIgnore   the name ignore
+     * @param contentType  the content type
      * @param parameterMap the parameter map
      */
     @Given("^add (.*) with (.*) given multipart-form params$")
@@ -957,6 +959,11 @@ public class BaseStepDefinition {
         }
     }
 
+    /**
+     * Before.
+     *
+     * @param scenario the scenario
+     */
     @Before
     public void before(Scenario scenario) {
         this.scenario = scenario;
@@ -1009,8 +1016,8 @@ public class BaseStepDefinition {
     /**
      * Verify response.
      *
-     * @param resource the resource
      * @param type     the data
+     * @param resource the resource
      * @param readData the data
      * @throws Throwable the throwable
      */
@@ -1198,8 +1205,11 @@ public class BaseStepDefinition {
     /**
      * Mock single response.
      *
-     * @param resource the resource
-     * @param fileBody the file body
+     * @param resource    the resource
+     * @param contentType the content type
+     * @param fileBody    the file body
+     * @param xpaths      the xpaths
+     * @throws Exception the exception
      */
     @And("^Verify (.*) response (.*) include byPath (.*) includes in the response$")
     public void verifyXMLByPathResponse(String resource, String contentType,
@@ -1237,36 +1247,42 @@ public class BaseStepDefinition {
         }
     }
 
+    /**
+     * Verify.
+     *
+     * @param path   the path
+     * @param csvson the csvson
+     * @throws Exception the exception
+     */
     @And("^Verify (.*) response csvson includes in the response$")
     public void verify(String path, List<String> csvson)
-            throws Exception {
-        JSONArray expectedArray = Csvson.buildCSVson(csvson, ScenarioContext
-                .getContext(String.valueOf(Thread.currentThread().getId())));
-        Object objJson = StepDefinitionHelper.getJSON(validatableResponse.extract().body().asString());
-        JSONCompareResult result = null;
-        scenario.attach(expectedArray.toString(), "application/json", "Expected json");
-        if (objJson instanceof JSONArray) {
-            JSONArray actualArray = new JSONArray(validatableResponse.extract().body().asString());
-            result = JSONCompare.compareJSON(expectedArray, actualArray, JSONCompareMode.LENIENT);
-            scenario.attach(actualArray.toString(), "application/json", "Actual json");
-        } else if (objJson instanceof JSONObject) {
-            JSONObject actualArray = new JSONObject(validatableResponse.extract().body().asString());
-            if (actualArray.optJSONArray(path) != null && actualArray.optJSONArray(path).length() > 0) {
-                result = JSONCompare.compareJSON(expectedArray, actualArray.getJSONArray(path), JSONCompareMode.LENIENT);
-            } else {
-                result = JSONCompare.compareJSON(expectedArray.getJSONObject(0), actualArray, JSONCompareMode.LENIENT);
-            }
-            scenario.attach(actualArray.toString(), "application/json", "Actual json");
-        }
+        throws Exception {
+        HelperUtil.verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
+    }
 
-        if (result == null) {
-            Assert.assertTrue("Actual input is not a valid JSON Object", false);
-        } else if (result.failed()) {
-            scenario.attach(result.getMessage(), "text/plain", "Unmatched csvson");
-            assertTrue("Csvson record does not match", result.passed());
-        } else {
-            assertTrue("Csvson record matches", result.passed());
-        }
+    /**
+     * Verify exact order match.
+     *
+     * @param path   the path
+     * @param csvson the csvson
+     * @throws Exception the exception
+     */
+    @And("^Verify (.*) response csvson includes exact-order-match in the response$")
+    public void verifyExactOrderMatch(String path, List<String> csvson)
+        throws Exception {
+        HelperUtil.verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
+    }
+
+    /**
+     * Verify exact match.
+     *
+     * @param path   the path
+     * @param csvson the csvson
+     * @throws Exception the exception
+     */
+    @And("^Verify (.*) response csvson includes exact-match in the response$")
+    public void verifyExactMatch(String path, List<String> csvson) throws  Exception{
+        HelperUtil.verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
     }
 
 

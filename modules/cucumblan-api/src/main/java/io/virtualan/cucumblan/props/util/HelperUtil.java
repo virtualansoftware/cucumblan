@@ -6,6 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import io.cucumber.java.Scenario;
+import io.restassured.response.ValidatableResponse;
+import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
 import io.virtualan.jassert.VirtualJSONAssert;
@@ -26,7 +29,9 @@ import org.custommonkey.xmlunit.XpathEngine;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -183,5 +188,80 @@ public class HelperUtil {
     DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(expectedXML, actualXML));
     List<?> allDifferences = diff.getAllDifferences();
     Assert.assertEquals("Differences found: " + diff.toString(), 0, allDifferences.size());
+  }
+
+
+  /**
+   * Verify csvson.
+   *
+   * @param validatableResponse the validatable response
+   * @param path                the path
+   * @param csvson              the csvson
+   * @param mode                the mode
+   * @param scenario            the scenario
+   * @throws Exception the exception
+   */
+  public static void verifyCSVSON(ValidatableResponse validatableResponse, String path,
+      List<String> csvson, JSONCompareMode mode, Scenario scenario)
+      throws Exception {
+    JSONArray expectedArray = Csvson.buildCSVson(csvson, ScenarioContext
+        .getContext(String.valueOf(Thread.currentThread().getId())));
+    Object objJson = StepDefinitionHelper.getJSON(validatableResponse.extract().body().asString());
+    JSONCompareResult result = null;
+    scenario.attach(expectedArray.toString(), "application/json", "Expected json");
+    JSONArray notFoundArray = null;
+    if (objJson instanceof JSONArray) {
+      JSONArray actualArray = new JSONArray(validatableResponse.extract().body().asString());
+      scenario.attach(actualArray.toString(), "application/json", "Actual json");
+      if(expectedArray.length() == actualArray.length()) {
+        result = JSONCompare.compareJSON(expectedArray, actualArray, mode);
+      } else {
+        notFoundArray = getUnmatchedElement(mode, expectedArray, actualArray);
+      }
+    } else if (objJson instanceof JSONObject) {
+      JSONObject actualArray = new JSONObject(validatableResponse.extract().body().asString());
+      if (actualArray.optJSONArray(path) != null && actualArray.optJSONArray(path).length() > 0) {
+        if(expectedArray.length() == actualArray.getJSONArray(path).length()) {
+          result = JSONCompare.compareJSON(expectedArray, actualArray.getJSONArray(path), mode);
+        } else {
+          notFoundArray = getUnmatchedElement(mode, expectedArray, actualArray.getJSONArray(path));
+        }
+      } else {
+        result = JSONCompare.compareJSON(expectedArray.getJSONObject(0), actualArray, mode);
+      }
+      scenario.attach(actualArray.toString(), "application/json", "Actual json");
+    }
+    if (result == null && notFoundArray == null) {
+      Assert.assertTrue("Actual input is not a valid JSON Object", false);
+    } else if (result != null && result.failed()) {
+      scenario.attach(result.getMessage(), "text/plain", "Unmatched csvson");
+      assertTrue("Csvson record does not match", result.passed());
+    } else if (notFoundArray != null && notFoundArray.length() > 0) {
+      scenario.attach(notFoundArray.toString(2), "application/json", "Unmatched csvson");
+      assertTrue("Csvson record does not match and see unmatched records", false);
+    } else {
+      assertTrue("Csvson record matches", true);
+    }
+  }
+
+  private static boolean isMatchNotFound(JSONObject actual, JSONArray expectedArray, JSONCompareMode mode){
+    for (int j = 0; j < expectedArray.length(); j++) {
+      JSONCompareResult result = JSONCompare.compareJSON(actual,expectedArray.getJSONObject(j), mode);
+      if(result.passed()){
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static JSONArray getUnmatchedElement(JSONCompareMode mode, JSONArray expectedArray,
+      JSONArray actualArray) {
+    JSONArray notFoundArray = new JSONArray();
+    for (int i = 0; i < expectedArray.length(); i++) {
+      if(isMatchNotFound(expectedArray.getJSONObject(i), actualArray, mode)){
+        notFoundArray.put(expectedArray.getJSONObject(i));
+      }
+    }
+    return notFoundArray;
   }
 }
