@@ -4,11 +4,11 @@
   <artifactId>cucumblan-db</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-db</name>
-  <version>1.2.8-SNAPSHOT</version>
+  <version>1.2.9-SNAPSHOT</version>
   <properties>
     <junit.version>5.5.2</junit.version>
     <cucumber.version>6.11.0</cucumber.version>
-    <mapson.version>1.1.7</mapson.version>
+    <mapson.version>1.1.8</mapson.version>
   </properties>
   <description>
     Cucumblan-db is a database test automation framework that supports Behavior Driven Development (BDD),
@@ -145,7 +145,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>5.3.8</version>
+      <version>5.3.9</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -166,7 +166,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.12.3</version>
+      <version>2.12.4</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
@@ -186,7 +186,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
-      <version>1.7.31</version>
+      <version>1.7.32</version>
     </dependency>
   </dependencies>
 
