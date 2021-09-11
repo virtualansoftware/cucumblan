@@ -35,11 +35,9 @@ import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
-import io.restassured.path.json.config.JsonPathConfig;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
-import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.exception.ParserError;
 import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
@@ -68,9 +66,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
-import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.skyscreamer.jsonassert.JSONCompareResult;
 
 
 /**
@@ -485,23 +481,32 @@ public class BaseStepDefinition {
     @Given("^Store the (.*) value of the key as (.*)")
     public void storeResponseAskey(String responseKey, String key) {
         if (!this.skipScenario) {
-            String value = validatableResponse.extract().body().jsonPath().getString(responseKey);
-            if (value != null) {
+            if(".".equalsIgnoreCase(responseKey)){
                 ScenarioContext
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                        validatableResponse.extract().body().asString());
+            } else {
+                String value = validatableResponse.extract().body().jsonPath()
+                    .getString(responseKey);
+                if (value != null) {
+                    ScenarioContext
 
                         .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                                validatableResponse.extract().body().jsonPath().getString(responseKey));
-            } else if (response.getCookie(responseKey) != null) {
-                ScenarioContext
+                            validatableResponse.extract().body().jsonPath().getString(responseKey));
+                } else if (response.getCookie(responseKey) != null) {
+                    ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key, response.getCookie(responseKey));
-            } else if (response.getHeader(responseKey) != null) {
-                ScenarioContext
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                            response.getCookie(responseKey));
+                } else if (response.getHeader(responseKey) != null) {
+                    ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key, response.getHeader(responseKey));
-            } else {
-                LOGGER.warning(responseKey + " :  for " + key + " not found");
-                scenario.log(responseKey + " :  for " + key + " not found");
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                            response.getHeader(responseKey));
+                } else {
+                    LOGGER.warning(responseKey + " :  for " + key + " not found");
+                    scenario.log(responseKey + " :  for " + key + " not found");
+                }
             }
         }
     }
@@ -679,7 +684,7 @@ public class BaseStepDefinition {
     @Given("add (.*) data file with (.*) given input$")
     public void createFileRequest(String fileBody, String contentType) throws IOException {
         if (!this.skipScenario) {
-            String body = HelperUtil.readFileAsString(fileBody);
+            String body = HelperApiUtil.readFileAsString(fileBody);
             if (body != null) {
                 Map<String, String> mapHeader = new HashMap();
                 mapHeader.put("content-type", contentType);
@@ -1074,7 +1079,7 @@ public class BaseStepDefinition {
             if (processing != null) {
                 if (validatableResponse != null
                         && validatableResponse.extract().body().asString() != null) {
-                    String body = HelperUtil.readFileAsString(file);
+                    String body = HelperApiUtil.readFileAsString(file);
                     String jsonRequestActual = processing
                             .postResponseProcessing(validatableResponse.extract().body().asString());
                     String jsonRequestExpected = processing.postResponseProcessing(body);
@@ -1176,7 +1181,7 @@ public class BaseStepDefinition {
             attachResponse(validatableResponse);
             String listString = xmlString.stream().map(Object::toString)
                     .collect(Collectors.joining());
-            HelperUtil.assertXMLEquals(listString, response.asString());
+            HelperApiUtil.assertXMLEquals(listString, response.asString());
         }
     }
 
@@ -1192,9 +1197,9 @@ public class BaseStepDefinition {
             throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
-            String body = HelperUtil.readFileAsString(fileBody);
+            String body = HelperApiUtil.readFileAsString(fileBody);
             if (body != null) {
-                HelperUtil.assertXMLEquals(body, response.asString());
+                HelperApiUtil.assertXMLEquals(body, response.asString());
             } else {
                 Assert.assertTrue(fileBody + "  file is missing :", false);
             }
@@ -1215,14 +1220,14 @@ public class BaseStepDefinition {
     public void verifyXMLByPathResponse(String resource, String contentType,
                                         String fileBody, List<String> xpaths) throws Exception {
         if (!this.skipScenario) {
-            String body = HelperUtil.readFileAsString(fileBody);
+            String body = HelperApiUtil.readFileAsString(fileBody);
             attachActualResponse(body);
             attachResponse(validatableResponse);
             if (body != null) {
                 if (contentType.contains("xml")) {
-                    HelperUtil.assertXpathsEqual(xpaths, body, response.asString());
+                    HelperApiUtil.assertXpathsEqual(xpaths, body, response.asString());
                 } else {
-                    HelperUtil.assertJsonpathEqual(xpaths, body, response.asString());
+                    HelperApiUtil.assertJsonpathEqual(xpaths, body, response.asString());
                 }
             } else {
                 Assert.assertTrue(fileBody + "  file is missing :", false);
@@ -1257,7 +1262,8 @@ public class BaseStepDefinition {
     @And("^Verify (.*) response csvson includes in the response$")
     public void verify(String path, List<String> csvson)
         throws Exception {
-        HelperUtil.verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
+        HelperApiUtil
+            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
     }
 
     /**
@@ -1270,7 +1276,8 @@ public class BaseStepDefinition {
     @And("^Verify (.*) response csvson includes exact-order-match in the response$")
     public void verifyExactOrderMatch(String path, List<String> csvson)
         throws Exception {
-        HelperUtil.verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
+        HelperApiUtil
+            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
     }
 
     /**
@@ -1282,7 +1289,8 @@ public class BaseStepDefinition {
      */
     @And("^Verify (.*) response csvson includes exact-match in the response$")
     public void verifyExactMatch(String path, List<String> csvson) throws  Exception{
-        HelperUtil.verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
+        HelperApiUtil
+            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
     }
 
 
