@@ -8,7 +8,7 @@
 	<name>cucumblan-soapapitesting</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<properties>
-		<cucumblan.version>1.3.9-SNAPSHOT</cucumblan.version>
+		<cucumblan.version>1.3.10-SNAPSHOT</cucumblan.version>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
