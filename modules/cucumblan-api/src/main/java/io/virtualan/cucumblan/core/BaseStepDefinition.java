@@ -319,6 +319,7 @@ public class BaseStepDefinition {
      * @param responseValue the response value
      * @param key           the key
      */
+    @Given("^Add (.*) ad key and (.*) as value")
     @Given("^Add the (.*) value of the key as (.*)")
     public void addVariable(String responseValue, String key) {
         if (!this.skipScenario) {
@@ -984,6 +985,7 @@ public class BaseStepDefinition {
      * @param statusCode the status code
      */
     @Then("^Verify the status code is (\\d+)")
+    @Then("^the status code is (\\d+)")
     public void verifyStatusCode(int statusCode) {
         if (!this.skipScenario) {
             ScenarioContext
