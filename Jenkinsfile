@@ -23,7 +23,7 @@ pipeline {
                     bat 'mvn clean install -Denv=samples '
             }
         }
-        stage('Generate HTML report') {
+      /*  stage('Generate HTML report') {
            steps { 
               cucumber buildStatus: 'SUCCESS',
                 reportTitle: 'My report',
@@ -36,7 +36,7 @@ pipeline {
                     ]
                 ]
            }
-       }
+       } */
         
        
     }
