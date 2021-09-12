@@ -39,7 +39,7 @@ import org.xml.sax.InputSource;
  * The type Helper util.
  */
 @Slf4j
-public class HelperUtil {
+public class HelperApiUtil {
 
 
   private static String convertStreamToString(InputStream is) throws IOException {
