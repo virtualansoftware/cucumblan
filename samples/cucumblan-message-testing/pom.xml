@@ -7,12 +7,12 @@
 	<name>cucumblan-message-testing</name>
 	<properties>
 		<cucumblan-api.version>1.3.10-SNAPSHOT</cucumblan-api.version>
-		<cucumblan-message.version>1.2.10-NAPSHOT</cucumblan-message.version>
+		<cucumblan-message.version>1.2.10-SNAPSHOT</cucumblan-message.version>
 		<mapson.version>1.1.8</mapson.version>
 		<kafka-clients.version>2.8.0</kafka-clients.version>
 		<junit.version>5.5.2</junit.version>
 		<cucumber.version>6.7.0</cucumber.version>
-		<virtualan.version>1.1.2-SNAPSHOT</virtualan.version>
+		<virtualan.version>1.1.6</virtualan.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<description>
@@ -131,12 +131,6 @@
 			<groupId>io.virtualan</groupId>
 			<artifactId>cucumblan-api</artifactId>
 			<version>${cucumblan-api.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.virtualan</groupId>
-			<artifactId>mapson</artifactId>
-			<version>1.1.6-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
