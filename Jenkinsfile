@@ -23,20 +23,7 @@ pipeline {
                     bat 'mvn clean install -Denv=samples '
             }
         }
-      /*  stage('Generate HTML report') {
-           steps { 
-              cucumber buildStatus: 'SUCCESS',
-                reportTitle: 'My report',
-                fileIncludePattern: '**/*.json',
-                trendsLimit: 10,
-                classifications: [
-                    [
-                        'key': 'Browser',
-                        'value': 'Firefox'
-                    ]
-                ]
-           }
-       } */
+      
         
        
     }
