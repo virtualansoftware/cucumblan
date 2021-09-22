@@ -105,4 +105,18 @@ public interface MessageType<T, TT> {
       throws MessageNotDefinedException;
 
 
+  /**
+   * Build message while consuming the message
+   * for your specific needs Refer io.virtualan.cucumblan.message.typeimpl.JSONMessage
+   *
+   * @param value  the any message object
+   * @return the message type used for Pre defined verification steps
+   * @throws MessageNotDefinedException the message not defined exception
+   */
+  default MessageType  buildConsumerMessage(TT value)
+      throws MessageNotDefinedException {
+    return null;
+  }
+
+
 }

@@ -315,13 +315,13 @@ public class MsgBaseStepDefinition {
    * @throws BadInputDataException      bad input data exception
    * @throws MessageNotDefinedException the message not defined exception
    */
-  @Given("Verify (.*) for receiveQ (.*) find message on (.*) with type (.*)$")
-  public void verifyConsumedJMSJSONObjectWithOutId(String dummy, String receiveQ, String resource, String type,
+  @Given("Verify (.*) for receiveQ (.*) find (.*) message on (.*) with type (.*)$")
+  public void verifyConsumedJMSJSONObjectWithOutId(String dummy, String receiveQ, String jsonpath, String resource, String type,
       List<String> csvson)
       throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException {
     String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
 
-    String expectedJson = MQClient.readMessage(scenario,resource,eventNameInput);
+    String expectedJson = MQClient.findMessage(scenario,resource,eventNameInput, jsonpath, type);
     if (expectedJson != null) {
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
       scenario.attach(csvobject.toString(4), "application/json",
@@ -340,7 +340,7 @@ public class MsgBaseStepDefinition {
       }
     } else {
       Assertions.assertTrue(false,
-          " Unable to read message name (" + eventNameInput + ") with identifier : ");
+          " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath);
     }
   }
 
