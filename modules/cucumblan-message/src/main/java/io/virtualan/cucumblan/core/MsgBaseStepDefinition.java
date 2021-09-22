@@ -25,6 +25,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.virtualan.csvson.Csvson;
+import io.virtualan.cucumblan.core.msg.MQClient;
+import io.virtualan.cucumblan.message.exception.UnableToProcessException;
 import io.virtualan.cucumblan.props.util.EventRequest;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaConsumerClient;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaProducerClient;
@@ -36,8 +38,11 @@ import io.virtualan.cucumblan.props.util.MsgHelper;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.exception.BadInputDataException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -195,6 +200,33 @@ public class MsgBaseStepDefinition {
     }
   }
 
+
+  /**
+   * Produce message.
+   *
+   * @param dummy     the dummy
+   * @param queueName the queue name
+   * @param resource  the resource
+   * @param queueType the queue type
+   * @param messages  the messages
+   * @throws UnableToProcessException the message not defined exception
+   */
+  @Given("Send inline message (.*) for messageQ (.*) on (.*) with type (.*)$")
+  public void produceJMSMessage(String dummy, String queueName, String resource, String queueType, List<String> messages)
+      throws UnableToProcessException {
+    String eventNameInput = StepDefinitionHelper.getActualValue(queueName);
+    if (eventNameInput != null) {
+      boolean message = false;
+        message = MQClient.postMessage(scenario,resource,eventNameInput,
+            StepDefinitionHelper.getActualValue(messages.stream().map(x -> x).collect(Collectors.joining())));
+      Assertions.assertTrue(message, "message posting status");
+    } else {
+      Assertions.assertTrue(false, queueName + " is not configured.");
+    }
+  }
+
+
+
   /**
    * Produce message.
    *
@@ -228,6 +260,51 @@ public class MsgBaseStepDefinition {
     }
 
   }
+
+
+  /**
+   * Verify consumed json object.
+   *
+   * @param receiveQ the event name
+   * @param id        the id
+   * @param resource  the resource
+   * @param type      the type
+   * @param csvson    the csvson
+   * @throws InterruptedException       the interrupted exception
+   * @throws BadInputDataException      bad input data exception
+   * @throws MessageNotDefinedException the message not defined exception
+   */
+  @Given("Verify (.*) for receiveQ (.*) contains (.*) on (.*) with type (.*)$")
+  public void verifyConsumedJMSJSONObject(String dummy, String receiveQ, String id, String resource, String type,
+      List<String> csvson)
+      throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException {
+    String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
+    String idInput = StepDefinitionHelper.getActualValue(id);
+
+    String expectedJson = MQClient.readMessage(scenario,resource,eventNameInput, idInput);
+    if (expectedJson != null) {
+      JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+      scenario.attach(csvobject.toString(4), "application/json",
+          "ExpectedResponse:");
+      Object expectedJsonObj = StepDefinitionHelper.getJSON(expectedJson);
+      if (expectedJsonObj instanceof JSONObject) {
+        scenario.attach(((JSONObject)expectedJsonObj).toString(4), "application/json",
+            "ActualResponse:");
+        JSONAssert
+            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJsonObj,
+                JSONCompareMode.LENIENT);
+      } else {
+        scenario.attach(((JSONArray)expectedJsonObj).toString(4), "application/json",
+            "ActualResponse:");
+        JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
+      }
+    } else {
+      Assertions.assertTrue(false,
+          " Unable to read message name (" + eventNameInput + ") with identifier : " + id);
+    }
+  }
+
+
 
 
   /**
