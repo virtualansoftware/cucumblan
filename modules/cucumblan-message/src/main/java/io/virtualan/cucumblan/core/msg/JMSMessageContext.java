@@ -66,11 +66,11 @@ public class JMSMessageContext {
   private static ConnectionFactory buildJMSsConnectionFactory(String resource) throws IOException, JMSException {
     Properties props = new Properties();
     InputStream stream = Thread.currentThread().getContextClassLoader()
-        .getResourceAsStream("consumer-amq-" + resource + ".properties");
+        .getResourceAsStream("cucumblan-amq-" + resource + ".properties");
     if (stream != null) {
       props.load(stream);
     } else {
-      logger.warning("consumer-amq-" + resource + ".properties is not found");
+      logger.warning("cucumblan-amq-" + resource + ".properties is not found");
       System.exit(1);
     }
     if(props.get("username") != null && props.get("password") != null){

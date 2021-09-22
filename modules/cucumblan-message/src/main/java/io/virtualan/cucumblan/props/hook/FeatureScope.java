@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 @Slf4j
 public class FeatureScope implements ConcurrentEventListener {
-    //private ThreadLocal threadLocal = new ThreadLocal();
 
     @Override
     public void setEventPublisher(EventPublisher eventPublisher) {

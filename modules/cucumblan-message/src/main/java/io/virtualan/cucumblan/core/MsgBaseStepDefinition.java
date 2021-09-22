@@ -304,6 +304,46 @@ public class MsgBaseStepDefinition {
     }
   }
 
+  /**
+   * Verify consumed json object.
+   *
+   * @param receiveQ the event name
+   * @param resource  the resource
+   * @param type      the type
+   * @param csvson    the csvson
+   * @throws InterruptedException       the interrupted exception
+   * @throws BadInputDataException      bad input data exception
+   * @throws MessageNotDefinedException the message not defined exception
+   */
+  @Given("Verify (.*) for receiveQ (.*) find message on (.*) with type (.*)$")
+  public void verifyConsumedJMSJSONObjectWithOutId(String dummy, String receiveQ, String resource, String type,
+      List<String> csvson)
+      throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException {
+    String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
+
+    String expectedJson = MQClient.readMessage(scenario,resource,eventNameInput);
+    if (expectedJson != null) {
+      JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+      scenario.attach(csvobject.toString(4), "application/json",
+          "ExpectedResponse:");
+      Object expectedJsonObj = StepDefinitionHelper.getJSON(expectedJson);
+      if (expectedJsonObj instanceof JSONObject) {
+        scenario.attach(((JSONObject)expectedJsonObj).toString(4), "application/json",
+            "ActualResponse:");
+        JSONAssert
+            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJsonObj,
+                JSONCompareMode.LENIENT);
+      } else {
+        scenario.attach(((JSONArray)expectedJsonObj).toString(4), "application/json",
+            "ActualResponse:");
+        JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
+      }
+    } else {
+      Assertions.assertTrue(false,
+          " Unable to read message name (" + eventNameInput + ") with identifier : ");
+    }
+  }
+
 
 
 

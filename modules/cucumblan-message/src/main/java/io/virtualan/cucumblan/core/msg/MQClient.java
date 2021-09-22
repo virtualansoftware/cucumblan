@@ -63,4 +63,25 @@ public class MQClient {
     Message object =  jmsTemplateReceive.receiveSelected(new ActiveMQQueue(receiveQ), messageId);
     return  object.getBody(String.class);
   }
+
+
+  /**
+   * Read message string.
+   *
+   * @param scenario  the scenario
+   * @param resource  the resource
+   * @param receiveQ  the receive q
+   * @return the string
+   * @throws IOException  the io exception
+   * @throws JMSException the jms exception
+   */
+  public static String  readMessage(Scenario scenario, String resource, String receiveQ)
+      throws IOException, JMSException {
+    ConnectionFactory connectionFactory =
+        JMSMessageContext.loadConnectionFactory(resource);
+    JmsTemplate jmsTemplateReceive = new JmsTemplate(connectionFactory);
+    jmsTemplateReceive.setDefaultDestination(new ActiveMQQueue(receiveQ));
+    Object object = jmsTemplateReceive.receiveAndConvert();
+    return  (String) object;
+  }
 }
