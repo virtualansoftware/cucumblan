@@ -26,17 +26,19 @@ import io.virtualan.cucumblan.jdbc.util.StreamingJsonResultSetExtractor;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.mapson.Mapson;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import io.virtualan.mapson.Mapson;
+import java.util.stream.Collectors;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -93,14 +95,18 @@ public class DBBaseStepDefinition {
           if (!jdbcTemplateMap.containsKey(source)) {
             BasicDataSource dataSource = new BasicDataSource();
             dataSource.setDriverClassName(
-                StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.driver-class-name")));
+                StepDefinitionHelper.getActualValue(ApplicationConfiguration
+                    .getProperty(source + ".cucumblan.jdbc.driver-class-name")));
             dataSource
                 .setUsername(
-                    StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.username")));
+                    StepDefinitionHelper.getActualValue(
+                        ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.username")));
             dataSource
                 .setPassword(
-                    StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.password")));
-            dataSource.setUrl(StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.url")));
+                    StepDefinitionHelper.getActualValue(
+                        ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.password")));
+            dataSource.setUrl(StepDefinitionHelper.getActualValue(
+                ApplicationConfiguration.getProperty(source + ".cucumblan.jdbc.url")));
             dataSource.setMaxIdle(5);
             dataSource.setInitialSize(5);
             JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -122,7 +128,7 @@ public class DBBaseStepDefinition {
   public void before(Scenario scenario) {
     this.scenario = scenario;
     this.sqlJson = null;
-    if(jdbcTemplateMap.isEmpty()){
+    if (jdbcTemplateMap.isEmpty()) {
       loadAllDataSource();
     }
   }
@@ -130,21 +136,21 @@ public class DBBaseStepDefinition {
   /**
    * given sql.
    *
-   * @param dummy    the dummy
+   * @param dummy the dummy
    * @throws Exception the exception
    */
   @Given("As a user perform sql (.*) action$")
   public void dummyGiven(String dummy) throws Exception {
   }
 
-    /**
-     * Insert sql.
-     *
-     * @param dummy    the dummy
-     * @param resource the resource
-     * @param sqls     the sqls
-     * @throws Exception the exception
-     */
+  /**
+   * Insert sql.
+   *
+   * @param dummy    the dummy
+   * @param resource the resource
+   * @param sqls     the sqls
+   * @throws Exception the exception
+   */
   @Given("Execute DDL for the given sql (.*) on (.*)$")
   @Given("Execute UPDATE for the given sql (.*) on (.*)$")
   @Given("Execute DELETE for the given sql (.*) on (.*)$")
@@ -155,9 +161,9 @@ public class DBBaseStepDefinition {
       try {
         jdbcTemplate.execute(StepDefinitionHelper.getActualValue(sql));
       } catch (Exception e) {
-        LOGGER.warning("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
-        scenario.log("Unable to load " + dummy +" this sqls " + sql + " : " + e.getMessage());
-        Assert.assertTrue(dummy+"  sqls are not inserted : (" + e.getMessage() + ")", false);
+        LOGGER.warning("Unable to load " + dummy + " this sqls " + sql + " : " + e.getMessage());
+        scenario.log("Unable to load " + dummy + " this sqls " + sql + " : " + e.getMessage());
+        Assert.assertTrue(dummy + "  sqls are not inserted : (" + e.getMessage() + ")", false);
       }
     }
     Assert.assertTrue("All sqls are executed successfully", true);
@@ -177,14 +183,18 @@ public class DBBaseStepDefinition {
   public void storeSqlResponseAskey(String responseKey, String key) throws JSONException {
     if (sqlJson != null) {
       Map<String, String> mapson = Mapson.buildMAPsonFromJson(sqlJson);
-      if(mapson.get(responseKey) != null) {
+      if (mapson.get(responseKey) != null) {
         ScenarioContext
-                .setContext(String.valueOf(Thread.currentThread().getId()), key, mapson.get(responseKey));
+            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                mapson.get(responseKey));
       } else {
-        Assert.assertTrue(responseKey + " not found in the sql " , false);
+        Assert.assertTrue(responseKey + " not found in the sql ", false);
       }
+    } else {
+      Assert.assertTrue( " Sql query response not found for the executed query?  ", false);
     }
   }
+
 
   /**
    * Verify.
@@ -203,7 +213,7 @@ public class DBBaseStepDefinition {
       try {
         sqlJson = getJson(resource,
             StepDefinitionHelper.getActualValue(selectSql.get(0)));
-      }catch (Exception e){
+      } catch (Exception e) {
         Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
       }
     } else {
@@ -214,14 +224,46 @@ public class DBBaseStepDefinition {
       Assert.assertNull(sqlJson);
     } else {
       List<String> csvons = selectSql.subList(1, selectSql.size());
-      JSONArray expectedArray = Csvson.buildCSVson(csvons, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+      JSONArray expectedArray = Csvson
+          .buildCSVson(csvons,
+              ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
       JSONArray actualArray = new JSONArray(sqlJson);
-      JSONCompareResult result = JSONCompare.compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
+      JSONCompareResult result = JSONCompare
+          .compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
       scenario.attach(expectedArray.toString(), "application/json", "ExpectedCvsonResponse");
-      if(result.failed()){
+      if (result.failed()) {
         scenario.log(result.getMessage());
       }
       Assertions.assertTrue(result.passed(), " select sql and cvson record matches");
+    }
+  }
+
+  /**
+   * SELECT.
+   *
+   * @param dummy1    the dummy 1
+   * @param dummy     the dummy
+   * @param resource  the resource
+   * @param selectSql the select sql
+   * @throws Exception the exception
+   */
+  @Given("Select (.*) with the given sql (.*) on (.*)$")
+  public void select(String dummy1, String dummy, String resource, List<String> selectSql)
+      throws Exception {
+    JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
+    if (selectSql.size() >= 1) {
+      try {
+        scenario.attach(
+            new JSONObject("{\"sql\" : \"" + StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))) + "\", \"resource\" : \"" + resource + "\" }")
+                .toString(2), "application/json", "SelectSql");
+        sqlJson = getJson(resource,
+            StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))));
+        scenario.attach(sqlJson, "application/json", "SelectSqlResponse");
+      } catch (Exception e) {
+        Assert.assertTrue(" Invalid sql? " + e.getMessage(), false);
+      }
+    } else {
+      Assert.assertTrue(" select sql missing ", false);
     }
   }
 
@@ -232,4 +274,4 @@ public class DBBaseStepDefinition {
     return os.toString();
   }
 
-}   
+}

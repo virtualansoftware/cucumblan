@@ -8,5 +8,8 @@ Scenario: Testing the sql validation
         | select * from employees where emp_no = 2                  |
         | EMP_NO,BIRTH_DATE,FIRST_NAME,LAST_NAME,GENDER,HIRE_DATE   |
         |   i~2,l~253087200000,ELan,Thangamani,Male,l~1191992400000          |
+    Then Select details with the given sql for employees on employee
+        | select * from employees where emp_no = 2                  |
+    Then Store-sql's [0].FIRST_NAME value of the key as firstName
     And Execute DELETE for the given sql for employees on employee
         | delete from employees where emp_no = 2    |
