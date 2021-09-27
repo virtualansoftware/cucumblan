@@ -29,10 +29,12 @@ import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.Mapson;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -249,13 +251,13 @@ public class DBBaseStepDefinition {
   public void select(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    scenario.attach(
-        new JSONObject("{\"sql\" : \"" + selectSql + "\", \"resource\" : \"" + resource + "\" }")
-            .toString(2), "application/json", "SelectSql");
     if (selectSql.size() >= 1) {
       try {
+        scenario.attach(
+            new JSONObject("{\"sql\" : \"" + StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))) + "\", \"resource\" : \"" + resource + "\" }")
+                .toString(2), "application/json", "SelectSql");
         sqlJson = getJson(resource,
-            StepDefinitionHelper.getActualValue(selectSql.get(0)));
+            StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))));
         scenario.attach(sqlJson, "application/json", "SelectSqlResponse");
       } catch (Exception e) {
         Assert.assertTrue(" Invalid sql? " + e.getMessage(), false);
