@@ -51,11 +51,12 @@ public class HelperApiUtil {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         while ((line = reader.readLine()) != null) {
           sb.append(line);
+          sb.append('\n');
         }
       } finally {
         is.close();
       }
-      return sb.toString();
+      return sb.toString().trim();
     } else {
       return null;
     }
