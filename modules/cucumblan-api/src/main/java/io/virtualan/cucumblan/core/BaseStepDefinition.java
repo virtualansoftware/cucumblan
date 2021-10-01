@@ -319,7 +319,7 @@ public class BaseStepDefinition {
      * @param responseValue the response value
      * @param key           the key
      */
-    @Given("^Add (.*) ad key and (.*) as value")
+    @Given("^Add (.*) as key and (.*) as value")
     @Given("^Add the (.*) value of the key as (.*)")
     public void addVariable(String responseValue, String key) {
         if (!this.skipScenario) {
@@ -779,6 +779,24 @@ public class BaseStepDefinition {
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
                     , "application/json", "requestData :  ");
+            request = request.contentType("application/json").body(jsonBody);
+        }
+    }
+
+    /**
+     * Delete request.
+     *
+     * @param nameIgnore   the name ignore
+     * @param parameterMap the parameter map
+     * @throws Exception the exception
+     */
+    @Given("^Delete (.*) with given input$")
+    public void deleteRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
+        if (!this.skipScenario) {
+            jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
+                .getContext(String.valueOf(Thread.currentThread().getId())));
+            scenario.attach(jsonBody
+                , "application/json", "requestData :  ");
             request = request.contentType("application/json").body(jsonBody);
         }
     }
