@@ -284,11 +284,14 @@ public class BaseStepDefinition {
     @Given("^Provided all the feature level parameters from file$")
     public void loadGlobalParamFromFile() throws IOException {
         Map<String, String> env = System.getenv();
-        for (String envName : env.keySet()) {
-            if(envName.startsWith("cucumblan.")) {
-                ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()), envName.replace("cucumblan.",""),
-                        env.get(envName));
+        if(env != null && !env.isEmpty()) {
+            for (String envName : env.keySet()) {
+                if (envName.startsWith("cucumblan.")) {
+                    ScenarioContext
+                        .setContext(String.valueOf(Thread.currentThread().getId()),
+                            envName.replace("cucumblan.", ""),
+                            env.get(envName));
+                }
             }
         }
         Properties properties = new Properties();
