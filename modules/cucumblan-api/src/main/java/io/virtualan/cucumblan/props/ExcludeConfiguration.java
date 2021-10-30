@@ -51,7 +51,7 @@ public class ExcludeConfiguration {
 
   private static boolean findMatch(Map<String,String> excludeProperties, String actual) {
     for (Map.Entry entry : excludeProperties.entrySet()) {
-      if (actual.matches(entry.getKey().toString())){
+      if (actual != null && actual.trim().matches(entry.getKey().toString().trim())){
         return entry.getValue().toString().equalsIgnoreCase("IGNORE");
       }
     }
@@ -60,7 +60,7 @@ public class ExcludeConfiguration {
 
   private static boolean findMatch(String actual) {
     for (Map.Entry entry : excludeProperties.entrySet()) {
-      if (actual.matches(entry.getKey().toString())){
+      if (actual !=null && actual.trim().matches(entry.getKey().toString())){
         return entry.getValue().toString().equalsIgnoreCase("IGNORE");
       }
     }
@@ -81,7 +81,7 @@ public class ExcludeConfiguration {
       return true;
     }else if (excludes != null && keyName != null && !excludes.trim().isEmpty()) {
       excludeList = Stream.of(excludes.split(",")).collect(Collectors.toList());
-      return excludeList.contains(keyName) || excludeList.stream().anyMatch(x -> keyName.contains(x));
+      return excludeList.contains(keyName.trim()) || excludeList.stream().anyMatch(x -> keyName.trim().contains(x.trim()));
     } else if(excludes == null && findMatch(resource)){
       LOGGER.info(" Skipping comparison for resource based on pattern : " + resource);
       return true;
@@ -96,8 +96,8 @@ public class ExcludeConfiguration {
       return true;
     } else if (excludes != null && keyName != null && !excludes.trim().isEmpty()) {
       List<String> excludeList = (List)Stream.of(excludes.split(",")).collect(Collectors.toList());
-      return excludeList.contains(keyName) || excludeList.stream().anyMatch((x) -> {
-        return keyName.contains(x);
+      return excludeList.contains(keyName.trim()) || excludeList.stream().anyMatch((x) -> {
+        return keyName.trim().contains(x.trim());
       });
     } else if (excludes == null && findMatch(excludeProperties, resource)) {
       LOGGER.info(" Skipping comparison for resource based on pattern : " + resource);

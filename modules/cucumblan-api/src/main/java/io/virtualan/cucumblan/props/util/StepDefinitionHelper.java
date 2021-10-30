@@ -57,10 +57,6 @@ public class StepDefinitionHelper {
     if (object == null) {
       return null;
     }
-    //TODO validate
-//    if (object instanceof JSONArray) {
-//      return object;
-//    }
 
     String returnValue = (String) object;
     String key = "";
