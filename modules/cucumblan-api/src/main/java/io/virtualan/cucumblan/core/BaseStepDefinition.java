@@ -96,7 +96,6 @@ public class BaseStepDefinition {
     private String jsonBody;
     private RequestSpecification request = given();
     private Scenario scenario;
-    private int sequence;
     private String acceptContentType;
     private boolean skipScenario = false;
 
@@ -1001,7 +1000,6 @@ public class BaseStepDefinition {
     public void before(Scenario scenario) {
         this.scenario = scenario;
         LOGGER.info("scenario ID:: " + scenario.getId());
-        this.sequence = 1;
         this.acceptContentType = null;
         this.skipScenario = false;
     }
