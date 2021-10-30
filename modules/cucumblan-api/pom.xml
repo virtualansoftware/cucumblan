@@ -7,7 +7,7 @@
   <version>1.3.13-SNAPSHOT</version>
   <properties>
     <cucumber.version>6.11.0</cucumber.version>
-    <mapson.version>1.1.8</mapson.version>
+    <mapson.version>1.1.9</mapson.version>
     <junit.version>5.8.0</junit.version>
   </properties>
   <description>

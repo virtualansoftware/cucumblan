@@ -284,21 +284,30 @@ public class BaseStepDefinition {
      */
     @Given("^Provided all the feature level parameters from file$")
     public void loadGlobalParamFromFile() throws IOException {
-        if (!this.skipScenario) {
-            Properties properties = new Properties();
-            InputStream stream = ApplicationConfiguration.class.getClassLoader()
-                    .getResourceAsStream("cucumblan-env.properties");
-            if (stream != null) {
-                properties.load(stream);
+        Map<String, String> env = System.getenv();
+        for (String envName : env.keySet()) {
+            if(envName.startsWith("cucumblan.")) {
                 ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()), (Map) properties);
-                scenario.attach(new JSONObject(ScenarioContext
-                                .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(),
-                        "application/json", "ContextId" + String.valueOf(Thread.currentThread().getId()));
-            } else {
-                LOGGER.warning(
-                        "cucumblan-env.properties is not configured. Need to add if default data loaded");
+                    .setContext(String.valueOf(Thread.currentThread().getId()), envName.replace("cucumblan.",""),
+                        env.get(envName));
             }
+        }
+        Properties properties = new Properties();
+        InputStream stream = ApplicationConfiguration.class.getClassLoader()
+                .getResourceAsStream("cucumblan-env.properties");
+        if(stream == null){
+            stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cucumblan-env.properties");
+        }
+        if (stream != null) {
+            properties.load(stream);
+            ScenarioContext
+                    .setContext(String.valueOf(Thread.currentThread().getId()), (Map) properties);
+            scenario.attach(new JSONObject(ScenarioContext
+                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(),
+                    "application/json", "ContextId" + String.valueOf(Thread.currentThread().getId()));
+        } else {
+            LOGGER.warning(
+                    "cucumblan-env.properties is not configured. Need to add if default data loaded");
         }
     }
 
