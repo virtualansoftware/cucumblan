@@ -723,7 +723,7 @@ public class BaseStepDefinition {
                 Map<String, String> mapHeader = new HashMap();
                 mapHeader.put("content-type", contentType);
                 String listString = input.stream().map(Object::toString)
-                        .collect(Collectors.joining());
+                        .collect(Collectors.joining("\n"));
                 request = request.headers(mapHeader).contentType(contentType).body(listString);
             } else {
                 Assert.assertTrue(fileBody + " input inline is missing ", false);
