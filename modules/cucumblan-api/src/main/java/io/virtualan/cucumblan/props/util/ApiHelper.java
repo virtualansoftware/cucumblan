@@ -19,12 +19,12 @@ public class ApiHelper {
 
     if (ApplicationConfiguration.getProperty("service.api." + system) == null) {
       if( ApplicationConfiguration.getProperty("service.api") != null){
-          return ApplicationConfiguration.getProperty("service.api");
+          return StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty("service.api"));
       } else {
-        return resourceKey;
+        return StepDefinitionHelper.getActualValue(resourceKey);
       }
     }
-    return ApplicationConfiguration.getProperty("service.api." + system);
+    return StepDefinitionHelper.getActualValue(ApplicationConfiguration.getProperty("service.api." + system));
   }
 
   /**
@@ -34,7 +34,7 @@ public class ApiHelper {
    * @param system      the system
    * @return the actual resource
    */
-  public static String getActualResource(String resourceKey, String system) {
+  public static String getActualResource(String resourceKey, String system) throws Exception {
     Properties props = EndpointConfiguration.getInstance().getProperty(system);
     if (ApplicationConfiguration.getProperty("service.api." + system) == null ) {
       if( ApplicationConfiguration.getProperty("service.api") != null){
@@ -43,7 +43,7 @@ public class ApiHelper {
         return url;
       } else {
         log.warn("service.api : configuration is missing.. Unable to proceed");
-        System.exit(-1);
+        throw  new Exception("service.api : configuration is missing.. Unable to proceed");
       }
     }
     String url = ApplicationConfiguration.getProperty("service.api." + system)

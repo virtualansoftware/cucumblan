@@ -37,6 +37,7 @@ import io.virtualan.cucumblan.props.TopicConfiguration;
 import io.virtualan.cucumblan.props.util.MsgHelper;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.mapson.Mapson;
 import io.virtualan.mapson.exception.BadInputDataException;
 import java.io.IOException;
 import java.util.List;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 import javax.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -61,6 +63,8 @@ public class MsgBaseStepDefinition {
 
   private Scenario scenario;
 
+  String msgJson = null;
+
   /**
    * Before.
    *
@@ -69,6 +73,7 @@ public class MsgBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    this.msgJson = null;
   }
 
 
@@ -102,7 +107,9 @@ public class MsgBaseStepDefinition {
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
-
+      if(builtMessage.getMessageAsJson() != null) {
+        this.msgJson = builtMessage.getMessageAsJson().toString();
+      }
       KafkaProducerClient
           .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
               partition, builtMessage.getHeaders());
@@ -152,6 +159,9 @@ public class MsgBaseStepDefinition {
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
+      if(builtMessage.getMessageAsJson() != null) {
+        this.msgJson = builtMessage.getMessageAsJson().toString();
+      }
       scenario.log(builtMessage.toString());
       if (builtMessage.getKey() != null) {
         KafkaProducerClient
@@ -185,6 +195,9 @@ public class MsgBaseStepDefinition {
     MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
+      if(builtMessage.getMessageAsJson() != null) {
+        this.msgJson = builtMessage.getMessageAsJson().toString();
+      }
       scenario.log(builtMessage.toString());
       if (builtMessage.getKey() != null) {
         KafkaProducerClient
@@ -246,6 +259,9 @@ public class MsgBaseStepDefinition {
     if (topic != null && messageType != null) {
       MessageType builtMessage = messageType.buildProducerMessage(messages);
       scenario.log(builtMessage.toString());
+      if(builtMessage.getMessageAsJson() != null) {
+        this.msgJson = builtMessage.getMessageAsJson().toString();
+      }
       if (builtMessage.getKey() != null) {
         KafkaProducerClient
             .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
@@ -283,6 +299,7 @@ public class MsgBaseStepDefinition {
 
     String expectedJson = MQClient.readMessage(scenario,resource,eventNameInput, idInput);
     if (expectedJson != null) {
+      this.msgJson = expectedJson;
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
       scenario.attach(csvobject.toString(4), "application/json",
           "ExpectedResponse:");
@@ -323,6 +340,7 @@ public class MsgBaseStepDefinition {
 
     String expectedJson = MQClient.findMessage(scenario,resource,eventNameInput, jsonpath, type);
     if (expectedJson != null) {
+      this.msgJson = expectedJson;
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
       scenario.attach(csvobject.toString(4), "application/json",
           "ExpectedResponse:");
@@ -343,6 +361,7 @@ public class MsgBaseStepDefinition {
           " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath);
     }
   }
+
 
 
 
@@ -376,6 +395,9 @@ public class MsgBaseStepDefinition {
 
     MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
     if (expectedJson != null) {
+      if(expectedJson.getMessageAsJson() != null) {
+        this.msgJson = expectedJson.getMessageAsJson().toString();
+      }
       JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
       scenario.attach(csvobject.toString(4), "application/json",
           "ExpectedResponse:");
@@ -424,6 +446,9 @@ public class MsgBaseStepDefinition {
 
     MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
     if (expectedJson != null) {
+      if(expectedJson.getMessageAsJson() != null) {
+        this.msgJson = expectedJson.getMessageAsJson().toString();
+      }
       scenario.attach(expectedJson.getMessage().toString(), "application/json",
           "ActualResponse");
       MessageType finalExpectedJson = expectedJson;
@@ -436,6 +461,22 @@ public class MsgBaseStepDefinition {
     } else {
       Assertions.assertTrue(false,
           " Unable to read event name (" + eventName + ") with identifier : " + id);
+    }
+  }
+
+  @Given("^Store-message's (.*) value of the key as (.*)")
+  public void storeMessageResponseAskey(String responseKey, String key) throws JSONException {
+    if (msgJson != null) {
+      Map<String, String> mapson = Mapson.buildMAPsonFromJson(msgJson);
+      if (mapson.get(responseKey) != null) {
+        ScenarioContext
+            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                mapson.get(responseKey));
+      } else {
+        Assertions.assertTrue( false, responseKey + " not found in the read message ");
+      }
+    } else {
+      Assertions.assertTrue(false, " Message not found for the read message?  ");
     }
   }
 
