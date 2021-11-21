@@ -1154,6 +1154,13 @@ public class BaseStepDefinition {
             }
         }
     }
+    
+    private boolean checkEqualNumbers(String a, String b){
+        boolean result = false;
+        System.out.println("CHECK: a=" + a + ", b=" + b);
+        //TODO
+        return result;
+    }
 
     private boolean areEqualKeyValues(
             String resource, Map<String, String> first,
@@ -1166,7 +1173,9 @@ public class BaseStepDefinition {
                         !((e.getValue() != null && second.get(e.getKey()) != null && StepDefinitionHelper.getActualValue(e.getValue().trim())
                                 .equals(second.get(e.getKey()).trim()))
                                 || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || ""
-                                .equals(second.get(e.getKey()))))))
+                                .equals(second.get(e.getKey()))))
+                                || (checkEqualNumbers(e.getValue(), second.get(e.getKey())))
+                        ))
                 .collect(Collectors.toMap(e -> e.getKey(),
                         e -> {
                             JSONObject object = new JSONObject();
