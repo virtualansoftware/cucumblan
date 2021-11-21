@@ -1158,6 +1158,7 @@ public class BaseStepDefinition {
     private boolean checkEqualNumbers(String a, String b){
         boolean result = false;
         System.out.println("CHECK: a=" + a + ", b=" + b);
+        LOGGER.severe("CHECK: a=" + a + ", b=" + b);
         //TODO
         return result;
     }
@@ -1170,11 +1171,11 @@ public class BaseStepDefinition {
         Map<String, JSONObject> result = first.entrySet().stream()
                 .filter(y -> (!ExcludeConfiguration.shouldSkip(resource, y.getKey())))
                 .filter(e ->
-                        !((e.getValue() != null && second.get(e.getKey()) != null && StepDefinitionHelper.getActualValue(e.getValue().trim())
-                                .equals(second.get(e.getKey()).trim()))
-                                || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || ""
-                                .equals(second.get(e.getKey()))))
-                                || (checkEqualNumbers(e.getValue(), second.get(e.getKey())))
+                        !(
+                                (e.getValue() != null && second.get(e.getKey()) != null && checkEqualNumbers(StepDefinitionHelper.getActualValue(e.getValue().trim()),second.get(e.getKey()).trim()))
+//                                        || (checkEqualNumbers(e.getValue(), second.get(e.getKey())))
+                                        || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || "".equals(second.get(e.getKey()))))
+                                
                         ))
                 .collect(Collectors.toMap(e -> e.getKey(),
                         e -> {
