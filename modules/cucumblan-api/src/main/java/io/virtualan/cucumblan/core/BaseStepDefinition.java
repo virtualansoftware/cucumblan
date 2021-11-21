@@ -1155,10 +1155,19 @@ public class BaseStepDefinition {
         }
     }
     
-    private boolean checkEqualNumbers(String a, String b){
+    private boolean checkEqualNumbers(String compareValue, String apiValue){
         boolean result = false;
-        System.out.println("CHECK: a=" + a + ", b=" + b);
-        LOGGER.severe("CHECK: a=" + a + ", b=" + b);
+        if ( compareValue == null && (apiValue == null || apiValue.equals(""))) return true;
+        if ( compareValue == null || apiValue == null) return false;
+        LOGGER.severe("CHECK: compareValue=" + compareValue + ", apiValue=" + apiValue);
+        if ( compareValue.equals(apiValue) ) return true;
+        try {
+            if ( Float.parseFloat(compareValue) == Float.parseFloat(apiValue) ) {
+                result = true;
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.severe("NOT a number.");
+        }
         //TODO
         return result;
     }
@@ -1173,7 +1182,6 @@ public class BaseStepDefinition {
                 .filter(e ->
                         !(
                                 (e.getValue() != null && second.get(e.getKey()) != null && checkEqualNumbers(StepDefinitionHelper.getActualValue(e.getValue().trim()),second.get(e.getKey()).trim()))
-//                                        || (checkEqualNumbers(e.getValue(), second.get(e.getKey())))
                                         || (e.getValue() == null && (e.getValue() == second.get(e.getKey()) || "".equals(second.get(e.getKey()))))
                                 
                         ))
