@@ -8,7 +8,7 @@
   <properties>
     <mapson.version>1.1.8</mapson.version>
     <selenium.version>4.0.0</selenium.version>
-    <junit.version>5.7.2</junit.version>
+    <junit.version>5.8.1</junit.version>
     <cucumber.version>6.11.0</cucumber.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -125,7 +125,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.12</version>
+      <version>0.10.1</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

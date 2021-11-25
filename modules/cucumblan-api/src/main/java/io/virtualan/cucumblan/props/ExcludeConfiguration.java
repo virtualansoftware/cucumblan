@@ -28,9 +28,6 @@ public class ExcludeConfiguration {
   static String excludes = null;
   private final static Logger LOGGER = Logger.getLogger(ExcludeConfiguration.class.getName());
 
-  static {
-    reload();
-  }
 
   public static  void reload() {
     try {
@@ -75,6 +72,7 @@ public class ExcludeConfiguration {
    * @return the property
    */
   public static boolean shouldSkip(String resource,String keyName) {
+    ExcludeConfiguration.reload();
     String excludes = excludeProperties.getProperty(resource);
     if(excludes != null &&  excludes.equalsIgnoreCase("IGNORE")) {
       LOGGER.info(" Skipping response comparison for resource : "+ resource );
@@ -90,6 +88,7 @@ public class ExcludeConfiguration {
   }
 
   public static boolean shouldSkip(Map<String,String> excludeProperties, String resource, String keyName) {
+    ExcludeConfiguration.reload();
     String excludes = excludeProperties.get(resource);
     if (excludes != null && excludes.equalsIgnoreCase("IGNORE")) {
       LOGGER.info(" Skipping response comparison for resource : " + resource);

@@ -284,11 +284,14 @@ public class BaseStepDefinition {
     @Given("^Provided all the feature level parameters from file$")
     public void loadGlobalParamFromFile() throws IOException {
         Map<String, String> env = System.getenv();
-        for (String envName : env.keySet()) {
-            if(envName.startsWith("cucumblan.")) {
-                ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()), envName.replace("cucumblan.",""),
-                        env.get(envName));
+        if(env != null && !env.isEmpty()) {
+            for (String envName : env.keySet()) {
+                if (envName.startsWith("cucumblan.")) {
+                    ScenarioContext
+                        .setContext(String.valueOf(Thread.currentThread().getId()),
+                            envName.replace("cucumblan.", ""),
+                            env.get(envName));
+                }
             }
         }
         Properties properties = new Properties();
@@ -720,7 +723,7 @@ public class BaseStepDefinition {
                 Map<String, String> mapHeader = new HashMap();
                 mapHeader.put("content-type", contentType);
                 String listString = input.stream().map(Object::toString)
-                        .collect(Collectors.joining());
+                        .collect(Collectors.joining("\n"));
                 request = request.headers(mapHeader).contentType(contentType).body(listString);
             } else {
                 Assert.assertTrue(fileBody + " input inline is missing ", false);
@@ -840,7 +843,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) post (.*) in (.*) resource on (.*)")
     public void createRequest(String dummyString, String acceptContentType, String resource,
-                              String system) {
+                              String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -874,7 +877,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) get (.*) in (.*) resource on (.*)")
     public void readRequest(String dummyString, String acceptContentType, String resource,
-                            String system) {
+                            String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -906,7 +909,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) put (.*) in (.*) resource on (.*)")
     public void modifyRequest(String dummyString, String acceptContentType, String resource,
-                              String system) {
+                              String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -938,7 +941,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) patch (.*) in (.*) resource on (.*)")
     public void patchRequest(String dummyString, String acceptContentType, String resource,
-                             String system) {
+                             String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -970,7 +973,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) delete (.*) in (.*) resource on (.*)")
     public void deleteById(String dummyString, String acceptContentType, String resource,
-                           String system) {
+                           String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
