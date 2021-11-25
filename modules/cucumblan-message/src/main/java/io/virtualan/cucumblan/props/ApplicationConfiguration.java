@@ -1,24 +1,5 @@
 package io.virtualan.cucumblan.props;
 
-/*
- *
- *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
- *
- *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *     in compliance with the License. You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *     Unless required by applicable law or agreed to in writing, software distributed under the License
- *     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *     or implied. See the License for the specific language governing permissions and limitations under
- *     the License.
- *
- *
- *
- */
-
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
@@ -33,13 +14,8 @@ public class ApplicationConfiguration {
   private final static Logger LOGGER = Logger.getLogger(ApplicationConfiguration.class.getName());
 
   private static Properties properties = new Properties();
-  static {
-    reload();
-  }
 
-  /**
-   * Reload.
-   */
+
   public static  void reload(){
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cucumblan.properties");
@@ -59,8 +35,6 @@ public class ApplicationConfiguration {
   /**
    * Gets properties.
    *
-   * @param key   the key
-   * @param value the value
    */
   public static void setProperty(String key, String value) {
     properties.put(key, value);
@@ -72,8 +46,9 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static boolean getInline() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("data-inline") != null ?
-        properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
+            properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
   }
 
   /**
@@ -82,8 +57,9 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static boolean isProdMode() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("prod-mode") != null ?
-        properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
+            properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
   }
 
 
@@ -93,8 +69,9 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getStandardPackage() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("standard-package") != null ?
-        properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
+            properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
   }
   /**
 
@@ -104,18 +81,20 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getMessageTypePackage() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("message-package") != null ?
-        properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
+            properties.getProperty("message-package") : "io.virtualan.cucumblan.message.typeimpl";
   }
 
-   /**
+  /**
    * Gets property.
    *
    * @return the property
    */
   public static String getActionPackage() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("action-package") != null ?
-        properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
+            properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
   }
   /**
 
@@ -127,8 +106,9 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static boolean getBoolean(String keyName) {
+    ApplicationConfiguration.reload();
     return properties.getProperty(keyName) != null ?
-        properties.getProperty(keyName).equalsIgnoreCase("true") : false;
+            properties.getProperty(keyName).equalsIgnoreCase("true") : false;
   }
 
 
@@ -138,6 +118,8 @@ public class ApplicationConfiguration {
    * @return the properties
    */
   public static Map<String, String> getProperties() {
+
+    ApplicationConfiguration.reload();
     return (Map)properties;
   }
 
@@ -148,11 +130,14 @@ public class ApplicationConfiguration {
    * @return the property
    */
   public static String getProperty(String keyName) {
+
+    ApplicationConfiguration.reload();
     return properties.getProperty(keyName);
   }
 
   public static int getMessageCount() {
+    ApplicationConfiguration.reload();
     return properties.getProperty("wait-message-count") != null ?
-        Integer.parseInt(properties.getProperty("wait-message-count")) : 2;
+            Integer.parseInt(properties.getProperty("wait-message-count")) : 2;
   }
 }
