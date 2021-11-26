@@ -158,18 +158,6 @@
    <version>${virtualan.version}</version>
   </dependency>
 
-  <dependency>
-   <groupId>org.skyscreamer</groupId>
-   <artifactId>jsonassert</artifactId>
-   <version>1.5.0</version>
-   <exclusions>
-    <exclusion>
-     <groupId>com.vaadin.external.google</groupId>
-     <artifactId>android-json</artifactId>
-    </exclusion>
-   </exclusions>
-  </dependency>
-
   <!-- HyperSQL DB -->
   <dependency>
    <groupId>org.hsqldb</groupId>

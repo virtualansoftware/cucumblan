@@ -8,7 +8,7 @@
   <properties>
     <junit.version>5.5.2</junit.version>
     <cucumber.version>6.11.0</cucumber.version>
-    <mapson.version>1.1.9</mapson.version>
+    <cucumblan-utils.version>1.0.0-SNAPSHOT</cucumblan-utils.version>
   </properties>
   <description>
     Cucumblan-db is a database test automation framework that supports Behavior Driven Development (BDD),
@@ -133,11 +133,6 @@
       <version>${cucumber.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.virtualan</groupId>
-      <artifactId>mapson</artifactId>
-      <version>${mapson.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
@@ -178,6 +173,12 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <version>1.7.32</version>
     </dependency>
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>cucumblan-utils</artifactId>
+      <version>${cucumblan-utils.version}</version>
+    </dependency>
+
   </dependencies>
 
 </project>

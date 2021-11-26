@@ -13,12 +13,12 @@ import org.junit.Test;
 public class ExcelAndMathHelperTest {
 
   @Test
-  public void add() throws IOException {
+  public void add() throws Exception {
     Assert.assertEquals(11, ExcelAndMathHelper.evaluate(Integer.class,"SUM(10,1)"));
   }
 
   @Test
-  public void calculate() throws IOException {
+  public void calculate() throws Exception {
     Map<String, String> contextObject = new HashMap<>();
     contextObject.put("I", "629.01");
     contextObject.put("P", "999.20");
@@ -28,7 +28,7 @@ public class ExcelAndMathHelperTest {
 
 
   @Test
-  public void evaluate() throws IOException {
+  public void evaluate() throws Exception {
     Map<String, String> contextObject = new HashMap<>();
     contextObject.put("condition", "100");
     Assert.assertEquals(false,
@@ -36,7 +36,7 @@ public class ExcelAndMathHelperTest {
   }
 
   @Test
-  public void evaluateDate() throws IOException {
+  public void evaluateDate() throws Exception {
     Map<String, String> contextObject = new HashMap<>();
     contextObject.put("cdate", "05/15/2021");
     Assert.assertEquals("15/05/2021",
@@ -44,7 +44,7 @@ public class ExcelAndMathHelperTest {
   }
 
   @Test
-  public void evaluateTodayDate() throws IOException {
+  public void evaluateTodayDate() throws Exception {
     Map<String, String> contextObject = new HashMap<>();
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date date = new Date();
