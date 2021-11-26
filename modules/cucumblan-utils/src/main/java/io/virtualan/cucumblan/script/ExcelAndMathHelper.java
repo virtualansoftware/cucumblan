@@ -15,11 +15,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelAndMathHelper {
 
-    public static Object evaluateWithVariables(Class type, String formula, Map<String, String> contextObject) throws IOException {
+    public static Object evaluateWithVariables(Class type, String formula, Map<String, String> contextObject) throws Exception {
         return evaluate(type, Helper.getActualValueForAll(formula,contextObject).toString());
     }
 
-    public static Object evaluate(Class type, String formula) throws IOException {
+    public static Object evaluate(Class type, String formula) throws Exception {
         Object cellValue = new Object();
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
@@ -45,6 +45,6 @@ public class ExcelAndMathHelper {
             }
         }
         workbook.close();
-        return null;
+        throw new Exception(formula +"is not resolved for type > " + type.getName());
     }
 }

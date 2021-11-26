@@ -44,6 +44,7 @@ import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
 import io.virtualan.cucumblan.props.util.*;
+import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
@@ -355,7 +356,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) decimal value of the key as (.*)")
-    public void modifyDecimalVariable(String responseValue, String key) throws IOException {
+    public void modifyDecimalVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Double.class,
@@ -373,7 +374,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) integer value of the key as (.*)")
-    public void modifyIntVariable(String responseValue, String key) throws IOException {
+    public void modifyIntVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(Integer.class,
@@ -390,7 +391,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) function value of the key as (.*)")
-    public void modifyfunctionVariable(String responseValue, String key) throws IOException {
+    public void modifyfunctionVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                 .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(String.class,
@@ -407,7 +408,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^perform the (.*) condition to skip scenario")
-    public void modifyBooleanVariable(String condition) throws IOException {
+    public void modifyBooleanVariable(String condition) throws Exception {
         skipScenario = (Boolean) ExcelAndMathHelper
                 .evaluateWithVariables(Boolean.class, condition, ScenarioContext
                         .getContext(String.valueOf(Thread.currentThread().getId())));
@@ -421,7 +422,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) condition success$")
-    public void evaluateVariable(String condition) throws IOException {
+    public void evaluateVariable(String condition) throws Exception {
         if (!this.skipScenario) {
             boolean flag = (Boolean) ExcelAndMathHelper
                     .evaluateWithVariables(Boolean.class, condition, ScenarioContext
@@ -439,7 +440,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) condition fail$")
-    public void evaluateVariableFail(String condition) throws IOException {
+    public void evaluateVariableFail(String condition) throws Exception {
         if (!this.skipScenario) {
             boolean flag = (Boolean) ExcelAndMathHelper
                     .evaluateWithVariables(Boolean.class, condition, ScenarioContext
@@ -457,7 +458,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) boolean value of the key as (.*)")
-    public void modifyBooleanVariable(String responseValue, String key) throws IOException {
+    public void modifyBooleanVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Boolean.class,

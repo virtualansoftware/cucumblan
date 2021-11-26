@@ -7,7 +7,7 @@ import io.virtualan.cucumblan.message.exception.UnableToProcessException;
 import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.mapson.Mapson;
-import io.virtualan.mapson.exception.BadInputDataException;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -35,15 +35,20 @@ public class MQClient {
    * @throws UnableToProcessException the unable to process exception
    */
   public static boolean postMessage(Scenario scenario, String resource, String sendQ,
-      String message)
+      String message, String type)
       throws UnableToProcessException {
     try {
-      scenario.attach(message, "application/json", "message");
-      ConnectionFactory connectionFactory =
-          JMSMessageContext.loadConnectionFactory(resource);
-      JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
-      jmsTemplate.setDefaultDestination(new ActiveMQQueue(sendQ));
-      jmsTemplate.convertAndSend(message);
+      if("AMQ".equalsIgnoreCase(type)) {
+        scenario.attach(message, "text/plain", "message");
+        ConnectionFactory connectionFactory =
+                JMSMessageContext.loadConnectionFactory(resource);
+        JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
+        jmsTemplate.setDefaultDestination(new ActiveMQQueue(sendQ));
+        jmsTemplate.convertAndSend(message);
+      } else {
+        logger.warning(type +" is not supported");
+        throw new UnableToProcessException(type +" is not supported");
+      }
     } catch (Exception e) {
       logger.warning("Unable to post message for resource " + resource);
       throw new UnableToProcessException(
@@ -64,14 +69,18 @@ public class MQClient {
    * @throws JMSException the jms exception
    */
   public static String readMessage(Scenario scenario, String resource, String receiveQ,
-      String messageId)
-      throws IOException, JMSException {
-    ConnectionFactory connectionFactory =
-        JMSMessageContext.loadConnectionFactory(resource);
-    JmsTemplate jmsTemplateReceive = new JmsTemplate(connectionFactory);
-    jmsTemplateReceive.setDefaultDestination(new ActiveMQQueue(receiveQ));
-    Message object = jmsTemplateReceive.receiveSelected(new ActiveMQQueue(receiveQ), messageId);
-    return object.getBody(String.class);
+      String messageId, String type)
+          throws UnableToProcessException, IOException, JMSException {
+    if("AMQ".equalsIgnoreCase(type)) {
+      ConnectionFactory connectionFactory =
+              JMSMessageContext.loadConnectionFactory(resource);
+      JmsTemplate jmsTemplateReceive = new JmsTemplate(connectionFactory);
+      jmsTemplateReceive.setDefaultDestination(new ActiveMQQueue(receiveQ));
+      Message object = jmsTemplateReceive.receiveSelected(new ActiveMQQueue(receiveQ), messageId);
+      return object.getBody(String.class);
+    } else {
+      throw  new UnableToProcessException(type+ "is not supported");
+    }
   }
 
 

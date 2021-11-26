@@ -19,24 +19,16 @@
 
 package io.virtualan.cucumblan.core.msg;
 
-import io.virtualan.cucumblan.message.type.MessageType;
-import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
-import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSException;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 
 /**
  * The Message context.

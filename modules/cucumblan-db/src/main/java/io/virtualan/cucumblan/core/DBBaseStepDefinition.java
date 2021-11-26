@@ -28,8 +28,8 @@ import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.mapson.Mapson;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +81,7 @@ public class DBBaseStepDefinition {
   static Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<String, JdbcTemplate>();
 
   String sqlJson = null;
+  private boolean skipScenario = false;
 
   /**
    * The Scenario.
@@ -127,6 +128,7 @@ public class DBBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    this.skipScenario = false;
     this.sqlJson = null;
     if (jdbcTemplateMap.isEmpty()) {
       loadAllDataSource();
@@ -156,18 +158,35 @@ public class DBBaseStepDefinition {
   @Given("Execute DELETE for the given sql (.*) on (.*)$")
   @Given("Execute INSERT for the given sql (.*) on (.*)$")
   public void insertSql(String dummy, String resource, List<String> sqls) throws Exception {
-    JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    for (String sql : sqls) {
-      try {
-        jdbcTemplate.execute(StepDefinitionHelper.getActualValue(sql));
-      } catch (Exception e) {
-        LOGGER.warning("Unable to load " + dummy + " this sqls " + sql + " : " + e.getMessage());
-        scenario.log("Unable to load " + dummy + " this sqls " + sql + " : " + e.getMessage());
-        Assert.assertTrue(dummy + "  sqls are not inserted : (" + e.getMessage() + ")", false);
+    if (!this.skipScenario) {
+      JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
+      for (String sql : sqls) {
+        try {
+          jdbcTemplate.execute(StepDefinitionHelper.getActualValue(sql));
+        } catch (Exception e) {
+          LOGGER.warning("Unable to load " + dummy + " this sqls " + sql + " : " + e.getMessage());
+          scenario.log("Unable to load " + dummy + " this sqls " + sql + " : " + e.getMessage());
+          Assert.assertTrue(dummy + "  sqls are not inserted : (" + e.getMessage() + ")", false);
+        }
       }
+      Assert.assertTrue("All sqls are executed successfully", true);
     }
-    Assert.assertTrue("All sqls are executed successfully", true);
   }
+
+  /**
+   * perform the skip scenario
+   *
+   * @param condition the response value excel based
+   * @throws IOException the io exception
+   */
+  @Given("^perform-db the (.*) condition to skip scenario")
+  public void modifyBooleanVariable(String condition) throws Exception {
+    skipScenario = (Boolean) io.virtualan.cucumblan.script.ExcelAndMathHelper
+            .evaluateWithVariables(Boolean.class, condition, ScenarioContext
+                    .getContext(String.valueOf(Thread.currentThread().getId())));
+    scenario.log("condition :" + condition + " : is Skipped : " + skipScenario);
+  }
+
 
   private JdbcTemplate getJdbcTemplate(String resource) throws Exception {
     if (jdbcTemplateMap.containsKey(resource)) {
@@ -181,17 +200,19 @@ public class DBBaseStepDefinition {
 
   @Given("^Store-sql's (.*) value of the key as (.*)")
   public void storeSqlResponseAskey(String responseKey, String key) throws JSONException {
-    if (sqlJson != null) {
-      Map<String, String> mapson = Mapson.buildMAPsonFromJson(sqlJson);
-      if (mapson.get(responseKey) != null) {
-        ScenarioContext
-            .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                mapson.get(responseKey));
+    if (!this.skipScenario) {
+      if (sqlJson != null) {
+        Map<String, String> mapson = Mapson.buildMAPsonFromJson(sqlJson);
+        if (mapson.get(responseKey) != null) {
+          ScenarioContext
+                  .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                          mapson.get(responseKey));
+        } else {
+          Assert.assertTrue(responseKey + " not found in the sql ", false);
+        }
       } else {
-        Assert.assertTrue(responseKey + " not found in the sql ", false);
+        Assert.assertTrue(" Sql query response not found for the executed query?  ", false);
       }
-    } else {
-      Assert.assertTrue( " Sql query response not found for the executed query?  ", false);
     }
   }
 
@@ -208,33 +229,36 @@ public class DBBaseStepDefinition {
   @Given("Verify (.*) with the given sql (.*) on (.*)$")
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
-    JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    if (selectSql.size() >= 1) {
-      try {
-        sqlJson = getJson(resource,
-            StepDefinitionHelper.getActualValue(selectSql.get(0)));
-      } catch (Exception e) {
-        Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
+    if (!this.skipScenario) {
+
+      JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
+      if (selectSql.size() >= 1) {
+        try {
+          sqlJson = getJson(resource,
+                  StepDefinitionHelper.getActualValue(selectSql.get(0)));
+        } catch (Exception e) {
+          Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
+        }
+      } else {
+        Assert.assertTrue(" select sqls missing ", false);
       }
-    } else {
-      Assert.assertTrue(" select sqls missing ", false);
-    }
-    scenario.attach(sqlJson, "application/json", "ActualSqlResponse");
-    if (selectSql.size() == 1) {
-      Assert.assertNull(sqlJson);
-    } else {
-      List<String> csvons = selectSql.subList(1, selectSql.size());
-      JSONArray expectedArray = Csvson
-          .buildCSVson(csvons,
-              ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
-      JSONArray actualArray = new JSONArray(sqlJson);
-      JSONCompareResult result = JSONCompare
-          .compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
-      scenario.attach(expectedArray.toString(), "application/json", "ExpectedCvsonResponse");
-      if (result.failed()) {
-        scenario.log(result.getMessage());
+      scenario.attach(sqlJson, "application/json", "ActualSqlResponse");
+      if (selectSql.size() == 1) {
+        Assert.assertNull(sqlJson);
+      } else {
+        List<String> csvons = selectSql.subList(1, selectSql.size());
+        JSONArray expectedArray = Csvson
+                .buildCSVson(csvons,
+                        ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+        JSONArray actualArray = new JSONArray(sqlJson);
+        JSONCompareResult result = JSONCompare
+                .compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
+        scenario.attach(expectedArray.toString(), "application/json", "ExpectedCvsonResponse");
+        if (result.failed()) {
+          scenario.log(result.getMessage());
+        }
+        Assertions.assertTrue(result.passed(), " select sql and cvson record matches");
       }
-      Assertions.assertTrue(result.passed(), " select sql and cvson record matches");
     }
   }
 
@@ -250,20 +274,23 @@ public class DBBaseStepDefinition {
   @Given("Select (.*) with the given sql (.*) on (.*)$")
   public void select(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
-    JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-    if (selectSql.size() >= 1) {
-      try {
-        scenario.attach(
-            new JSONObject("{\"sql\" : \"" + StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))) + "\", \"resource\" : \"" + resource + "\" }")
-                .toString(2), "application/json", "SelectSql");
-        sqlJson = getJson(resource,
-            StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))));
-        scenario.attach(sqlJson, "application/json", "SelectSqlResponse");
-      } catch (Exception e) {
-        Assert.assertTrue(" Invalid sql? " + e.getMessage(), false);
+    if (!this.skipScenario) {
+
+      JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
+      if (selectSql.size() >= 1) {
+        try {
+          scenario.attach(
+                  new JSONObject("{\"sql\" : \"" + StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))) + "\", \"resource\" : \"" + resource + "\" }")
+                          .toString(2), "application/json", "SelectSql");
+          sqlJson = getJson(resource,
+                  StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))));
+          scenario.attach(sqlJson, "application/json", "SelectSqlResponse");
+        } catch (Exception e) {
+          Assert.assertTrue(" Invalid sql? " + e.getMessage(), false);
+        }
+      } else {
+        Assert.assertTrue(" select sql missing ", false);
       }
-    } else {
-      Assert.assertTrue(" select sql missing ", false);
     }
   }
 
