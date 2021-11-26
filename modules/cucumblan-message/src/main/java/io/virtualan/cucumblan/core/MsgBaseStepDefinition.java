@@ -61,6 +61,8 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 @Slf4j
 public class MsgBaseStepDefinition {
 
+  private boolean skipScenario = false;
+
   private Scenario scenario;
 
   String msgJson = null;
@@ -73,6 +75,7 @@ public class MsgBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
+    this.skipScenario = false;
     this.msgJson = null;
   }
 
@@ -88,6 +91,21 @@ public class MsgBaseStepDefinition {
   }
 
   /**
+   * perform the skip scenario
+   *
+   * @param condition the response value excel based
+   * @throws IOException the io exception
+   */
+  @Given("^perform-message the (.*) condition to skip scenario")
+  public void modifyBooleanVariable(String condition) throws Exception {
+    skipScenario = (Boolean) io.virtualan.cucumblan.script.ExcelAndMathHelper
+            .evaluateWithVariables(Boolean.class, condition, ScenarioContext
+                    .getContext(String.valueOf(Thread.currentThread().getId())));
+    scenario.log("condition :" + condition + " : is Skipped : " + skipScenario);
+  }
+
+
+  /**
    * Produce message with partition.
    *
    * @param eventName the event name
@@ -100,21 +118,23 @@ public class MsgBaseStepDefinition {
   @Given("Send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
   public void produceMessageWithPartition(String dummy, String eventName, Integer partition, String resource,
       String type, Object messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    String typeInput = StepDefinitionHelper.getActualValue(type);
-    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
-    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
-    if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.buildProducerMessage(messages);
-      scenario.log(builtMessage.toString());
-      if(builtMessage.getMessageAsJson() != null) {
-        this.msgJson = builtMessage.getMessageAsJson().toString();
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      String typeInput = StepDefinitionHelper.getActualValue(type);
+      String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
+      MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
+      if (topic != null && messageType != null) {
+        MessageType builtMessage = messageType.buildProducerMessage(messages);
+        scenario.log(builtMessage.toString());
+        if (builtMessage.getMessageAsJson() != null) {
+          this.msgJson = builtMessage.getMessageAsJson().toString();
+        }
+        KafkaProducerClient
+                .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                        partition, builtMessage.getHeaders());
+      } else {
+        Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
       }
-      KafkaProducerClient
-          .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-              partition, builtMessage.getHeaders());
-    } else {
-      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
   }
 
@@ -137,8 +157,10 @@ public class MsgBaseStepDefinition {
    */
   @Given("Clear the consumed message (.*) for the event (.*)$")
   public void clearMessage(String dummy, String eventName) throws InterruptedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    MessageContext.removeEventContextMap(eventNameInput);
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      MessageContext.removeEventContextMap(eventNameInput);
+    }
   }
 
   /**
@@ -153,27 +175,29 @@ public class MsgBaseStepDefinition {
   @Given("Send message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessage(String dummy, String eventName, String resource, String type,
       DataTable messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    String typeInput = StepDefinitionHelper.getActualValue(type);
-    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
-    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
-    if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.buildProducerMessage(messages);
-      if(builtMessage.getMessageAsJson() != null) {
-        this.msgJson = builtMessage.getMessageAsJson().toString();
-      }
-      scenario.log(builtMessage.toString());
-      if (builtMessage.getKey() != null) {
-        KafkaProducerClient
-            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                null, builtMessage.getHeaders());
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      String typeInput = StepDefinitionHelper.getActualValue(type);
+      String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
+      MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
+      if (topic != null && messageType != null) {
+        MessageType builtMessage = messageType.buildProducerMessage(messages);
+        if (builtMessage.getMessageAsJson() != null) {
+          this.msgJson = builtMessage.getMessageAsJson().toString();
+        }
+        scenario.log(builtMessage.toString());
+        if (builtMessage.getKey() != null) {
+          KafkaProducerClient
+                  .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                          null, builtMessage.getHeaders());
+        } else {
+          KafkaProducerClient
+                  .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                          null, builtMessage.getHeaders());
+        }
       } else {
-        KafkaProducerClient
-            .sendMessage(resource, topic, null, builtMessage.getMessage(),
-                null, builtMessage.getHeaders());
+        Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
       }
-    } else {
-      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
   }
 
@@ -189,27 +213,29 @@ public class MsgBaseStepDefinition {
   @Given("Send inline message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessage(String dummy, String eventName, String resource, String type,
       List<String> messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    String typeInput = StepDefinitionHelper.getActualValue(type);
-    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
-    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
-    if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.buildProducerMessage(messages);
-      if(builtMessage.getMessageAsJson() != null) {
-        this.msgJson = builtMessage.getMessageAsJson().toString();
-      }
-      scenario.log(builtMessage.toString());
-      if (builtMessage.getKey() != null) {
-        KafkaProducerClient
-            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                null, builtMessage.getHeaders());
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      String typeInput = StepDefinitionHelper.getActualValue(type);
+      String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
+      MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
+      if (topic != null && messageType != null) {
+        MessageType builtMessage = messageType.buildProducerMessage(messages);
+        if (builtMessage.getMessageAsJson() != null) {
+          this.msgJson = builtMessage.getMessageAsJson().toString();
+        }
+        scenario.log(builtMessage.toString());
+        if (builtMessage.getKey() != null) {
+          KafkaProducerClient
+                  .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                          null, builtMessage.getHeaders());
+        } else {
+          KafkaProducerClient
+                  .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                          null, builtMessage.getHeaders());
+        }
       } else {
-        KafkaProducerClient
-            .sendMessage(resource, topic, null, builtMessage.getMessage(),
-                null, builtMessage.getHeaders());
+        Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
       }
-    } else {
-      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
   }
 
@@ -227,14 +253,16 @@ public class MsgBaseStepDefinition {
   @Given("Send inline message (.*) for messageQ (.*) on (.*) with type (.*)$")
   public void produceJMSMessage(String dummy, String queueName, String resource, String queueType, List<String> messages)
       throws UnableToProcessException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(queueName);
-    if (eventNameInput != null) {
-      boolean message = false;
-        message = MQClient.postMessage(scenario,resource,eventNameInput,
-            StepDefinitionHelper.getActualValue(messages.stream().map(x -> x).collect(Collectors.joining())));
-      Assertions.assertTrue(message, "message posting status");
-    } else {
-      Assertions.assertTrue(false, queueName + " is not configured.");
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(queueName);
+      if (eventNameInput != null) {
+        boolean message = false;
+        message = MQClient.postMessage(scenario, resource, eventNameInput,
+                StepDefinitionHelper.getActualValue(messages.stream().map(x -> x).collect(Collectors.joining())), queueType);
+        Assertions.assertTrue(message, "message posting status");
+      } else {
+        Assertions.assertTrue(false, queueName + " is not configured.");
+      }
     }
   }
 
@@ -252,29 +280,30 @@ public class MsgBaseStepDefinition {
   @Given("Send mapson message (.*) for event (.*) on (.*) with type (.*)$")
   public void produceMessageMapson(String dummy, String eventName, String resource, String type,
       Map<String, String> messages) throws MessageNotDefinedException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    String typeInput = StepDefinitionHelper.getActualValue(type);
-    String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
-    MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
-    if (topic != null && messageType != null) {
-      MessageType builtMessage = messageType.buildProducerMessage(messages);
-      scenario.log(builtMessage.toString());
-      if(builtMessage.getMessageAsJson() != null) {
-        this.msgJson = builtMessage.getMessageAsJson().toString();
-      }
-      if (builtMessage.getKey() != null) {
-        KafkaProducerClient
-            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                null, builtMessage.getHeaders());
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      String typeInput = StepDefinitionHelper.getActualValue(type);
+      String topic = StepDefinitionHelper.getActualValue(TopicConfiguration.getProperty(eventNameInput));
+      MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
+      if (topic != null && messageType != null) {
+        MessageType builtMessage = messageType.buildProducerMessage(messages);
+        scenario.log(builtMessage.toString());
+        if (builtMessage.getMessageAsJson() != null) {
+          this.msgJson = builtMessage.getMessageAsJson().toString();
+        }
+        if (builtMessage.getKey() != null) {
+          KafkaProducerClient
+                  .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                          null, builtMessage.getHeaders());
+        } else {
+          KafkaProducerClient
+                  .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                          null, builtMessage.getHeaders());
+        }
       } else {
-        KafkaProducerClient
-            .sendMessage(resource, topic, null, builtMessage.getMessage(),
-                null, builtMessage.getHeaders());
+        Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
       }
-    } else {
-      Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type +" is not configured");
     }
-
   }
 
 
@@ -293,31 +322,33 @@ public class MsgBaseStepDefinition {
   @Given("Verify (.*) for receiveQ (.*) contains (.*) on (.*) with type (.*)$")
   public void verifyConsumedJMSJSONObject(String dummy, String receiveQ, String id, String resource, String type,
       List<String> csvson)
-      throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
-    String idInput = StepDefinitionHelper.getActualValue(id);
+          throws Exception {
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
+      String idInput = StepDefinitionHelper.getActualValue(id);
 
-    String expectedJson = MQClient.readMessage(scenario,resource,eventNameInput, idInput);
-    if (expectedJson != null) {
-      this.msgJson = expectedJson;
-      JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
-      scenario.attach(csvobject.toString(4), "application/json",
-          "ExpectedResponse:");
-      Object expectedJsonObj = StepDefinitionHelper.getJSON(expectedJson);
-      if (expectedJsonObj instanceof JSONObject) {
-        scenario.attach(((JSONObject)expectedJsonObj).toString(4), "application/json",
-            "ActualResponse:");
-        JSONAssert
-            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJsonObj,
-                JSONCompareMode.LENIENT);
+      String expectedJson = MQClient.readMessage(scenario, resource, eventNameInput, idInput, type);
+      if (expectedJson != null) {
+        this.msgJson = expectedJson;
+        JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+        scenario.attach(csvobject.toString(4), "application/json",
+                "ExpectedResponse:");
+        Object expectedJsonObj = StepDefinitionHelper.getJSON(expectedJson);
+        if (expectedJsonObj instanceof JSONObject) {
+          scenario.attach(((JSONObject) expectedJsonObj).toString(4), "application/json",
+                  "ActualResponse:");
+          JSONAssert
+                  .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJsonObj,
+                          JSONCompareMode.LENIENT);
+        } else {
+          scenario.attach(((JSONArray) expectedJsonObj).toString(4), "application/json",
+                  "ActualResponse:");
+          JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
+        }
       } else {
-        scenario.attach(((JSONArray)expectedJsonObj).toString(4), "application/json",
-            "ActualResponse:");
-        JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
+        Assertions.assertTrue(false,
+                " Unable to read message name (" + eventNameInput + ") with identifier : " + id);
       }
-    } else {
-      Assertions.assertTrue(false,
-          " Unable to read message name (" + eventNameInput + ") with identifier : " + id);
     }
   }
 
@@ -336,29 +367,31 @@ public class MsgBaseStepDefinition {
   public void verifyConsumedJMSJSONObjectWithOutId(String dummy, String receiveQ, String jsonpath, String resource, String type,
       List<String> csvson)
       throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException {
-    String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
+    if (!this.skipScenario) {
+      String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
 
-    String expectedJson = MQClient.findMessage(scenario,resource,eventNameInput, jsonpath, type);
-    if (expectedJson != null) {
-      this.msgJson = expectedJson;
-      JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
-      scenario.attach(csvobject.toString(4), "application/json",
-          "ExpectedResponse:");
-      Object expectedJsonObj = StepDefinitionHelper.getJSON(expectedJson);
-      if (expectedJsonObj instanceof JSONObject) {
-        scenario.attach(((JSONObject)expectedJsonObj).toString(4), "application/json",
-            "ActualResponse:");
-        JSONAssert
-            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJsonObj,
-                JSONCompareMode.LENIENT);
+      String expectedJson = MQClient.findMessage(scenario, resource, eventNameInput, jsonpath, type);
+      if (expectedJson != null) {
+        this.msgJson = expectedJson;
+        JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+        scenario.attach(csvobject.toString(4), "application/json",
+                "ExpectedResponse:");
+        Object expectedJsonObj = StepDefinitionHelper.getJSON(expectedJson);
+        if (expectedJsonObj instanceof JSONObject) {
+          scenario.attach(((JSONObject) expectedJsonObj).toString(4), "application/json",
+                  "ActualResponse:");
+          JSONAssert
+                  .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJsonObj,
+                          JSONCompareMode.LENIENT);
+        } else {
+          scenario.attach(((JSONArray) expectedJsonObj).toString(4), "application/json",
+                  "ActualResponse:");
+          JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
+        }
       } else {
-        scenario.attach(((JSONArray)expectedJsonObj).toString(4), "application/json",
-            "ActualResponse:");
-        JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
+        Assertions.assertTrue(false,
+                " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath);
       }
-    } else {
-      Assertions.assertTrue(false,
-          " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath);
     }
   }
 
@@ -382,39 +415,41 @@ public class MsgBaseStepDefinition {
   public void verifyConsumedJSONObject(String dummy, String eventName, String id, String resource, String type,
       List<String> csvson)
       throws InterruptedException, BadInputDataException, MessageNotDefinedException {
-    int recheck = 0;
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    String typeInput = StepDefinitionHelper.getActualValue(type);
-    String idInput = StepDefinitionHelper.getActualValue(id);
-    EventRequest eventRequest = new EventRequest();
-    eventRequest.setRecheck(recheck);
-    eventRequest.setEventName(eventNameInput);
-    eventRequest.setType(typeInput);
-    eventRequest.setId(idInput);
-    eventRequest.setResource(resource);
+    if (!this.skipScenario) {
+      int recheck = 0;
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      String typeInput = StepDefinitionHelper.getActualValue(type);
+      String idInput = StepDefinitionHelper.getActualValue(id);
+      EventRequest eventRequest = new EventRequest();
+      eventRequest.setRecheck(recheck);
+      eventRequest.setEventName(eventNameInput);
+      eventRequest.setType(typeInput);
+      eventRequest.setId(idInput);
+      eventRequest.setResource(resource);
 
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
-    if (expectedJson != null) {
-      if(expectedJson.getMessageAsJson() != null) {
-        this.msgJson = expectedJson.getMessageAsJson().toString();
-      }
-      JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
-      scenario.attach(csvobject.toString(4), "application/json",
-          "ExpectedResponse:");
-      if (expectedJson.getMessageAsJson() instanceof JSONObject) {
-        scenario.attach(((JSONObject)expectedJson.getMessageAsJson()).toString(4), "application/json",
-            "ActualResponse:");
-        JSONAssert
-            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson.getMessageAsJson(),
-                JSONCompareMode.LENIENT);
+      MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
+      if (expectedJson != null) {
+        if (expectedJson.getMessageAsJson() != null) {
+          this.msgJson = expectedJson.getMessageAsJson().toString();
+        }
+        JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+        scenario.attach(csvobject.toString(4), "application/json",
+                "ExpectedResponse:");
+        if (expectedJson.getMessageAsJson() instanceof JSONObject) {
+          scenario.attach(((JSONObject) expectedJson.getMessageAsJson()).toString(4), "application/json",
+                  "ActualResponse:");
+          JSONAssert
+                  .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson.getMessageAsJson(),
+                          JSONCompareMode.LENIENT);
+        } else {
+          scenario.attach(((JSONArray) expectedJson.getMessageAsJson()).toString(4), "application/json",
+                  "ActualResponse:");
+          JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
+        }
       } else {
-        scenario.attach(((JSONArray)expectedJson.getMessageAsJson()).toString(4), "application/json",
-            "ActualResponse:");
-        JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
+        Assertions.assertTrue(false,
+                " Unable to read event name (" + eventName + ") with identifier : " + id);
       }
-    } else {
-      Assertions.assertTrue(false,
-          " Unable to read event name (" + eventName + ") with identifier : " + id);
     }
   }
 
@@ -433,50 +468,54 @@ public class MsgBaseStepDefinition {
   public void consumeMessage(String dummy, String eventName, String id, String resource, String type,
       Map<String, String> keyValue)
       throws InterruptedException, MessageNotDefinedException {
-    int recheck = 0;
-    String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
-    String typeInput = StepDefinitionHelper.getActualValue(type);
-    String idInput = StepDefinitionHelper.getActualValue(id);
-    EventRequest eventRequest = new EventRequest();
-    eventRequest.setRecheck(recheck);
-    eventRequest.setEventName(eventNameInput);
-    eventRequest.setType(typeInput);
-    eventRequest.setId(idInput);
-    eventRequest.setResource(resource);
+    if (!this.skipScenario) {
+      int recheck = 0;
+      String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+      String typeInput = StepDefinitionHelper.getActualValue(type);
+      String idInput = StepDefinitionHelper.getActualValue(id);
+      EventRequest eventRequest = new EventRequest();
+      eventRequest.setRecheck(recheck);
+      eventRequest.setEventName(eventNameInput);
+      eventRequest.setType(typeInput);
+      eventRequest.setId(idInput);
+      eventRequest.setResource(resource);
 
-    MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
-    if (expectedJson != null) {
-      if(expectedJson.getMessageAsJson() != null) {
-        this.msgJson = expectedJson.getMessageAsJson().toString();
+      MessageType expectedJson = KafkaConsumerClient.getEvent(eventRequest);
+      if (expectedJson != null) {
+        if (expectedJson.getMessageAsJson() != null) {
+          this.msgJson = expectedJson.getMessageAsJson().toString();
+        }
+        scenario.attach(expectedJson.getMessage().toString(), "application/json",
+                "ActualResponse");
+        MessageType finalExpectedJson = expectedJson;
+        keyValue.forEach((k, v) -> {
+          Object value = MsgHelper.getJSON(finalExpectedJson.getMessageAsJson().toString(), k);
+          Assertions.assertEquals(
+                  StepDefinitionHelper.getObjectValue(StepDefinitionHelper.getActualValue((String) v)),
+                  value, k + " is not failed.");
+        });
+      } else {
+        Assertions.assertTrue(false,
+                " Unable to read event name (" + eventName + ") with identifier : " + id);
       }
-      scenario.attach(expectedJson.getMessage().toString(), "application/json",
-          "ActualResponse");
-      MessageType finalExpectedJson = expectedJson;
-      keyValue.forEach((k, v) -> {
-        Object value = MsgHelper.getJSON(finalExpectedJson.getMessageAsJson().toString(), k);
-        Assertions.assertEquals(
-            StepDefinitionHelper.getObjectValue(StepDefinitionHelper.getActualValue((String) v)),
-            value, k + " is not failed.");
-      });
-    } else {
-      Assertions.assertTrue(false,
-          " Unable to read event name (" + eventName + ") with identifier : " + id);
     }
   }
 
   @Given("^Store-message's (.*) value of the key as (.*)")
   public void storeMessageResponseAskey(String responseKey, String key) throws JSONException {
-    if (msgJson != null) {
-      Map<String, String> mapson = Mapson.buildMAPsonFromJson(msgJson);
-      if (mapson.get(responseKey) != null) {
-        ScenarioContext
-            .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                mapson.get(responseKey));
+    if (!this.skipScenario) {
+      if (msgJson != null) {
+        Map<String, String> mapson = Mapson.buildMAPsonFromJson(msgJson);
+        if (mapson.get(responseKey) != null) {
+          ScenarioContext
+                  .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                          mapson.get(responseKey));
+        } else {
+          Assertions.assertTrue(false, responseKey + " not found in the read message ");
+        }
       } else {
-        Assertions.assertTrue( false, responseKey + " not found in the read message ");
+        Assertions.assertTrue(false, " Message not found for the read message?  ");
       }
-    } else {
-      Assertions.assertTrue(false, " Message not found for the read message?  ");
     }
   }
 
