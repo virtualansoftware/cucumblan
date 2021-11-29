@@ -8,7 +8,7 @@
   <properties>
     <kafka-clients.version>2.7.0</kafka-clients.version>
     <junit.version>5.5.2</junit.version>
-    <cucumber.version>6.7.0</cucumber.version>
+    <cucumber.version>7.0.0</cucumber.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cucumblan-utils.version>1.0.2-SNAPSHOT</cucumblan-utils.version>
   </properties>
