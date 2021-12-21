@@ -205,6 +205,10 @@
                     <groupId>org.apache.xmlgraphics</groupId>
                     <artifactId>batik-svgbrowser</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -227,10 +231,6 @@
                 <exclusion>
                     <groupId>org.apache.xmlgraphics</groupId>
                     <artifactId>batik-svgbrowser</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
