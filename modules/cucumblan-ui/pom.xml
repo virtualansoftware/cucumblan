@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
   <name>cucumblan-ui</name>
   <properties>
-    <mapson.version>1.1.8</mapson.version>
+    <mapson.version>1.1.9</mapson.version>
     <selenium.version>4.1.0</selenium.version>
     <junit.version>5.8.1</junit.version>
     <cucumber.version>6.11.0</cucumber.version>
