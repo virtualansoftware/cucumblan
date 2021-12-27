@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.virtualan</groupId>
   <artifactId>cucumblan-message</artifactId>
-  <version>1.2.20-SNAPSHOT</version>
+  <version>1.2.21-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>cucumblan-message</name>
   <properties>
     <kafka-clients.version>2.7.0</kafka-clients.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cucumblan-utils.version>1.0.4-SNAPSHOT</cucumblan-utils.version>
+    <cucumblan-utils.version>1.0.5-SNAPSHOT</cucumblan-utils.version>
   </properties>
   <description>
     Cucumblan-message is a cucumber and selenium based test automation framework that supports Behavior Driven Development (BDD),
