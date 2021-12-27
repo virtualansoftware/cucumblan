@@ -223,6 +223,9 @@ public class BaseStepDefinition {
                 if ("Accept".equalsIgnoreCase(params.getKey())) {
                     acceptContentType = StepDefinitionHelper.getActualValue(params.getValue());
                 }
+                if ("contentType".equalsIgnoreCase(params.getKey())) {
+                    request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()));
+                }
                 request = request
                         .header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
             }
@@ -533,7 +536,7 @@ public class BaseStepDefinition {
     @Given("^add (.*) with given path params$")
     public void readParamsRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
-            request = request.contentType("application/json");
+            //request = request.contentType("application/json");
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request
                         .pathParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -612,7 +615,7 @@ public class BaseStepDefinition {
     @Given("add (.*) with given query params$")
     public void readRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
-            request = request.contentType("application/json");
+            //request = request.contentType("application/json");
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request
                         .queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -665,7 +668,7 @@ public class BaseStepDefinition {
     @Given("^Populate (.*) with given input$")
     public void loadRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
-            request = request.contentType("application/json");
+            //request = request.contentType("application/json");
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request
                         .queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -773,7 +776,7 @@ public class BaseStepDefinition {
                 scenario.attach(new JSONObject(jsonBody).toString(4)
                         , "application/json", "requestData :  ");
             }
-            request = request.contentType("application/json").body(jsonBody);
+            request = request.body(jsonBody);
         }
     }
 
