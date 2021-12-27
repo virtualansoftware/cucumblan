@@ -4,9 +4,9 @@
   <artifactId>cucumblan-db</artifactId>
   <packaging>jar</packaging>
   <name>cucumblan-db</name>
-  <version>1.2.20-SNAPSHOT</version>
+  <version>1.2.21-SNAPSHOT</version>
   <properties>
-    <cucumblan-utils.version>1.0.4-SNAPSHOT</cucumblan-utils.version>
+    <cucumblan-utils.version>1.0.5-SNAPSHOT</cucumblan-utils.version>
   </properties>
   <description>
     Cucumblan-db is a database test automation framework that supports Behavior Driven Development (BDD),
