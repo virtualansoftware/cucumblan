@@ -19,6 +19,7 @@
 
 package io.virtualan.cucumblan.ui.action;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -41,5 +42,5 @@ public interface Action {
      * @param webelement the webelement
      * @param value      the value
      */
-    void perform(String key, WebElement webelement, Object value);
+    void perform(WebDriver driver, String key, WebElement webelement, Object value);
 }

@@ -100,7 +100,6 @@ public class UIBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
-    //this.sequence = 1;
   }
 
   /**
@@ -169,8 +168,8 @@ public class UIBaseStepDefinition {
    * @param dt       the dt
    * @throws Exception the exception
    */
-  @Given("perform the (.*) page action on (.*)$")
-  public void loadPage(String pageName, String resource, DataTable dt) throws Exception {
+  @Given("(.*) the (.*) page on (.*)$")
+  public void loadPage(String dummy, String pageName, String resource, DataTable dt) throws Exception {
     List<Map<String, String>> data = dt.asMaps();
     Map<String, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
     if (pageMap != null && !pageMap.isEmpty()) {
@@ -239,7 +238,7 @@ public class UIBaseStepDefinition {
       throws InterruptedException {
     WebElement webelement = driver.findElement(By.xpath(element.getXPath()));
     Action action = actionProcessorMap.get(element.getAction());
-    action.perform(key, webelement, value);
+    action.perform(driver, key, webelement, value);
   }
 
   /**
