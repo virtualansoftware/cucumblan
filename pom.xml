@@ -61,10 +61,11 @@
 	</build>
 	<modules>
 		<module>modules/cucumblan-utils</module>
-<!--		<module>modules/cucumblan-api</module>-->
+		<module>modules/cucumblan-api</module>
+		<module>modules/cucumblan-db</module>
+		<module>modules/cucumblan-message</module>
 		<module>modules/cucumblan-ui</module>
-<!--		<module>modules/cucumblan-db</module>-->
-<!--		<module>modules/cucumblan-message</module>-->
+		<module>modules/cucumblan-mobile</module>
 	</modules>
 	<profiles>
 		<!-- Samples -->
@@ -78,10 +79,10 @@
 			</activation>
 			<modules>
 				<module>samples/cucumblan-apitesting</module>
+<!--				<module>samples/cucumblan-soap-apitesting</module>-->
 				<module>samples/cucumblan-uitesting</module>
-<!--				<module>samples/cucumblan-lakesidemutual-uitesting</module>-->
 				<module>samples/cucumblan-message-testing</module>
-				<module>samples/cucumblan-soapapitesting</module>
+<!--				<module>samples/cucumblan-android-mobile-testing</module>-->
 			</modules>
 		</profile>
 		<profile>

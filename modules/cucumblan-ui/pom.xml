@@ -137,6 +137,7 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+
     <dependency>
       <groupId>io.virtualan</groupId>
       <artifactId>mapson</artifactId>

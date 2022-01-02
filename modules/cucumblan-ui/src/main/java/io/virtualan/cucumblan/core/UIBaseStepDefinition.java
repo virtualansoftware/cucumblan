@@ -27,7 +27,6 @@ import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
-import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.props.util.UIHelper;
 import io.virtualan.cucumblan.ui.action.Action;
@@ -52,7 +51,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
-
 /**
  * The type Ui base step definition.
  *
@@ -61,14 +59,13 @@ import org.reflections.scanners.SubTypesScanner;
 public class UIBaseStepDefinition {
 
   private final static Logger LOGGER = Logger.getLogger(UIBaseStepDefinition.class.getName());
-  private static PagePropLoader pagePropLoader;
   private static Map<String, Action> actionProcessorMap = new HashMap<>();
 
   static {
     loadActionProcessors();
   }
 
-  private WebDriver driver = null;
+  private WebDriver webDriver = null;
   private Scenario scenario;
 
   /**
@@ -119,7 +116,7 @@ public class UIBaseStepDefinition {
      * @param driverName the driver name
      * @param resource   the url
      */
-  @Given("Load Driver (.*) And URL on (.*)$")
+  @Given("Load driver (.*) and url on (.*)$")
   public void loadDriverAndURL(String driverName, String resource) {
     switch (driverName) {
       case "CHROME":
@@ -127,12 +124,15 @@ public class UIBaseStepDefinition {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("start-maximized");
         //chromeOptions.addArguments("--headless", "--window-size=1920,1200");
-        driver = new ChromeDriver(chromeOptions);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        webDriver = new ChromeDriver(chromeOptions);
+        webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         break;
       case "FIREFOX":
-        driver = new FirefoxDriver();
-        driver.manage().window().maximize();
+        webDriver = new FirefoxDriver();
+        webDriver.manage().window().maximize();
+        break;
+      case "ANDROID":
+
         break;
       default:
         throw new IllegalArgumentException("Browser \"" + driverName + "\" isn't supported.");
@@ -144,14 +144,14 @@ public class UIBaseStepDefinition {
     } else {
       scenario.log("Url for " + resource + " : " + url);
     }
-    driver.get(url);
+    webDriver.get(url);
   }
 
   @After
   public void embedScreenshotOnFail(Scenario s) {
     if (s.isFailed()) {
       try {
-        final byte[] screenshot = ((TakesScreenshot) driver)
+        final byte[] screenshot = ((TakesScreenshot) webDriver)
             .getScreenshotAs(OutputType.BYTES);
         s.attach(screenshot, "image/png", "Failed-Image :" + UUID.randomUUID().toString());
       } catch (ClassCastException cce) {
@@ -165,17 +165,16 @@ public class UIBaseStepDefinition {
    *
    * @param pageName the page name
    * @param resource the resource
-   * @param dt       the dt
+   * @param data       the data
    * @throws Exception the exception
    */
   @Given("(.*) the (.*) page on (.*)$")
-  public void loadPage(String dummy, String pageName, String resource, DataTable dt) throws Exception {
-    List<Map<String, String>> data = dt.asMaps();
+  public void loadPage(String dummy, String pageName, String resource, Map<String, String> data) throws Exception {
     Map<String, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
     if (pageMap != null && !pageMap.isEmpty()) {
 
       pageMap.forEach((k, v) -> {
-        String elementValue = data.get(0).get(v.getName());
+        String elementValue = data.get(v.getName());
         if (elementValue != null && "DATA".equalsIgnoreCase(v.getType())|| "NAVIGATION".equalsIgnoreCase(v.getType()))  {
           try {
             actionProcessor(v.getName(), elementValue, v);
@@ -221,7 +220,7 @@ public class UIBaseStepDefinition {
   @Then("verify (.*) contains data in the page$")
   public void verify(String name, Map<String, String> xpathWithValue) {
     for(Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
-      WebElement webelement = driver.findElement(By.xpath(xpathMaps.getKey()));
+      WebElement webelement = webDriver.findElement(By.xpath(xpathMaps.getKey()));
       Assertions.assertEquals(StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText() , xpathMaps.getKey() + " is not Matched.");
     }
   }
@@ -236,9 +235,9 @@ public class UIBaseStepDefinition {
    */
   public void actionProcessor(String key, String value, PageElement element)
       throws InterruptedException {
-    WebElement webelement = driver.findElement(By.xpath(element.getXPath()));
+    WebElement webelement = webDriver.findElement(By.xpath(element.getXPath()));
     Action action = actionProcessorMap.get(element.getAction());
-    action.perform(driver, key, webelement, value);
+    action.perform(webDriver, key, webelement, value);
   }
 
   /**
@@ -246,8 +245,8 @@ public class UIBaseStepDefinition {
    */
   @After
   public void cleanUp() {
-    if (driver != null && ApplicationConfiguration.isProdMode()) {
-      driver.close();
+    if (webDriver != null && ApplicationConfiguration.isProdMode()) {
+      webDriver.close();
     } else {
       LOGGER.warning(" Driver not loaded/Closed : ");
     }
