@@ -29,9 +29,9 @@ public class AppiumServer {
     public WebDriver startServer(String resource, String platform) throws Exception {
         AppiumServiceBuilder builder = null;
         try {
-            if (Platform.ANDROID.equals(platform)) {
+            if (Platform.ANDROID.name().equalsIgnoreCase(platform)) {
                 builder = buildAndroid(resource);
-            } else if (Platform.IOS.equals(platform)) {
+            } else if (Platform.IOS.name().equalsIgnoreCase(platform)) {
                 builder = buildIOS(resource);
             }
             service = AppiumDriverLocalService.buildService(builder);
@@ -39,9 +39,9 @@ public class AppiumServer {
         } catch (Exception e) {
             LOGGER.warning(" Unable to start the app " + e.getMessage());
         }
-        if (Platform.ANDROID.equals(platform)) {
+        if (Platform.ANDROID.name().equalsIgnoreCase(platform)) {
             driver = buildAppiumDriverForAndroid(resource);
-        } else if (Platform.IOS.equals(platform)) {
+        } else if (Platform.IOS.name().equalsIgnoreCase(platform)) {
             driver = buildAppiumDriverForIOS(resource);
         }
         driver.manage().timeouts().implicitlyWait(MobileHelper.getWaitTime(resource), TimeUnit.SECONDS);
@@ -58,7 +58,7 @@ public class AppiumServer {
         MobileHelper.getAdditionalConfigResource(resource, dc);
         if (MobileHelper.getUrl(resource) == null) {
             File root = new File(System.getProperty("user.dir"));
-            File app = new File(root, MobileHelper.getUrl(resource));
+            File app = new File(root, MobileHelper.getFile(resource));
             dc.setCapability("app", app.getAbsolutePath());
             return new AppiumDriver<MobileElement>(service.getUrl(), dc);
         } else {
@@ -77,7 +77,7 @@ public class AppiumServer {
         MobileHelper.getAdditionalConfigResource(resource, dc);
         if (MobileHelper.getUrl(resource) == null) {
             File root = new File(System.getProperty("user.dir"));
-            File app = new File(root, MobileHelper.getUrl(resource));
+            File app = new File(root, MobileHelper.getFile(resource));
             dc.setCapability("app", app.getAbsolutePath());
             return new AppiumDriver<MobileElement>(service.getUrl(), dc);
         } else {

@@ -65,27 +65,27 @@ public class MobileHelper {
   }
 
   public static String getPlatform(String resource) {
-    return ApplicationConfiguration.getProperty("service.mobile.platform.resource");
+    return ApplicationConfiguration.getProperty("service.mobile.platform."+resource);
   }
 
   public static String getBrowserName(String resource) {
-    return ApplicationConfiguration.getProperty("service.mobile.browser_name.resource");
+    return ApplicationConfiguration.getProperty("service.mobile.browser_name."+resource);
   }
 
   public static String getDevice(String resource) {
-    return ApplicationConfiguration.getProperty("service.mobile.device.resource");
+    return ApplicationConfiguration.getProperty("service.mobile.device."+resource);
   }
 
   public static String getUDID(String resource) {
-    return ApplicationConfiguration.getProperty("service.mobile.udid.resource");
+    return ApplicationConfiguration.getProperty("service.mobile.udid."+resource);
   }
 
   public static String getBundleId(String resource) {
-    return ApplicationConfiguration.getProperty("service.mobile.bundle_id.resource");
+    return ApplicationConfiguration.getProperty("service.mobile.bundle_id."+resource);
   }
 
   public static void getAdditionalConfigResource(String resource, DesiredCapabilities dc) {
-    String readAddConf = ApplicationConfiguration.getProperty("service.mobile.additional.resource");
+    String readAddConf = ApplicationConfiguration.getProperty("service.mobile.additional."+resource);
     if(readAddConf != null){
       Map<String,String> addconf = Pattern.compile("\\s*;\\s*")
               .splitAsStream(readAddConf.trim())

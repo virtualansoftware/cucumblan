@@ -6,10 +6,6 @@
   <packaging>jar</packaging>
   <name>cucumblan-ui</name>
   <properties>
-    <mapson.version>1.1.12</mapson.version>
-    <selenium.version>4.1.0</selenium.version>
-    <junit.version>5.8.2</junit.version>
-    <cucumber.version>7.1.0</cucumber.version>
     <cucumblan-utils.version>1.0.5-SNAPSHOT</cucumblan-utils.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -123,46 +119,9 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>0.9.12</version>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.virtualan</groupId>
-      <artifactId>mapson</artifactId>
-      <version>${mapson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.6</version>
-    </dependency>
-    <dependency>
       <groupId>io.appium</groupId>
       <artifactId>java-client</artifactId>
       <version>7.6.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-junit</artifactId>
-      <version>${cucumber.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-java</artifactId>
-      <version>${cucumber.version}</version>
     </dependency>
     <dependency>
       <groupId>io.virtualan</groupId>
