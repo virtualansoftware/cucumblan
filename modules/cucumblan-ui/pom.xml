@@ -10,6 +10,7 @@
     <selenium.version>4.1.0</selenium.version>
     <junit.version>5.8.2</junit.version>
     <cucumber.version>7.1.0</cucumber.version>
+    <cucumblan-utils.version>1.0.5-SNAPSHOT</cucumblan-utils.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>
@@ -148,6 +149,11 @@
       <version>1.6</version>
     </dependency>
     <dependency>
+      <groupId>io.appium</groupId>
+      <artifactId>java-client</artifactId>
+      <version>7.6.0</version>
+    </dependency>
+    <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit</artifactId>
       <version>${cucumber.version}</version>
@@ -157,6 +163,11 @@
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
       <version>${cucumber.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>cucumblan-utils</artifactId>
+      <version>${cucumblan-utils.version}</version>
     </dependency>
   </dependencies>
 </project>

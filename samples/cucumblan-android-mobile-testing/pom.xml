@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 	<name>cucumblan-mobile-uitesting</name>
 	<properties>
-		<cucumblan.version>0.1.0-SNAPSHOT</cucumblan.version>
+		<cucumblan.version>1.0.9-SNAPSHOT</cucumblan.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -109,7 +109,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.virtualan</groupId>
-			<artifactId>cucumblan-mobile</artifactId>
+			<artifactId>cucumblan-ui</artifactId>
 			<version>${cucumblan.version}</version>
 		</dependency>
 		<dependency>

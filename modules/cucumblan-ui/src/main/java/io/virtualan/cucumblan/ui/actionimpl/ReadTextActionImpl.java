@@ -51,7 +51,7 @@ public class ReadTextActionImpl implements Action {
     @Override
     public void perform(WebDriver driver, String key, WebElement webelement, Object value) {
         String actualData = webelement.getText();
-        ScenarioContext.setContext(key, actualData);
+        ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId()), key, actualData);
         return;
     }
 }
