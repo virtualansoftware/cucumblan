@@ -14,10 +14,9 @@
   </properties>
   <description>
     Cucumblan-ui is a cucumber and selenium based test automation framework that supports Behavior Driven Development (BDD),
-    allowing users to create feature using predefined step definition with low code for UI. I
-    t works based on the Gherkin Domain Specific Language (DSL). This simple but powerful api
-    framework while keeping it comprehensible to even non-technical(product owner, business analyst and domain
-    experts) users.
+    allowing users to create feature using predefined step definition with low code for UI. It works based on
+    the Gherkin Domain Specific Language (DSL). This simple but powerful framework while keeping it comprehensible
+    to even non-technical(product owner, business analyst and domain experts) users.
   </description>
   <url>https://www.cucumblan.io/</url>
   <licenses>
