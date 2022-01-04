@@ -223,7 +223,11 @@ public class BaseStepDefinition {
                 if ("Accept".equalsIgnoreCase(params.getKey())) {
                     acceptContentType = StepDefinitionHelper.getActualValue(params.getValue());
                 }
-                if ("contentType".equalsIgnoreCase(params.getKey())) {
+                if ("contentType".equalsIgnoreCase(params.getKey()) &&
+                        StepDefinitionHelper.getActualValue(params.getValue()).contains("multipart/form-data")) {
+                    String boundary = Long.toHexString(System.currentTimeMillis());
+                    request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()) +"; boundary="+boundary);
+                } else if ("contentType".equalsIgnoreCase(params.getKey())) {
                     request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()));
                 }
                 request = request
@@ -582,25 +586,18 @@ public class BaseStepDefinition {
                             .encodeContentTypeAs(contentType,
                                     ContentType.fromContentType(contentType))));
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
-                if (params.getKey().contains("MULTI-PART")) {
-                    if (params.getValue() != null) {
-                        String fileAndType = StepDefinitionHelper.getActualValue(params.getValue());
-                        if (params.getKey().split("=").length == 2 && fileAndType.split("=").length == 2) {
-                            request = request
-                                    .multiPart(params.getKey().split("=")[1],
-                                            new File(BaseStepDefinition.class.getClassLoader()
-                                                    .getResource(fileAndType.split("=")[0]).getFile()),
-                                            fileAndType.split("=")[1]);
-                        } else {
-                            scenario.log(
-                                    "MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
-                            LOGGER.warning(
-                                    "MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
-                        }
-                    }
+                String fileAndType = StepDefinitionHelper.getActualValue(params.getValue());
+                if(BaseStepDefinition.class.getClassLoader()
+                        .getResource(fileAndType) != null &&
+                        new File(BaseStepDefinition.class.getClassLoader()
+                        .getResource(fileAndType).getFile()).exists()) {
+                        request = request
+                                .multiPart(params.getKey(),
+                                        new File(BaseStepDefinition.class.getClassLoader()
+                                                .getResource(fileAndType).getFile()));
                 } else {
                     request = request
-                            .param(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+                            .multiPart(params.getKey(),fileAndType);
                 }
             }
         }
