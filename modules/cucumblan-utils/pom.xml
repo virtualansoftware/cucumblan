@@ -13,7 +13,7 @@
         <cucumber.version>7.0.0</cucumber.version>
         <junit.version>5.8.1</junit.version>
         <jackson.verion>2.12.1</jackson.verion>
-        <log4j.version>2.17.0</log4j.version>
+        <log4j.version>2.17.1</log4j.version>
     </properties>
     <description>
         Cucumblan-utils used for all cucumblan componnets
