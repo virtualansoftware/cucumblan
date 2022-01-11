@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.virtualan</groupId>
   <artifactId>cucumblan-ui</artifactId>
-  <version>1.0.9-SNAPSHOT</version>
+  <version>1.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>cucumblan-ui</name>
   <properties>
-    <cucumblan-utils.version>1.0.5-SNAPSHOT</cucumblan-utils.version>
+    <cucumblan-utils.version>1.0.6-SNAPSHOT</cucumblan-utils.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>
