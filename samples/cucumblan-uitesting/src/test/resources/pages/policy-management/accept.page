@@ -1,0 +1,7 @@
+1=Insurance Quote Requests<~~>CLICK<~~>//a[text()='Insurance Quote Requests']<~~>BY_X_PATH<~~>NAVIGATION
+2=Click Details<~~>CLICK<~~>//a[text()='Show Details']<~~>BY_X_PATH<~~>NAVIGATION
+3=Click Respond<~~>CLICK<~~>//button[text()='Respond']<~~>BY_X_PATH<~~>NAVIGATION
+4=Select Accept<~~>CLICK<~~>//*[@id="accept"]<~~>BY_X_PATH<~~>NAVIGATION
+5=Premium<~~>SET_TEXT<~~>//input[@placeholder='Amount in CHF']<~~>BY_X_PATH<~~>DATA
+6=PolicyLimit<~~>SET_TEXT<~~>/html/body/div/div[2]/div/div[2]/div/div/div[2]/div/div/div[2]/form/div[4]/input<~~>BY_X_PATH<~~>DATA
+7=Next<~~>CLICK<~~>//button[text()='Send Response']<~~>BY_X_PATH<~~>NAVIGATION
