@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 	<name>cucumblan-uitesting</name>
 	<properties>
-		<selenium.version>4.1.0</selenium.version>
+		<selenium.version>4.1.1</selenium.version>
 
 		<junit.version>5.8.2</junit.version>
 		<cucumber.version>7.0.0</cucumber.version>
