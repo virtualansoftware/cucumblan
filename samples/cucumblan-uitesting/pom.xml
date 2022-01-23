@@ -8,21 +8,14 @@
 	<packaging>jar</packaging>
 	<name>cucumblan-uitesting</name>
 	<properties>
-		<selenium.version>4.1.0</selenium.version>
-
-		<junit.version>5.8.2</junit.version>
-		<cucumber.version>7.0.0</cucumber.version>
+		<selenium.version>4.1.1</selenium.version>
+		<junit.version>5.5.2</junit.version>
+		<cucumblan.version>1.0.9-SNAPSHOT</cucumblan.version>
+		<cucumber.version>6.7.0</cucumber.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cucumblan.version>1.0.10</cucumblan.version>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<virtualan.version>1.2.3</virtualan.version>
-		<cucumber.version>6.11.0</cucumber.version>
-		<hsqldb.version>2.3.2</hsqldb.version>
-		<spring.boot.version>2.6.2</spring.boot.version>
-		<springfox.version>2.9.2</springfox.version>
-		<groovy.version>2.4.7</groovy.version>
 	</properties>
 	<description>
 		Cucumblan-ui is a cucumber and selenium based test automation framework that supports Behavior Driven Development (BDD),
@@ -66,7 +59,6 @@
 		</repository>
 	</distributionManagement>
 	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -77,92 +69,6 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-			</plugin>
-<!--			<plugin>-->
-<!--				<groupId>org.springframework.boot</groupId>-->
-<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<goals>-->
-<!--							<goal>repackage</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-<!--			<plugin>-->
-<!--				<groupId>org.openapitools</groupId>-->
-<!--				<artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--				<version>4.2.3</version>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>Person-service-vs-api</id>-->
-<!--						<goals>-->
-<!--							<goal>generate</goal>-->
-<!--						</goals>-->
-<!--						<configuration>-->
-<!--							<inputSpec>${project.basedir}/src/main/resources/META-INF/resources/yaml/Person/person.yaml</inputSpec>-->
-<!--							<output>${project.basedir}/target/external/</output>-->
-<!--							<apiPackage>org.openapitools.virtualan.api</apiPackage>-->
-<!--							<modelPackage>org.openapitools.virtualan.to</modelPackage>-->
-<!--							<generatorName>spring</generatorName>-->
-<!--							<configOptions>-->
-<!--								<virtualService>true</virtualService>-->
-<!--							</configOptions>-->
-<!--						</configuration>-->
-<!--					</execution>-->
-<!--					<execution>-->
-<!--						<id>risk-service-vs-api</id>-->
-<!--						<goals>-->
-<!--							<goal>generate</goal>-->
-<!--						</goals>-->
-<!--						<configuration>-->
-<!--							<inputSpec>${project.basedir}/src/main/resources/META-INF/resources/yaml/Risk/riskfactor.yaml</inputSpec>-->
-<!--							<output>${project.basedir}/target/external/</output>-->
-<!--							<apiPackage>org.openapitools.virtualan.api</apiPackage>-->
-<!--							<modelPackage>org.openapitools.virtualan.to</modelPackage>-->
-<!--							<generatorName>spring</generatorName>-->
-<!--							<skipValidateSpec>true</skipValidateSpec>-->
-<!--							<configOptions>-->
-<!--								<virtualService>true</virtualService>-->
-<!--							</configOptions>-->
-<!--						</configuration>-->
-<!--					</execution>-->
-<!--					<execution>-->
-<!--						<id>pet-service-vs-api</id>-->
-<!--						<goals>-->
-<!--							<goal>generate</goal>-->
-<!--						</goals>-->
-<!--						<configuration>-->
-<!--							<inputSpec>${project.basedir}/src/main/resources/META-INF/resources/yaml/Pet/petstore.yaml</inputSpec>-->
-<!--							<output>${project.basedir}/target/external/</output>-->
-<!--							<apiPackage>org.openapitools.virtualan.api</apiPackage>-->
-<!--							<modelPackage>org.openapitools.virtualan.to</modelPackage>-->
-<!--							<generatorName>spring</generatorName>-->
-<!--							<configOptions>-->
-<!--								<virtualService>true</virtualService>-->
-<!--							</configOptions>-->
-<!--						</configuration>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.basedir}/target/external/src/gen/java</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -180,6 +86,29 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>net.masterthought</groupId>
+				<artifactId>maven-cucumber-reporting</artifactId>
+				<version>5.3.0</version>
+				<executions>
+					<execution>
+						<id>execution</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<projectName>Customer Self Service</projectName>
+							<skip>false</skip>
+							<outputDirectory>target/html-reports</outputDirectory>
+							<inputDirectory>${project.build.directory}</inputDirectory>
+							<jsonFiles>
+								<param>**/*.json</param>
+							</jsonFiles>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -206,63 +135,14 @@
 			<version>${cucumber.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<version>${spring.boot.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<version>${spring.boot.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.13.1</version>
-		</dependency>
-
-		<!-- HyperSQL DB -->
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>${hsqldb.version}</version>
-		</dependency>
-		<!-- END Virtual Service API support -->
-
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>2.0.1.Final</version>
-		</dependency>
-
-<!--		<dependency>-->
-<!--			<groupId>io.cucumber</groupId>-->
-<!--			<artifactId>cucumber-spring</artifactId>-->
-<!--			<version>${cucumber.version}</version>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
-
-		<!-- START Virtual Service API support -->
-		<dependency>
-			<groupId>io.virtualan</groupId>
-			<artifactId>virtualization</artifactId>
-			<version>${virtualan.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>io.virtualan</groupId>
-					<artifactId>mapson</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
 			<groupId>io.virtualan</groupId>
 			<artifactId>cucumblan-ui</artifactId>
 			<version>${cucumblan.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>net.masterthought</groupId>
+			<artifactId>cucumber-reporting</artifactId>
+			<version>5.3.1</version>
+		</dependency>
 	</dependencies>
 </project>

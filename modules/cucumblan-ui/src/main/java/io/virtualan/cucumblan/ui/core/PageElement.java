@@ -19,6 +19,8 @@
 
 package io.virtualan.cucumblan.ui.core;
 
+import org.openqa.selenium.By;
+
 /**
  * The type Page element.
  *
@@ -37,12 +39,17 @@ public class PageElement {
   /**
    * The Page element x path.
    */
-  String xPath;
+  String value;
 
   /**
    * The Page element x path.
    */
   String type;
+
+  /**
+   * The Page element Type.
+   */
+  String findElementType;
 
   /**
    * Instantiates a new Page element.
@@ -53,11 +60,12 @@ public class PageElement {
    * @param type              the type
    */
   public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
-      String type) {
+                     String findElementType, String type) {
     super();
     this.name = pageElementName;
     this.action = pageElementAction;
-    this.xPath = pageElementXPath;
+    this.value = pageElementXPath;
+    this.findElementType = findElementType;
     this.type = type;
   }
 
@@ -117,21 +125,30 @@ public class PageElement {
   }
 
   /**
-   * Gets page element x path.
+   * Gets page element path.
    *
-   * @return the page element x path
+   * @return the page element path
    */
-  public String getXPath() {
-    return xPath;
+  public String getValue() {
+    return value;
   }
 
   /**
    * Sets page element x path.
    *
-   * @param xPath the page element x path
+   * @param path the page element x path
    */
-  public void setXPath(String xPath) {
-    this.xPath = xPath;
+  public void setValue(String path) {
+    this.value = path;
+  }
+
+
+  public String getFindElementType() {
+    return findElementType;
+  }
+
+  public void setFindElementType(String findElementType) {
+    this.findElementType = findElementType;
   }
 
   @Override
@@ -139,8 +156,34 @@ public class PageElement {
     return "PageElement{" +
         "pageElementName='" + name + '\'' +
         ", pageElementAction='" + action + '\'' +
-        ", pageElementXPath='" + xPath + '\'' +
+        ", pageElementValue='" + value + '\'' +
         ", pageElementType'" + type + '\'' +
+        ", findElementType'" + findElementType + '\'' +
+        ", pageElement'" + findElement() + '\'' +
         '}';
+  }
+
+
+  public By findElement() {
+    switch (findElementType) {
+      case "BY_ID":
+        return By.id(value);
+      case "BY_NAME":
+        return By.name(value);
+      case "BY_TAG_NAME":
+        return By.tagName(value);
+      case "BY_LINK_TEXT":
+        return By.linkText(value);
+      case "BY_PARTIAL_LINK_TEXT":
+        return By.partialLinkText(value);
+      case "BY_X_PATH":
+        return By.xpath(value);
+      case "BY_CSS":
+        return By.cssSelector(value);
+      case "BY_CLASS_NAME":
+        return By.className(value);
+      default:
+        return By.id(value); // Build Intelligence - self heal later
+    }
   }
 }
