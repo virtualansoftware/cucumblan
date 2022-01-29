@@ -11,5 +11,6 @@ Scenario: Testing the sql validation
     Then Select details with the given sql for employees on employee
         | select * from employees where emp_no = 2                  |
     Then Store-sql's [0].FIRST_NAME value of the key as firstName
+    And Store-sql's [0].EMP_NO value of the key as id
     And Execute DELETE for the given sql for employees on employee
-        | delete from employees where emp_no = 2    |
+        | delete from employees where emp_no = [id]    |

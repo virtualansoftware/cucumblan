@@ -26,6 +26,7 @@ import io.virtualan.cucumblan.jdbc.util.StreamingJsonResultSetExtractor;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.cucumblan.props.util.UtilHelper;
 import io.virtualan.mapson.Mapson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -206,7 +207,7 @@ public class DBBaseStepDefinition {
         if (mapson.get(responseKey) != null) {
           ScenarioContext
                   .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                          mapson.get(responseKey));
+                          UtilHelper.getObject(mapson.get(responseKey)));
         } else {
           Assert.assertTrue(responseKey + " not found in the sql ", false);
         }
@@ -215,6 +216,7 @@ public class DBBaseStepDefinition {
       }
     }
   }
+
 
 
   /**
