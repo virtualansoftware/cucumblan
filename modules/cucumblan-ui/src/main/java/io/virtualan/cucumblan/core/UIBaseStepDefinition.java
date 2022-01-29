@@ -20,38 +20,38 @@
 
 package io.virtualan.cucumblan.core;
 
-import io.cucumber.datatable.DataTable;
+import io.appium.java_client.AppiumDriver;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.virtualan.cucumblan.mobile.AppiumServer;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
-import io.virtualan.cucumblan.props.util.ScenarioContext;
+import io.virtualan.cucumblan.props.util.MobileHelper;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.props.util.UIHelper;
 import io.virtualan.cucumblan.ui.action.Action;
 import io.virtualan.cucumblan.ui.core.PageElement;
 import io.virtualan.cucumblan.ui.core.PagePropLoader;
+
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
-
 
 /**
  * The type Ui base step definition.
@@ -61,14 +61,14 @@ import org.reflections.scanners.SubTypesScanner;
 public class UIBaseStepDefinition {
 
   private final static Logger LOGGER = Logger.getLogger(UIBaseStepDefinition.class.getName());
-  private static PagePropLoader pagePropLoader;
   private static Map<String, Action> actionProcessorMap = new HashMap<>();
+  private AppiumServer appiumServer;
 
   static {
     loadActionProcessors();
   }
 
-  private WebDriver driver = null;
+  private WebDriver webDriver = null;
   private Scenario scenario;
 
   /**
@@ -87,11 +87,9 @@ public class UIBaseStepDefinition {
     buildInclasses.stream().forEach(x -> {
       Action action = null;
       try {
-        action = x.newInstance();
+        action = x.getDeclaredConstructor().newInstance();
         actionProcessorMap.put(action.getType(), action);
-      } catch (InstantiationException e) {
-        LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
-      } catch (IllegalAccessException e) {
+      } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
         LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
       }
     });
@@ -100,7 +98,6 @@ public class UIBaseStepDefinition {
   @Before
   public void before(Scenario scenario) {
     this.scenario = scenario;
-    //this.sequence = 1;
   }
 
   /**
@@ -120,24 +117,56 @@ public class UIBaseStepDefinition {
      * @param driverName the driver name
      * @param resource   the url
      */
-  @Given("Load Driver (.*) And URL on (.*)$")
-  public void loadDriverAndURL(String driverName, String resource) {
+  @Given("Load driver (.*) and url on (.*)$")
+  public void loadDriverAndURL(String driverName, String resource) throws Exception {
     switch (driverName) {
       case "CHROME":
         System.setProperty("webdriver.chrome.driver", "conf/chromedriver.exe");
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("start-maximized");
         //chromeOptions.addArguments("--headless", "--window-size=1920,1200");
-        driver = new ChromeDriver(chromeOptions);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        webDriver = new ChromeDriver(chromeOptions);
+        webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        loadUrl(resource);
         break;
       case "FIREFOX":
-        driver = new FirefoxDriver();
-        driver.manage().window().maximize();
+        webDriver = new FirefoxDriver();
+        webDriver.manage().window().maximize();
+        loadUrl(resource);
+        break;
+      case "ANDROID":
+        try {
+          appiumServer  = new AppiumServer();
+          if (!appiumServer.checkIfServerIsRunnning(MobileHelper.getMobilePort())) {
+            appiumServer.startServer( resource, "ANDROID");
+            appiumServer.stopServer();
+          } else {
+            LOGGER.warning("Appium Server already running on Port - " + MobileHelper.getMobilePort());
+          }
+        } catch (Exception e) {
+        }
+        webDriver = appiumServer.startServer( resource, "ANDROID");
+        break;
+      case "IOS":
+        try {
+          appiumServer  = new AppiumServer();
+          if (!appiumServer.checkIfServerIsRunnning(MobileHelper.getMobilePort())) {
+            appiumServer.startServer( resource, "ANDROID");
+            appiumServer.stopServer();
+          } else {
+            LOGGER.warning("Appium Server already running on Port - " + MobileHelper.getMobilePort());
+          }
+        } catch (Exception e) {
+        }
+        webDriver = appiumServer.startServer(resource, "IOS");
         break;
       default:
         throw new IllegalArgumentException("Browser \"" + driverName + "\" isn't supported.");
     }
+    LOGGER.info(" Device connection established");
+  }
+
+  private void loadUrl(String resource) {
     String url = UIHelper.getUrl(resource);
     if (url == null) {
       scenario.log("Url missing for " + resource);
@@ -145,14 +174,14 @@ public class UIBaseStepDefinition {
     } else {
       scenario.log("Url for " + resource + " : " + url);
     }
-    driver.get(url);
+    webDriver.get(url);
   }
 
   @After
   public void embedScreenshotOnFail(Scenario s) {
     if (s.isFailed()) {
       try {
-        final byte[] screenshot = ((TakesScreenshot) driver)
+        final byte[] screenshot = ((TakesScreenshot) webDriver)
             .getScreenshotAs(OutputType.BYTES);
         s.attach(screenshot, "image/png", "Failed-Image :" + UUID.randomUUID().toString());
       } catch (ClassCastException cce) {
@@ -166,17 +195,16 @@ public class UIBaseStepDefinition {
    *
    * @param pageName the page name
    * @param resource the resource
-   * @param dt       the dt
+   * @param data       the data
    * @throws Exception the exception
    */
-  @Given("perform the (.*) page action on (.*)$")
-  public void loadPage(String pageName, String resource, DataTable dt) throws Exception {
-    List<Map<String, String>> data = dt.asMaps();
+  @Given("(.*) the (.*) page on (.*)$")
+  public void loadPage(String dummy, String pageName, String resource, Map<String, String> data) throws Exception {
     Map<String, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
     if (pageMap != null && !pageMap.isEmpty()) {
 
       pageMap.forEach((k, v) -> {
-        String elementValue = data.get(0).get(v.getName());
+        String elementValue = data.get(v.getName());
         if (elementValue != null && "DATA".equalsIgnoreCase(v.getType())|| "NAVIGATION".equalsIgnoreCase(v.getType()))  {
           try {
             actionProcessor(v.getName(), elementValue, v);
@@ -222,7 +250,7 @@ public class UIBaseStepDefinition {
   @Then("verify (.*) contains data in the page$")
   public void verify(String name, Map<String, String> xpathWithValue) {
     for(Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
-      WebElement webelement = driver.findElement(By.xpath(xpathMaps.getKey()));
+      WebElement webelement = webDriver.findElement(By.xpath(xpathMaps.getKey()));
       Assertions.assertEquals(StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText() , xpathMaps.getKey() + " is not Matched.");
     }
   }
@@ -237,9 +265,9 @@ public class UIBaseStepDefinition {
    */
   public void actionProcessor(String key, String value, PageElement element)
       throws InterruptedException {
-    WebElement webelement = driver.findElement(By.xpath(element.getXPath()));
+    WebElement webelement = webDriver.findElement(element.findElement());
     Action action = actionProcessorMap.get(element.getAction());
-    action.perform(key, webelement, value);
+    action.perform(webDriver, key, webelement, value);
   }
 
   /**
@@ -247,10 +275,13 @@ public class UIBaseStepDefinition {
    */
   @After
   public void cleanUp() {
-    if (driver != null && ApplicationConfiguration.isProdMode()) {
-      driver.close();
+    if (webDriver != null && ApplicationConfiguration.isProdMode()) {
+      webDriver.close();
     } else {
       LOGGER.warning(" Driver not loaded/Closed : ");
+    }
+    if (appiumServer != null) {
+      appiumServer.stopServer();
     }
   }
 

@@ -96,6 +96,19 @@ public class ApplicationConfiguration {
     return properties.getProperty("action-package") != null ?
         properties.getProperty("action-package") : "io.virtualan.cucumblan.ui.actionimpl";
   }
+
+
+  /**
+   * Gets property.
+   *
+   * @return the property
+   */
+  public static String getMobileActionPackage() {
+    ApplicationConfiguration.reload();
+    return properties.getProperty("mobile-action-package") != null ?
+        properties.getProperty("mobile-action-package") : "io.virtualan.cucumblan.mobile.actionimpl";
+  }
+
   /**
 
 

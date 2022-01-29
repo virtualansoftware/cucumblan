@@ -6,18 +6,18 @@
   <packaging>jar</packaging>
   <name>cucumblan-ui</name>
   <properties>
-    <mapson.version>1.1.10</mapson.version>
+    <mapson.version>1.1.12</mapson.version>
     <selenium.version>4.1.0</selenium.version>
     <junit.version>5.8.2</junit.version>
     <cucumber.version>7.1.0</cucumber.version>
+    <cucumblan-utils.version>1.0.5-SNAPSHOT</cucumblan-utils.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>
     Cucumblan-ui is a cucumber and selenium based test automation framework that supports Behavior Driven Development (BDD),
-    allowing users to create feature using predefined step definition with low code for UI. I
-    t works based on the Gherkin Domain Specific Language (DSL). This simple but powerful api
-    framework while keeping it comprehensible to even non-technical(product owner, business analyst and domain
-    experts) users.
+    allowing users to create feature using predefined step definition with low code for UI. It works based on
+    the Gherkin Domain Specific Language (DSL). This simple but powerful framework while keeping it comprehensible
+    to even non-technical(product owner, business analyst and domain experts) users.
   </description>
   <url>https://www.cucumblan.io/</url>
   <licenses>
@@ -125,7 +125,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.10.1</version>
+      <version>0.9.12</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -137,6 +137,7 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+
     <dependency>
       <groupId>io.virtualan</groupId>
       <artifactId>mapson</artifactId>
@@ -148,6 +149,11 @@
       <version>1.6</version>
     </dependency>
     <dependency>
+      <groupId>io.appium</groupId>
+      <artifactId>java-client</artifactId>
+      <version>7.6.0</version>
+    </dependency>
+    <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit</artifactId>
       <version>${cucumber.version}</version>
@@ -157,6 +163,11 @@
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
       <version>${cucumber.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>cucumblan-utils</artifactId>
+      <version>${cucumblan-utils.version}</version>
     </dependency>
   </dependencies>
 </project>
