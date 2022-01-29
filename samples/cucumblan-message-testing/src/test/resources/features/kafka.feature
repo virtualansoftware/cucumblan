@@ -9,6 +9,8 @@ Feature: Test Kafka API
       | type                     | Response                                                                                                                                                                                                                                                                               |
       | resource                 | virtualan.input                                                                                                                                                                                                                                                                        |
       | requestType              | KAFKA                                                                                                                                                                                                                                                                                  |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices/message resource on virtualan
     Then Verify the status code is 201
     And Verify across response includes following in the response
@@ -24,6 +26,8 @@ Feature: Test Kafka API
       | type                     | Response                                                                                                                                                                                                                                                                               |
       | resource                 | virtualan.input                                                                                                                                                                                                                                                                        |
       | requestType              | KAFKA                                                                                                                                                                                                                                                                                  |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices/message resource on virtualan
     Then Verify the status code is 201
     And Verify across response includes following in the response
@@ -39,6 +43,8 @@ Feature: Test Kafka API
       | type                     | Response                                                                                                                                                                                                                                                                               |
       | resource                 | virtualan.input                                                                                                                                                                                                                                                                        |
       | requestType              | KAFKA                                                                                                                                                                                                                                                                                  |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices/message resource on virtualan
     Then Verify the status code is 400
     And Verify across response includes following in the response
