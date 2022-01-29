@@ -279,8 +279,8 @@ public class BaseStepDefinition {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), globalParams);
             scenario.attach(new JSONObject(ScenarioContext
-                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(),
-                    "application/json", "requestData :  ContextId" + String.valueOf(Thread.currentThread().getId()));
+                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(4),
+                    "application/json", "ContextId:" + String.valueOf(Thread.currentThread().getId()));
         }
     }
 
@@ -313,8 +313,8 @@ public class BaseStepDefinition {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), (Map) properties);
             scenario.attach(new JSONObject(ScenarioContext
-                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(),
-                    "application/json", "ContextId" + String.valueOf(Thread.currentThread().getId()));
+                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(4),
+                    "application/json", "ContextId:" + String.valueOf(Thread.currentThread().getId()));
         } else {
             LOGGER.warning(
                     "cucumblan-env.properties is not configured. Need to add if default data loaded");
@@ -747,7 +747,7 @@ public class BaseStepDefinition {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                    , contentType, "requestData :  ");
+                    , contentType, "Request:");
             request = request.contentType(contentType).body(jsonBody);
         }
     }
@@ -768,10 +768,10 @@ public class BaseStepDefinition {
 
             if(StepDefinitionHelper.getJSON(jsonBody) instanceof  JSONArray){
                 scenario.attach(new JSONArray(jsonBody).toString(4)
-                        , "application/json", "requestData :  ");
+                        , "application/json", "RequestData:");
             } else {
                 scenario.attach(new JSONObject(jsonBody).toString(4)
-                        , "application/json", "requestData :  ");
+                        , "application/json", "RequestData:");
             }
             request = request.body(jsonBody);
         }
@@ -790,7 +790,7 @@ public class BaseStepDefinition {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             request = request.contentType("application/json").body(jsonBody);
         }
     }
@@ -808,7 +808,7 @@ public class BaseStepDefinition {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                 .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                , "application/json", "requestData :  ");
+                , "application/json", "RequestData:");
             request = request.contentType("application/json").body(jsonBody);
         }
     }
@@ -828,7 +828,7 @@ public class BaseStepDefinition {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             request = request.contentType(contentType).body(jsonBody);
         }
     }
@@ -859,7 +859,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
 
             response = request.baseUri(url).when()
                     .log().all()
@@ -893,7 +893,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .get(ApiHelper.getActualResource(resource, system));
@@ -925,7 +925,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .put(ApiHelper.getActualResource(resource, system));
@@ -957,7 +957,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .patch(ApiHelper.getActualResource(resource, system));
@@ -988,7 +988,7 @@ public class BaseStepDefinition {
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .delete(ApiHelper.getActualResource(resource, system));
@@ -1029,7 +1029,7 @@ public class BaseStepDefinition {
             scenario.attach(
                     new JSONObject(ScenarioContext.getPrintableContextObject(
                             String.valueOf(Thread.currentThread().getId()))).toString(4), "application/json",
-                    "contextual-dataset ");
+                    "Contextual-Dataset:");
         }
     }
 
@@ -1038,7 +1038,7 @@ public class BaseStepDefinition {
             String xmlType =
                     response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
             scenario.attach(validatableResponse.extract().body().asString(), xmlType,
-                    "actual-response ");
+                    "Actual-Response");
         }
     }
 
@@ -1046,7 +1046,7 @@ public class BaseStepDefinition {
         String xmlType =
                 response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
         scenario
-                .attach(actual, xmlType, "expected-response ");
+                .attach(actual, xmlType, "Expected-Response:");
     }
 
     /**
@@ -1189,7 +1189,7 @@ public class BaseStepDefinition {
                     object.put(x.getKey(), x.getValue());
                     array.put(object);
                 });
-                scenario.attach(array.toString(4), "application/json", "Comparison Failure");
+                scenario.attach(array.toString(4), "application/json", "Comparison Failure:");
 
             } else {
                 return values.isEmpty();
