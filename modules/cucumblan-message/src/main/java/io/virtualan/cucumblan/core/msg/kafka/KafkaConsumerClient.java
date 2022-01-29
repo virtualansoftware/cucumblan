@@ -19,6 +19,7 @@ package io.virtualan.cucumblan.core.msg.kafka;
  */
 
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
+import io.virtualan.cucumblan.message.exception.SkipMessageException;
 import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.TopicConfiguration;
@@ -171,6 +172,8 @@ public class KafkaConsumerClient {
         } else if (obj != null) {
           throw new MessageNotDefinedException("Id is not defined ");
         }
+      } catch (SkipMessageException e) {
+        LOGGER.warning(record.key() + " is skipped " + e.getMessage());
       } catch (MessageNotDefinedException e) {
         LOGGER.warning(record.key() + " is not defined " + e.getMessage());
         throw e;

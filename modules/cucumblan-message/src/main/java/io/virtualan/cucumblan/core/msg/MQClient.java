@@ -3,6 +3,7 @@ package io.virtualan.cucumblan.core.msg;
 import io.cucumber.java.Scenario;
 import io.virtualan.cucumblan.core.msg.kafka.MessageContext;
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
+import io.virtualan.cucumblan.message.exception.SkipMessageException;
 import io.virtualan.cucumblan.message.exception.UnableToProcessException;
 import io.virtualan.cucumblan.message.type.MessageType;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
@@ -106,7 +107,7 @@ public class MQClient {
 
   public static String findMessage(Scenario scenario, String resource,
       String eventNameInput, String mapson, String type)
-      throws IOException, JMSException, MessageNotDefinedException {
+          throws IOException, JMSException, MessageNotDefinedException, SkipMessageException {
     int countCheck = ApplicationConfiguration.getMessageCount();
     MessageType messageType = MessageContext.getMessageTypes().get(type);
     for (int i = 0; i < countCheck; i++) {

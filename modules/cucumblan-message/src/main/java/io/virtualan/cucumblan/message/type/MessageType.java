@@ -21,6 +21,8 @@ package io.virtualan.cucumblan.message.type;
 
 import io.virtualan.cucumblan.message.exception.MessageNotDefinedException;
 import java.util.List;
+
+import io.virtualan.cucumblan.message.exception.SkipMessageException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
 import org.json.JSONException;
@@ -103,7 +105,7 @@ public interface MessageType<T, TT> {
    * @throws MessageNotDefinedException the message not defined exception
    */
   MessageType buildConsumerMessage(ConsumerRecord<T, TT> record, T key, TT value)
-          throws MessageNotDefinedException;
+          throws MessageNotDefinedException, SkipMessageException;
 
 
   /**
@@ -115,7 +117,7 @@ public interface MessageType<T, TT> {
    * @throws MessageNotDefinedException the message not defined exception
    */
   default MessageType  buildConsumerMessage(TT value)
-      throws MessageNotDefinedException {
+      throws MessageNotDefinedException, SkipMessageException {
     return null;
   }
 
