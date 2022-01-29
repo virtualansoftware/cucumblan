@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 @Slf4j
 public class FeatureScope implements ConcurrentEventListener {
-    //private ThreadLocal threadLocal = new ThreadLocal();
 
     @Override
     public void setEventPublisher(EventPublisher eventPublisher) {
@@ -25,7 +24,6 @@ public class FeatureScope implements ConcurrentEventListener {
     };
 
     private void beforeAll() {
-        log.info("#####################################"+ Thread.currentThread().getId() + " in before all");
         ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId()), new HashMap<>());
     }
 
@@ -35,6 +33,5 @@ public class FeatureScope implements ConcurrentEventListener {
 
     private void afterAll() {
         ScenarioContext.remove(String.valueOf(Thread.currentThread().getId()));
-        log.info("#####################################"+ String.valueOf(Thread.currentThread().getId()) + " in after all");
     }
 }
