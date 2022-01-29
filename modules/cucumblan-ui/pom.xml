@@ -7,6 +7,10 @@
   <name>cucumblan-ui</name>
   <properties>
     <cucumblan-utils.version>1.0.6-SNAPSHOT</cucumblan-utils.version>
+    <selenium.version>4.1.1</selenium.version>
+    <mapson.version>1.1.12</mapson.version>
+    <junit.version>5.8.2</junit.version>
+    <cucumber.version>7.1.1</cucumber.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>
