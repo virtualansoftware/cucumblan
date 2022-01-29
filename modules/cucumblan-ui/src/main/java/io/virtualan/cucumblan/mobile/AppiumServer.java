@@ -9,7 +9,6 @@ import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import io.virtualan.cucumblan.props.util.MobileHelper;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
@@ -29,9 +28,9 @@ public class AppiumServer {
     public WebDriver startServer(String resource, String platform) throws Exception {
         AppiumServiceBuilder builder = null;
         try {
-            if (Platform.ANDROID.equals(platform)) {
+            if (Platform.ANDROID.name().equalsIgnoreCase(platform)) {
                 builder = buildAndroid(resource);
-            } else if (Platform.IOS.equals(platform)) {
+            } else if (Platform.IOS.name().equalsIgnoreCase(platform)) {
                 builder = buildIOS(resource);
             }
             service = AppiumDriverLocalService.buildService(builder);
@@ -39,12 +38,13 @@ public class AppiumServer {
         } catch (Exception e) {
             LOGGER.warning(" Unable to start the app " + e.getMessage());
         }
-        if (Platform.ANDROID.equals(platform)) {
+        if (Platform.ANDROID.name().equalsIgnoreCase(platform)) {
             driver = buildAppiumDriverForAndroid(resource);
-        } else if (Platform.IOS.equals(platform)) {
+        } else if (Platform.IOS.name().equalsIgnoreCase(platform)) {
             driver = buildAppiumDriverForIOS(resource);
         }
         driver.manage().timeouts().implicitlyWait(MobileHelper.getWaitTime(resource), TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(MobileHelper.getPageLoadWaitTime(resource), TimeUnit.SECONDS);
         return driver;
     }
 
@@ -55,14 +55,14 @@ public class AppiumServer {
         dc.setCapability(MobileCapabilityType.DEVICE_NAME, MobileHelper.getAppName(resource));
         dc.setCapability("appPackage", MobileHelper.getAppPackage(resource));
         dc.setCapability("appActivity", MobileHelper.getAppActivity(resource));
-        MobileHelper.getAdditionalConfigResource(resource, dc);
+        MobileHelper.additionalConfigResource(resource, dc);
         if (MobileHelper.getUrl(resource) == null) {
             File root = new File(System.getProperty("user.dir"));
-            File app = new File(root, MobileHelper.getUrl(resource));
+            File app = new File(root, MobileHelper.getFile(resource));
             dc.setCapability("app", app.getAbsolutePath());
             return new AppiumDriver<MobileElement>(service.getUrl(), dc);
         } else {
-            return new AppiumDriver<MobileElement>(new URL(MobileHelper.getUrl(resource)), dc);
+            return new AppiumDriver<MobileElement>(new URL(MobileHelper.getServerUrl(resource)), dc);
         }
     }
 
@@ -74,14 +74,14 @@ public class AppiumServer {
         dc.setCapability("device", MobileHelper.getDevice(resource));
         dc.setCapability("udid", MobileHelper.getUDID(resource));
         dc.setCapability("bundleId", MobileHelper.getBundleId(resource));
-        MobileHelper.getAdditionalConfigResource(resource, dc);
+        MobileHelper.additionalConfigResource(resource, dc);
         if (MobileHelper.getUrl(resource) == null) {
             File root = new File(System.getProperty("user.dir"));
-            File app = new File(root, MobileHelper.getUrl(resource));
+            File app = new File(root, MobileHelper.getFile(resource));
             dc.setCapability("app", app.getAbsolutePath());
             return new AppiumDriver<MobileElement>(service.getUrl(), dc);
         } else {
-            return new AppiumDriver<MobileElement>(new URL(MobileHelper.getUrl(resource)), dc);
+            return new AppiumDriver<MobileElement>(new URL(MobileHelper.getServerUrl(resource)), dc);
         }
     }
 

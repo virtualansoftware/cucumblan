@@ -36,6 +36,7 @@ import io.virtualan.cucumblan.ui.core.PageElement;
 import io.virtualan.cucumblan.ui.core.PagePropLoader;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +49,10 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
@@ -121,49 +124,69 @@ public class UIBaseStepDefinition {
   public void loadDriverAndURL(String driverName, String resource) throws Exception {
     switch (driverName) {
       case "CHROME":
-        System.setProperty("webdriver.chrome.driver", "conf/chromedriver.exe");
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("start-maximized");
-        //chromeOptions.addArguments("--headless", "--window-size=1920,1200");
-        webDriver = new ChromeDriver(chromeOptions);
-        webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        loadUrl(resource);
+        chromeDriverBuilder(resource);
         break;
       case "FIREFOX":
-        webDriver = new FirefoxDriver();
-        webDriver.manage().window().maximize();
-        loadUrl(resource);
+        firefoxDriverBuilder(resource);
         break;
       case "ANDROID":
-        try {
-          appiumServer  = new AppiumServer();
-          if (!appiumServer.checkIfServerIsRunnning(MobileHelper.getMobilePort())) {
-            appiumServer.startServer( resource, "ANDROID");
-            appiumServer.stopServer();
-          } else {
-            LOGGER.warning("Appium Server already running on Port - " + MobileHelper.getMobilePort());
-          }
-        } catch (Exception e) {
-        }
-        webDriver = appiumServer.startServer( resource, "ANDROID");
+        mobilebuilder(driverName, resource);
         break;
       case "IOS":
-        try {
-          appiumServer  = new AppiumServer();
-          if (!appiumServer.checkIfServerIsRunnning(MobileHelper.getMobilePort())) {
-            appiumServer.startServer( resource, "ANDROID");
-            appiumServer.stopServer();
-          } else {
-            LOGGER.warning("Appium Server already running on Port - " + MobileHelper.getMobilePort());
-          }
-        } catch (Exception e) {
-        }
-        webDriver = appiumServer.startServer(resource, "IOS");
+        mobilebuilder(driverName, resource);
         break;
       default:
         throw new IllegalArgumentException("Browser \"" + driverName + "\" isn't supported.");
     }
     LOGGER.info(" Device connection established");
+  }
+
+  private void mobilebuilder(String driverName, String resource) throws Exception {
+    try {
+      appiumServer = new AppiumServer();
+      if (!appiumServer.checkIfServerIsRunnning(MobileHelper.getMobilePort())) {
+        appiumServer.startServer(resource, driverName);
+        appiumServer.stopServer();
+      } else {
+        LOGGER.warning("Appium Server already running on Port - " + MobileHelper.getMobilePort());
+      }
+    } catch (Exception e) {
+    }
+    webDriver = appiumServer.startServer(resource, driverName);
+  }
+
+  private void firefoxDriverBuilder(String resource) throws MalformedURLException {
+    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+    UIHelper.additionalConfigResource(resource,capabilities);
+    FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
+    capabilities.setCapability("marionette", true);
+    if(UIHelper.getServerUrl(resource) == null ) {
+      System.setProperty("webdriver.gecko.driver",UIHelper.getFireboxDriverPath());
+      webDriver = new FirefoxDriver(firefoxOptions);
+    } else {
+      webDriver = new RemoteWebDriver(new URL(UIHelper.getServerUrl(resource)),firefoxOptions);
+    }
+    webDriver.manage().window().maximize();
+    webDriver.manage().timeouts().implicitlyWait(MobileHelper.getWaitTime(resource), TimeUnit.SECONDS);
+    loadUrl(resource);
+  }
+
+  private void chromeDriverBuilder(String resource) throws MalformedURLException {
+    ChromeOptions options = new ChromeOptions();
+    UIHelper.additionalConfigArguments(resource,options);
+    if(UIHelper.getServerUrl(resource) == null ) {
+      System.setProperty("webdriver.chrome.driver", UIHelper.getChromeDriverPath());
+      webDriver = new ChromeDriver(options);
+    } else {
+      DesiredCapabilities caps = new DesiredCapabilities();
+      caps.setCapability(ChromeOptions.CAPABILITY, options);
+      UIHelper.additionalConfigResource(resource,caps);
+      webDriver = new RemoteWebDriver(new URL(UIHelper.getServerUrl(resource)),caps);
+    }
+    webDriver.manage().window().maximize();
+    webDriver.manage().timeouts().implicitlyWait(UIHelper.getWaitTime(resource), TimeUnit.SECONDS);
+    webDriver.manage().timeouts().pageLoadTimeout(UIHelper.getPageLoadWaitTime(resource), TimeUnit.SECONDS);
+    loadUrl(resource);
   }
 
   private void loadUrl(String resource) {
