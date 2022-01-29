@@ -1,0 +1,4 @@
+1=UserName<~~>SET_TEXT<~~>com.aa.android.qa:id/username<~~>DATA
+2=LastName<~~>SET_TEXT<~~>com.aa.android.qa:id/lastname<~~>DATA
+3=Password<~~>SET_TEXT<~~>com.aa.android.qa:id/password<~~>DATA
+4=Login<~~>CLICK<~~>com.aa.android.qa:id/login_button<~~>NAVIGATION

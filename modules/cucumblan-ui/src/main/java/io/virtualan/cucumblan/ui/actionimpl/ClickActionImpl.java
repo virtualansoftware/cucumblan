@@ -20,6 +20,7 @@
 package io.virtualan.cucumblan.ui.actionimpl;
 
 import io.virtualan.cucumblan.ui.action.Action;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -46,7 +47,7 @@ public class ClickActionImpl implements Action {
      * @param value      the value
      */
     @Override
-    public void perform(String key, WebElement webelement, Object value) {
+    public void perform(WebDriver driver, String key, WebElement webelement, Object value) {
         webelement.click();
         return;
     }

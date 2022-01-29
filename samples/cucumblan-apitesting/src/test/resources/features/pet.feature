@@ -1,6 +1,8 @@
 Feature: Test Pet API
   Scenario: User calls service to READ a pet by its id
     Given pet with an path param petId of 1000
+    And add request with given header params
+      | contentType | application/json |
     When a user get application/json in pets_petId resource on pet
     Then Verify the status code is 500
     And Verify across response includes following in the response
@@ -15,6 +17,8 @@ Feature: Test Pet API
       |input            | INVALID_INPUT |
       |output           | ERROR         |
       |method           | POST          |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then Verify the status code is 400
     And Verify across response includes following in the response
@@ -28,6 +32,8 @@ Feature: Test Pet API
       | input           | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] } |
       | output          | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] }|
       | method          | POST         |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then Verify the status code is 201
     And Verify across response includes following in the response
@@ -43,6 +49,8 @@ Feature: Test Pet API
       | input           | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] } |
       | output          | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 100,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] }|
       | method          | POST        |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then Verify the status code is 400
     And Verify across response includes following in the response
@@ -57,6 +65,8 @@ Feature: Test Pet API
       |	status          |available        |
       |tags[0].id       | i~[petId_post]  |
       |tags[0].name     | Fish-POST       |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in pets resource on pet
     Then Verify the status code is 201
     And Verify across response includes following in the response
@@ -73,12 +83,16 @@ Feature: Test Pet API
       | method                  | GET           |
       | availableParams[0].key  | petId         |
       | availableParams[0].value| 110           |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then Verify the status code is 201
     And Verify response with mockStatus includes following in the response
       | mockStatus.code | Mock created successfully |
   Scenario: User calls service to READ a pet by its id
     Given pet with an path param petId of 110
+    And add request with given header params
+      | contentType | application/json |
     When a user get application/json in pets_petId resource on pet
     Then Verify the status code is 200
     And Verify across response includes following in the response
@@ -94,6 +108,8 @@ Feature: Test Pet API
       | method                  | DELETE           |
       | availableParams[0].key  | petId         |
       | availableParams[0].value| 120           |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then Verify the status code is 201
     And Verify response with mockStatus includes following in the response
@@ -117,6 +133,8 @@ Feature: Test Pet API
       | method                  | PUT           |
       | availableParams[0].key  | petId         |
       | availableParams[0].value| 130           |
+    And add request with given header params
+      | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then Verify the status code is 201
     And Verify response with mockStatus includes following in the response
@@ -132,6 +150,8 @@ Feature: Test Pet API
       |	status            |available      |
       |tags[0].id         | i~130         |
       |tags[0].name       | Fish-PUT      |
+    And add request with given header params
+      | contentType | application/json |
     When a user put application/json in pets_petId resource on pet
     Then Verify the status code is 200
     And Verify across response includes following in the response

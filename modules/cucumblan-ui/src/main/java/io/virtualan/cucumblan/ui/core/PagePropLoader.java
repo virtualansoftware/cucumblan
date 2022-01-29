@@ -58,13 +58,13 @@ public class PagePropLoader {
         prop.load(inputStream);
         for (Entry<Object, Object> p : prop.entrySet()) {
           String[] page = ((String) p.getValue()).split("<~~>");
-          pageMap.put(p.getKey().toString(), new PageElement(page[0], page[1], page[2], page[3]));
+          pageMap.put(p.getKey().toString(), new PageElement(page[0], page[1], page[2], page[3], page[4]));
         }
       } else {
-        LOGGER.warning("propFileName is not found >>> " + propFileName );
+        LOGGER.warning("page is not defined >>> " + propFileName );
       }
     } catch (Exception ioe) {
-      LOGGER.warning("propFileName is not loaded >>> " + propFileName );
+      LOGGER.warning("page is not defined/loaded >>> " + propFileName );
     } finally {
       if (inputStream != null) {
         inputStream.close();
