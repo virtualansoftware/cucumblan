@@ -1,4 +1,23 @@
 Feature: Create Quote
+
+  Scenario: Login validator
+    Given Load driver CHROME and url on css-lakeside
+    When enter user information the login page on css-lakeside
+      | Username | admin            |
+      | Password | 1password         |
+    And verify the page contains data in the page
+      | //*[text()='Invalid email address or password'] | Invalid email address or password |
+    When enter user information the login page on css-lakeside
+      | Username | sddsfds            |
+      | Password | 1passsdfsddsword         |
+    And verify the page contains data in the page
+      | //*[text()='Invalid email address or password'] | Invalid email address or password |
+    When enter user information the login page on css-lakeside
+      | Username | sddsfds            |
+      | Password | 1passsdfsddsword         |
+    And verify the page contains data in the page
+      | //*[text()='Invalid email address or password'] | Invalid email address or password |
+
   Scenario: Create Quote for existing user
     Given Load driver CHROME and url on css-lakeside
     When enter user information the login page on css-lakeside
