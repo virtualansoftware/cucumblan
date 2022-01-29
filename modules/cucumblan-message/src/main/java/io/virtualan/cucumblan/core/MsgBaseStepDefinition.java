@@ -26,6 +26,7 @@ import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.virtualan.csvson.Csvson;
 import io.virtualan.cucumblan.core.msg.MQClient;
+import io.virtualan.cucumblan.message.exception.SkipMessageException;
 import io.virtualan.cucumblan.message.exception.UnableToProcessException;
 import io.virtualan.cucumblan.props.util.EventRequest;
 import io.virtualan.cucumblan.core.msg.kafka.KafkaConsumerClient;
@@ -366,7 +367,7 @@ public class MsgBaseStepDefinition {
   @Given("Verify (.*) for receiveQ (.*) find (.*) message on (.*) with type (.*)$")
   public void verifyConsumedJMSJSONObjectWithOutId(String dummy, String receiveQ, String jsonpath, String resource, String type,
       List<String> csvson)
-      throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException {
+          throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException, SkipMessageException {
     if (!this.skipScenario) {
       String eventNameInput = StepDefinitionHelper.getActualValue(receiveQ);
 
