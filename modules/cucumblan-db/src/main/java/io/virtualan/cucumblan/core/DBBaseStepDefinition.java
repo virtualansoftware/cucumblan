@@ -198,7 +198,10 @@ public class DBBaseStepDefinition {
     }
   }
 
-
+  @Given("^Store-sql's (.*) as key and (.*) as value")
+  public void storeSqlResponseAskey(String key, String responseKey, String dummy) throws JSONException {
+    storeSqlResponseAskey(responseKey, key);
+  }
   @Given("^Store-sql's (.*) value of the key as (.*)")
   public void storeSqlResponseAskey(String responseKey, String key) throws JSONException {
     if (!this.skipScenario) {
@@ -229,37 +232,41 @@ public class DBBaseStepDefinition {
    * @throws Exception the exception
    */
   @Given("Verify (.*) with the given sql (.*) on (.*)$")
+  @Given("Validate (.*) given (.*) on (.*)$")
   public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     if (!this.skipScenario) {
-
+      int index = 0;
       JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
-      if (selectSql.size() >= 1) {
+      if (selectSql.size() >= 1 && selectSql.get(0).toLowerCase().startsWith("select") ) {
         try {
           sqlJson = getJson(resource,
                   StepDefinitionHelper.getActualValue(selectSql.get(0)));
+          index = 1;
         } catch (Exception e) {
-          Assert.assertTrue(" Invalid sqls?? " + e.getMessage(), false);
+          Assert.assertTrue(" Invalid query?? " + e.getMessage(), false);
         }
+      } else if(sqlJson != null) {
+        index = 0;
       } else {
-        Assert.assertTrue(" select sqls missing ", false);
+        Assert.assertTrue(" select query missing ", false);
       }
-      scenario.attach(sqlJson, "application/json", "ActualSqlResponse");
+      scenario.attach(new JSONArray(sqlJson).toString(4), "application/json", "ActualQueryResponse");
       if (selectSql.size() == 1) {
         Assert.assertNull(sqlJson);
       } else {
-        List<String> csvons = selectSql.subList(1, selectSql.size());
+        List<String> csvons = selectSql.subList(index, selectSql.size());
         JSONArray expectedArray = Csvson
                 .buildCSVson(csvons,
                         ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
         JSONArray actualArray = new JSONArray(sqlJson);
         JSONCompareResult result = JSONCompare
                 .compareJSON(actualArray, expectedArray, JSONCompareMode.LENIENT);
-        scenario.attach(expectedArray.toString(), "application/json", "ExpectedCvsonResponse");
+        scenario.attach(expectedArray.toString(4), "application/json", "ExpectedResponse:");
         if (result.failed()) {
           scenario.log(result.getMessage());
         }
-        Assertions.assertTrue(result.passed(), " select sql and cvson record matches");
+        Assertions.assertTrue(result.passed(), " select sql and csvson record matches");
       }
     }
   }
@@ -274,6 +281,7 @@ public class DBBaseStepDefinition {
    * @throws Exception the exception
    */
   @Given("Select (.*) with the given sql (.*) on (.*)$")
+  @Given("Read (.*) given (.*) on (.*)$")
   public void select(String dummy1, String dummy, String resource, List<String> selectSql)
       throws Exception {
     if (!this.skipScenario) {
@@ -283,10 +291,10 @@ public class DBBaseStepDefinition {
         try {
           scenario.attach(
                   new JSONObject("{\"sql\" : \"" + StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))) + "\", \"resource\" : \"" + resource + "\" }")
-                          .toString(2), "application/json", "SelectSql");
+                          .toString(4), "application/json", "SelectSql:");
           sqlJson = getJson(resource,
                   StepDefinitionHelper.getActualValue(selectSql.stream().collect(Collectors.joining("\n"))));
-          scenario.attach(sqlJson, "application/json", "SelectSqlResponse");
+          scenario.attach(sqlJson, "application/json", "SqlResponse:");
         } catch (Exception e) {
           Assert.assertTrue(" Invalid sql? " + e.getMessage(), false);
         }
