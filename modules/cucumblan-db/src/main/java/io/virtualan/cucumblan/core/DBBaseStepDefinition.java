@@ -33,7 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.JSONCompareResult;
@@ -266,7 +265,7 @@ public class DBBaseStepDefinition {
                 if (result.failed()) {
                     scenario.log(result.getMessage());
                 }
-                Assertions.assertTrue(result.passed(), " select sql and csvson record matches");
+                Assert.assertTrue( " select sql and csvson record matches", result.passed());
             }
         }
     }

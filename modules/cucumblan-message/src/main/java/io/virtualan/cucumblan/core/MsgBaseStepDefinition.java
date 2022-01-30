@@ -44,11 +44,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-
 import javax.jms.JMSException;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +133,7 @@ public class MsgBaseStepDefinition {
                         .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
                                 partition, builtMessage.getHeaders());
             } else {
-                Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
+                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -196,7 +196,7 @@ public class MsgBaseStepDefinition {
                                     null, builtMessage.getHeaders());
                 }
             } else {
-                Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
+                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -234,7 +234,7 @@ public class MsgBaseStepDefinition {
                                     null, builtMessage.getHeaders());
                 }
             } else {
-                Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
+                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -259,9 +259,9 @@ public class MsgBaseStepDefinition {
                 boolean message = false;
                 message = MQClient.postMessage(scenario, resource, eventNameInput,
                         StepDefinitionHelper.getActualValue(messages.stream().map(x -> x).collect(Collectors.joining())), queueType);
-                Assertions.assertTrue(message, "message posting status");
+                assertTrue( "message posting status", message);
             } else {
-                Assertions.assertTrue(false, queueName + " is not configured.");
+                assertTrue( queueName + " is not configured.", false);
             }
         }
     }
@@ -300,7 +300,7 @@ public class MsgBaseStepDefinition {
                                     null, builtMessage.getHeaders());
                 }
             } else {
-                Assertions.assertTrue(false, eventName + " is not configured for any topic. or " + type + " is not configured");
+                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -345,8 +345,8 @@ public class MsgBaseStepDefinition {
                     JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
                 }
             } else {
-                Assertions.assertTrue(false,
-                        " Unable to read message name (" + eventNameInput + ") with identifier : " + id);
+                assertTrue(
+                        " Unable to read message name (" + eventNameInput + ") with identifier : " + id, false);
             }
         }
     }
@@ -388,8 +388,8 @@ public class MsgBaseStepDefinition {
                     JSONAssert.assertEquals(csvobject, (JSONArray) expectedJsonObj, JSONCompareMode.LENIENT);
                 }
             } else {
-                Assertions.assertTrue(false,
-                        " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath);
+                assertTrue(
+                        " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath, false);
             }
         }
     }
@@ -443,8 +443,8 @@ public class MsgBaseStepDefinition {
                     JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
                 }
             } else {
-                Assertions.assertTrue(false,
-                        " Unable to read event name (" + eventName + ") with identifier : " + id);
+                assertTrue(
+                        " Unable to read event name (" + eventName + ") with identifier : " + id, false);
             }
         }
     }
@@ -486,13 +486,13 @@ public class MsgBaseStepDefinition {
                 MessageType finalExpectedJson = expectedJson;
                 keyValue.forEach((k, v) -> {
                     Object value = MsgHelper.getJSON(finalExpectedJson.getMessageAsJson().toString(), k);
-                    Assertions.assertEquals(
+                    assertEquals(k + " is not failed.",
                             StepDefinitionHelper.getObjectValue(StepDefinitionHelper.getActualValue((String) v)),
-                            value, k + " is not failed.");
+                            value);
                 });
             } else {
-                Assertions.assertTrue(false,
-                        " Unable to read event name (" + eventName + ") with identifier : " + id);
+                assertTrue(
+                        " Unable to read event name (" + eventName + ") with identifier : " + id, false);
             }
         }
     }
@@ -507,10 +507,10 @@ public class MsgBaseStepDefinition {
                             .setContext(String.valueOf(Thread.currentThread().getId()), key,
                                     mapson.get(responseKey));
                 } else {
-                    Assertions.assertTrue(false, responseKey + " not found in the read message ");
+                    assertTrue( responseKey + " not found in the read message ", false);
                 }
             } else {
-                Assertions.assertTrue(false, " Message not found for the read message?  ");
+                assertTrue( " Message not found for the read message?  ", false);
             }
         }
     }
