@@ -105,6 +105,7 @@ public class MsgBaseStepDefinition {
     }
 
 
+
     /**
      * Produce message with partition.
      *
@@ -495,6 +496,11 @@ public class MsgBaseStepDefinition {
                         " Unable to read event name (" + eventName + ") with identifier : " + id, false);
             }
         }
+    }
+
+    @Given("^Store (.*) as key and message's (.*) as value")
+    public void storeMessageResponseAskeySwap(String key, String responseKey) throws JSONException {
+        storeMessageResponseAskey(responseKey, key);
     }
 
     @Given("^Store-message's (.*) value of the key as (.*)")
