@@ -33,7 +33,8 @@ import io.virtualan.cucumblan.props.util.UIHelper;
 import io.virtualan.cucumblan.ui.action.Action;
 import io.virtualan.cucumblan.ui.core.PageElement;
 import io.virtualan.cucumblan.ui.core.PagePropLoader;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -231,24 +232,24 @@ public class UIBaseStepDefinition {
                         actionProcessor(v.getName(), elementValue, v);
                     } catch (InterruptedException e) {
                         LOGGER.warning("Unable to process this page: " + pageName);
-                        Assertions.assertTrue(false,
+                        assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                        + elementValue + ":" + v + "): " + e.getMessage());
+                                        + elementValue + ":" + v + "): " + e.getMessage(), false);
                     } catch (Exception e) {
                         LOGGER.warning("Unable to process this page: " + pageName);
-                        Assertions.assertTrue(false,
+                        assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                        + elementValue + ":" + v + "): " + e.getMessage());
+                                        + elementValue + ":" + v + "): " + e.getMessage(),false);
                     }
                 } else {
-                    Assertions.assertTrue(false,
+                    assertTrue(
                             pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                    + elementValue + ":" + v + "): incorrect field name");
+                                    + elementValue + ":" + v + "): incorrect field name", false);
                 }
 
             });
         } else {
-            Assertions.assertTrue(false, pageName + " Page is not found for resource " + resource);
+            assertTrue( pageName + " Page is not found for resource " + resource, false);
         }
     }
 
@@ -260,7 +261,7 @@ public class UIBaseStepDefinition {
      */
     @Then("verify (.*) has (.*) data in the page$")
     public void verify(String name, String value) {
-        Assertions.assertEquals(value, StepDefinitionHelper.getActualValue(name));
+        assertEquals(value, StepDefinitionHelper.getActualValue(name));
     }
 
     /**
@@ -272,7 +273,7 @@ public class UIBaseStepDefinition {
     public void verify(String name, Map<String, String> xpathWithValue) {
         for (Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
             WebElement webelement = webDriver.findElement(By.xpath(xpathMaps.getKey()));
-            Assertions.assertEquals(StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText(), xpathMaps.getKey() + " is not Matched.");
+            assertEquals(xpathMaps.getKey() + " is not Matched.", StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText());
         }
     }
 
