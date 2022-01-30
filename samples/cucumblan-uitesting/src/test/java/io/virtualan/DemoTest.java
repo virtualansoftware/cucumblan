@@ -9,9 +9,9 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "classpath:features",
-    glue = {"io.virtualan.cucumblan.core"},
-    plugin = {"pretty",
-        "json:target/cucumber-report.json"})
+        glue = {"io.virtualan.cucumblan.core"},
+        plugin = {"pretty",
+                "json:target/cucumber-report.json"})
 
 public class DemoTest {
 

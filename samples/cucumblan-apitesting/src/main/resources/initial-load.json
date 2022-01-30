@@ -21,7 +21,10 @@
     "requestType": "REST",
     "method": "GET",
     "rule": "parameters['petId'] == 0",
-    "output": { "code": "PET_1000",  "message": "Pet identifier is not valid"},
+    "output": {
+      "code": "PET_1000",
+      "message": "Pet identifier is not valid"
+    },
     "availableParams": [
       {
         "key": "petId",
@@ -194,5 +197,4 @@
     "httpStatusCode": "201",
     "method": "POST"
   }
-
 ]

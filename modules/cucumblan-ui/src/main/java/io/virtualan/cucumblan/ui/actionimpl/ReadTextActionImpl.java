@@ -26,9 +26,9 @@ import org.openqa.selenium.WebElement;
 
 /**
  * The type Read text action.
- * @author Elan Thangamani
  *
- * */
+ * @author Elan Thangamani
+ */
 public class ReadTextActionImpl implements Action {
 
     /**

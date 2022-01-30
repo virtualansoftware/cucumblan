@@ -140,7 +140,7 @@ paths:
         '404':
           description: Pet not found
       security:
-        - api_key: []
+        - api_key: [ ]
     put:
       tags:
         - pet
@@ -215,7 +215,7 @@ paths:
       operationId: getInventory
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: successful operation
@@ -225,7 +225,7 @@ paths:
               type: integer
               format: int32
       security:
-        - api_key: []
+        - api_key: [ ]
   /store/order:
     post:
       tags:
@@ -401,7 +401,7 @@ paths:
       operationId: logoutUser
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         default:
           description: successful operation

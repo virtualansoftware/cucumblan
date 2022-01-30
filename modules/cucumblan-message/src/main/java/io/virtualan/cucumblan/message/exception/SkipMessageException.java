@@ -21,22 +21,22 @@ package io.virtualan.cucumblan.message.exception;
 /**
  * The type Message not defined exception.
  */
-public class SkipMessageException extends  Exception{
+public class SkipMessageException extends Exception {
 
-  /**
-   * Instantiates a new Message not defined exception.
-   */
-  public SkipMessageException(){
-    super();
-  }
+    /**
+     * Instantiates a new Message not defined exception.
+     */
+    public SkipMessageException() {
+        super();
+    }
 
-  /**
-   * Instantiates a new Message not defined exception.
-   *
-   * @param msg the msg
-   */
-  public SkipMessageException(String msg){
-    super(msg);
-  }
+    /**
+     * Instantiates a new Message not defined exception.
+     *
+     * @param msg the msg
+     */
+    public SkipMessageException(String msg) {
+        super(msg);
+    }
 
 }

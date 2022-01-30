@@ -19,11 +19,6 @@
 
 package io.virtualan.cucumblan.core;
 
-import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -43,31 +38,33 @@ import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
-import io.virtualan.cucumblan.props.util.*;
+import io.virtualan.cucumblan.props.util.ApiHelper;
+import io.virtualan.cucumblan.props.util.HelperApiUtil;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
+import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+;
 
 
 /**
@@ -159,7 +156,7 @@ public class BaseStepDefinition {
     public void auth(String username, String password) {
         if (!this.skipScenario) {
             byte[] authBasic = Base64.getEncoder().encode(String
-                .format("%s:%s", StepDefinitionHelper.getActualValue(username),
+                    .format("%s:%s", StepDefinitionHelper.getActualValue(username),
                             StepDefinitionHelper.getActualValue(password)).getBytes());
             request.header("Authorization", String.format("Basic %s", new String(authBasic)));
         }
@@ -226,7 +223,7 @@ public class BaseStepDefinition {
                 if ("contentType".equalsIgnoreCase(params.getKey()) &&
                         StepDefinitionHelper.getActualValue(params.getValue()).contains("multipart/form-data")) {
                     String boundary = Long.toHexString(System.currentTimeMillis());
-                    request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()) +"; boundary="+boundary);
+                    request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()) + "; boundary=" + boundary);
                 } else if ("contentType".equalsIgnoreCase(params.getKey())) {
                     request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()));
                 }
@@ -292,20 +289,20 @@ public class BaseStepDefinition {
     @Given("^Provided all the feature level parameters from file$")
     public void loadGlobalParamFromFile() throws IOException {
         Map<String, String> env = System.getenv();
-        if(env != null && !env.isEmpty()) {
+        if (env != null && !env.isEmpty()) {
             for (String envName : env.keySet()) {
                 if (envName.startsWith("cucumblan.")) {
                     ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()),
-                            envName.replace("cucumblan.", ""),
-                            env.get(envName));
+                            .setContext(String.valueOf(Thread.currentThread().getId()),
+                                    envName.replace("cucumblan.", ""),
+                                    env.get(envName));
                 }
             }
         }
         Properties properties = new Properties();
         InputStream stream = ApplicationConfiguration.class.getClassLoader()
                 .getResourceAsStream("cucumblan-env.properties");
-        if(stream == null){
+        if (stream == null) {
             stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cucumblan-env.properties");
         }
         if (stream != null) {
@@ -384,7 +381,7 @@ public class BaseStepDefinition {
     public void modifyIntVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(Integer.class,
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Integer.class,
                             responseValue, ScenarioContext
                                     .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
         }
@@ -401,9 +398,9 @@ public class BaseStepDefinition {
     public void modifyfunctionVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
-                .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(String.class,
-                    responseValue, ScenarioContext
-                        .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(String.class,
+                            responseValue, ScenarioContext
+                                    .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
         }
     }
 
@@ -501,28 +498,28 @@ public class BaseStepDefinition {
     @Given("^Store the (.*) value of the key as (.*)")
     public void storeResponseAskey(String responseKey, String key) {
         if (!this.skipScenario) {
-            if(".".equalsIgnoreCase(responseKey)){
+            if (".".equalsIgnoreCase(responseKey)) {
                 ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                        validatableResponse.extract().body().asString());
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                validatableResponse.extract().body().asString());
             } else {
                 String value = validatableResponse.extract().body().jsonPath()
-                    .getString(responseKey);
+                        .getString(responseKey);
                 if (value != null) {
                     ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                            validatableResponse.extract().body().jsonPath().getString(responseKey));
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                    validatableResponse.extract().body().jsonPath().getString(responseKey));
                 } else if (response.getCookie(responseKey) != null) {
                     ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                            response.getCookie(responseKey));
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                    response.getCookie(responseKey));
                 } else if (response.getHeader(responseKey) != null) {
                     ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                            response.getHeader(responseKey));
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                    response.getHeader(responseKey));
                 } else {
                     LOGGER.warning(responseKey + " :  for " + key + " not found");
                     scenario.log(responseKey + " :  for " + key + " not found");
@@ -587,17 +584,17 @@ public class BaseStepDefinition {
                                     ContentType.fromContentType(contentType))));
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 String fileAndType = StepDefinitionHelper.getActualValue(params.getValue());
-                if(BaseStepDefinition.class.getClassLoader()
+                if (BaseStepDefinition.class.getClassLoader()
                         .getResource(fileAndType) != null &&
                         new File(BaseStepDefinition.class.getClassLoader()
-                        .getResource(fileAndType).getFile()).exists()) {
-                        request = request
-                                .multiPart(params.getKey(),
-                                        new File(BaseStepDefinition.class.getClassLoader()
-                                                .getResource(fileAndType).getFile()));
+                                .getResource(fileAndType).getFile()).exists()) {
+                    request = request
+                            .multiPart(params.getKey(),
+                                    new File(BaseStepDefinition.class.getClassLoader()
+                                            .getResource(fileAndType).getFile()));
                 } else {
                     request = request
-                            .multiPart(params.getKey(),fileAndType);
+                            .multiPart(params.getKey(), fileAndType);
                 }
             }
         }
@@ -766,7 +763,7 @@ public class BaseStepDefinition {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
 
-            if(StepDefinitionHelper.getJSON(jsonBody) instanceof  JSONArray){
+            if (StepDefinitionHelper.getJSON(jsonBody) instanceof JSONArray) {
                 scenario.attach(new JSONArray(jsonBody).toString(4)
                         , "application/json", "RequestData:");
             } else {
@@ -806,9 +803,9 @@ public class BaseStepDefinition {
     public void deleteRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
-                .getContext(String.valueOf(Thread.currentThread().getId())));
+                    .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                , "application/json", "RequestData:");
+                    , "application/json", "RequestData:");
             request = request.contentType("application/json").body(jsonBody);
         }
     }
@@ -1018,8 +1015,8 @@ public class BaseStepDefinition {
     public void verifyStatusCode(int statusCode) {
         if (!this.skipScenario) {
             ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()),"STATUS_CODE", String.valueOf(response.getStatusCode()));
-            if(response.getStatusCode() != statusCode){
+                    .setContext(String.valueOf(Thread.currentThread().getId()), "STATUS_CODE", String.valueOf(response.getStatusCode()));
+            if (response.getStatusCode() != statusCode) {
                 scenario.log(response.asPrettyString());
             }
             validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
@@ -1292,9 +1289,9 @@ public class BaseStepDefinition {
      */
     @And("^Verify (.*) response csvson includes in the response$")
     public void verify(String path, List<String> csvson)
-        throws Exception {
+            throws Exception {
         HelperApiUtil
-            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
+                .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
     }
 
     /**
@@ -1306,9 +1303,9 @@ public class BaseStepDefinition {
      */
     @And("^Verify (.*) response csvson includes exact-order-match in the response$")
     public void verifyExactOrderMatch(String path, List<String> csvson)
-        throws Exception {
+            throws Exception {
         HelperApiUtil
-            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
+                .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
     }
 
     /**
@@ -1319,9 +1316,9 @@ public class BaseStepDefinition {
      * @throws Exception the exception
      */
     @And("^Verify (.*) response csvson includes exact-match in the response$")
-    public void verifyExactMatch(String path, List<String> csvson) throws  Exception{
+    public void verifyExactMatch(String path, List<String> csvson) throws Exception {
         HelperApiUtil
-            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
+                .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
     }
 
 

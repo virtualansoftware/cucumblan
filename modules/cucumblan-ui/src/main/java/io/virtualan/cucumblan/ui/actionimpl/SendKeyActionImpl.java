@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 
 /**
  * The type Send key action.
+ *
  * @author Elan Thangamani
  */
 public class SendKeyActionImpl implements Action {
@@ -49,7 +50,7 @@ public class SendKeyActionImpl implements Action {
     @Override
     public void perform(WebDriver driver, String key, WebElement webelement, Object value) {
         webelement.clear();
-        webelement.sendKeys((String)value);
+        webelement.sendKeys((String) value);
         return;
     }
 }
