@@ -271,7 +271,7 @@ public class BaseStepDefinition {
      * @param globalParams the global params
      * @throws IOException the io exception
      */
-    @Given("^Provided all the feature level parameters$")
+    @Given("^provided all the feature level parameters$")
     public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
         if (!this.skipScenario) {
             ScenarioContext
@@ -287,7 +287,7 @@ public class BaseStepDefinition {
      *
      * @throws IOException the io exception
      */
-    @Given("^Provided all the feature level parameters from file$")
+    @Given("^provided all the feature level parameters from file$")
     public void loadGlobalParamFromFile() throws IOException {
         Map<String, String> env = System.getenv();
         if (env != null && !env.isEmpty()) {
@@ -322,7 +322,7 @@ public class BaseStepDefinition {
     /**
      * Validate global param.
      */
-    @Then("^Verify all the feature level parameters exists$")
+    @Then("^verify all the feature level parameters exists$")
     public void validateGlobalParam() {
         if (!this.skipScenario) {
             assertTrue("Valid Global Parameters are present ", ScenarioContext
@@ -341,7 +341,7 @@ public class BaseStepDefinition {
      * @param responseValue the response value
      * @param key           the key
      */
-    @Given("^Add the (.*) value of the key as (.*)$")
+    @Given("^add the (.*) value of the key as (.*)$")
     public void addVariable(String responseValue, String key) {
         if (!this.skipScenario) {
             if (responseValue.startsWith("[") && responseValue.endsWith("]")) {
@@ -498,7 +498,7 @@ public class BaseStepDefinition {
         }
     }
 
-    @Given("^Modify key as (.*) and (.*) as value$")
+    @Given("^modify key as (.*) and (.*) as value$")
     public void modifyStringVariableSwap(String responseValue, String key) throws IOException {
         modifyStringVariable(responseValue, key);
     }
@@ -510,7 +510,7 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^Modify the (.*) value of the key as (.*)$")
+    @Given("^modify the (.*) value of the key as (.*)$")
     public void modifyStringVariable(String responseValue, String key) throws IOException {
         if (!this.skipScenario) {
             ScenarioContext
@@ -520,7 +520,7 @@ public class BaseStepDefinition {
         }
     }
 
-    @Given("^Store (.*) as key and api's (.*) as value$")
+    @Given("^store (.*) as key and api's (.*) as value$")
     public void storeResponseAskeySwap( String key, String responseKey) {
         storeResponseAskey(responseKey, key);
     }
@@ -530,7 +530,7 @@ public class BaseStepDefinition {
      * @param responseKey the response key
      * @param key         the key
      */
-    @Given("^Store the (.*) value of the key as (.*)$")
+    @Given("^store the (.*) value of the key as (.*)$")
     public void storeResponseAskey(String responseKey, String key) {
         if (!this.skipScenario) {
             if (".".equalsIgnoreCase(responseKey)) {
@@ -677,7 +677,7 @@ public class BaseStepDefinition {
      * @param contentType  the content type
      * @param parameterMap the parameter map
      */
-    @Given("^Populate (.*) with contentType(.*) given input$")
+    @Given("^populate (.*) with contentType(.*) given input$")
     public void loadRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
             request = request.contentType(contentType);
@@ -694,7 +694,7 @@ public class BaseStepDefinition {
      * @param nameIgnore   the name ignore
      * @param parameterMap the parameter map
      */
-    @Given("^Populate (.*) with given input$")
+    @Given("^populate (.*) with given input$")
     public void loadRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
             //request = request.contentType("application/json");
@@ -772,7 +772,7 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Create (.*) with contentType (.*) given input$")
+    @Given("^create (.*) with contentType (.*) given input$")
     public void createRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
             throws Exception {
         if (!this.skipScenario) {
@@ -792,7 +792,7 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Create (.*) with given input$")
+    @Given("^create (.*) with given input$")
     public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
@@ -816,7 +816,7 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Update (.*) with given input$")
+    @Given("^update (.*) with given input$")
     public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
@@ -834,7 +834,7 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Delete (.*) with given input$")
+    @Given("^delete (.*) with given input$")
     public void deleteRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
@@ -853,7 +853,7 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Update (.*) with contentType (.*) given input$")
+    @Given("^update (.*) with contentType (.*) given input$")
     public void updateRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
             throws Exception {
         if (!this.skipScenario) {
@@ -1045,7 +1045,7 @@ public class BaseStepDefinition {
      *
      * @param statusCode the status code
      */
-    @Then("^Verify the status code is (\\d+)")
+    @Then("^verify the status code is (\\d+)")
     @Then("^the status code is (\\d+)")
     public void verifyStatusCode(int statusCode) {
         if (!this.skipScenario) {
@@ -1089,7 +1089,7 @@ public class BaseStepDefinition {
      * @param readData the data
      * @throws Throwable the throwable
      */
-    @And("^Verify-standard (.*) all inline (.*) api includes following in the response$")
+    @And("^verify-standard (.*) all inline (.*) api includes following in the response$")
     public void verifyFormatedMapson(String type, String resource, List<String> readData)
             throws Throwable {
         if (!this.skipScenario) {
@@ -1133,7 +1133,7 @@ public class BaseStepDefinition {
      * @param resource the resource
      * @throws Throwable the throwable
      */
-    @Given("^Verify-standard (.*) all (.*) file (.*) api includes following in the response$")
+    @Given("^verify-standard (.*) all (.*) file (.*) api includes following in the response$")
     public void verifyFormatedMapson(String type, String file, String resource)
             throws Throwable {
         if (!this.skipScenario) {
@@ -1173,7 +1173,7 @@ public class BaseStepDefinition {
      * @param data     the data
      * @throws Throwable the throwable
      */
-    @And("^Verify-all (.*) api includes following in the response$")
+    @And("^verify-all (.*) api includes following in the response$")
     public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
@@ -1238,7 +1238,7 @@ public class BaseStepDefinition {
      * @param xmlString the xml string
      * @throws Throwable the throwable
      */
-    @And("^Verify (.*) response inline includes in the response$")
+    @And("^verify (.*) response inline includes in the response$")
     public void verifyFileResponse(String resource, List<String> xmlString) throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
@@ -1255,7 +1255,7 @@ public class BaseStepDefinition {
      * @param fileBody the file body
      * @throws Throwable the throwable
      */
-    @And("^Verify (.*) response XML File (.*) includes in the response$")
+    @And("^verify (.*) response XML File (.*) includes in the response$")
     public void verifyXMLResponse(String resource, String fileBody)
             throws Throwable {
         if (!this.skipScenario) {
@@ -1279,7 +1279,7 @@ public class BaseStepDefinition {
      * @param xpaths      the xpaths
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response (.*) include byPath (.*) includes in the response$")
+    @And("^verify (.*) response (.*) include byPath (.*) includes in the response$")
     public void verifyXMLByPathResponse(String resource, String contentType,
                                         String fileBody, List<String> xpaths) throws Exception {
         if (!this.skipScenario) {
@@ -1304,7 +1304,7 @@ public class BaseStepDefinition {
      * @param resource the resource
      * @param context  the context
      */
-    @And("^Verify (.*) response with (.*) includes in the response$")
+    @And("^verify (.*) response with (.*) includes in the response$")
     public void verifySingleResponse(String resource, String context) {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
@@ -1322,7 +1322,7 @@ public class BaseStepDefinition {
      * @param csvson the csvson
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response csvson includes in the response$")
+    @And("^verify (.*) response csvson includes in the response$")
     public void verify(String path, List<String> csvson)
             throws Exception {
         HelperApiUtil
@@ -1336,7 +1336,7 @@ public class BaseStepDefinition {
      * @param csvson the csvson
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response csvson includes exact-order-match in the response$")
+    @And("^verify (.*) response csvson includes exact-order-match in the response$")
     public void verifyExactOrderMatch(String path, List<String> csvson)
             throws Exception {
         HelperApiUtil
@@ -1350,7 +1350,7 @@ public class BaseStepDefinition {
      * @param csvson the csvson
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response csvson includes exact-match in the response$")
+    @And("^verify (.*) response csvson includes exact-match in the response$")
     public void verifyExactMatch(String path, List<String> csvson) throws Exception {
         HelperApiUtil
                 .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
@@ -1364,7 +1364,7 @@ public class BaseStepDefinition {
      * @param data        the data
      * @throws Throwable the throwable
      */
-    @And("^Verify (.*) includes following in the response$")
+    @And("^verify (.*) includes following in the response$")
     public void verifyResponse(String dummyString, DataTable data) throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);

@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * The type Message base step definition.
+7 * The type Message base step definition.
  *
  * @author Elan Thangamani
  */
@@ -86,7 +86,7 @@ public class MsgBaseStepDefinition {
      * @param dummy the dummy
      * @throws Exception the exception
      */
-    @Given("As a user perform message (.*) action$")
+    @Given("as a user perform message (.*) action$")
     public void dummyGiven(String dummy) throws Exception {
     }
 
@@ -116,7 +116,7 @@ public class MsgBaseStepDefinition {
      * @param messages  the messages
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
+    @Given("send message (.*) for event (.*) in partition (.*) on (.*) with type (.*)$")
     public void produceMessageWithPartition(String dummy, String eventName, Integer partition, String resource,
                                             String type, Object messages) throws MessageNotDefinedException {
         if (!this.skipScenario) {
@@ -145,7 +145,7 @@ public class MsgBaseStepDefinition {
      * @param sleep the sleep
      * @throws InterruptedException the interrupted exception
      */
-    @Given("Pause message (.*) for process for (.*) milliseconds$")
+    @Given("pause message (.*) for process for (.*) milliseconds$")
     public void produceMessage(String dummy, long sleep) throws InterruptedException {
         Thread.sleep(sleep);
     }
@@ -156,7 +156,7 @@ public class MsgBaseStepDefinition {
      * @param eventName the eventName
      * @throws InterruptedException the interrupted exception
      */
-    @Given("Clear the consumed message (.*) for the event (.*)$")
+    @Given("clear the consumed message (.*) for the event (.*)$")
     public void clearMessage(String dummy, String eventName) throws InterruptedException {
         if (!this.skipScenario) {
             String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
@@ -173,7 +173,7 @@ public class MsgBaseStepDefinition {
      * @param messages  the messages
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Send message (.*) for event (.*) on (.*) with type (.*)$")
+    @Given("send message (.*) for event (.*) on (.*) with type (.*)$")
     public void produceMessage(String dummy, String eventName, String resource, String type,
                                DataTable messages) throws MessageNotDefinedException {
         if (!this.skipScenario) {
@@ -211,7 +211,7 @@ public class MsgBaseStepDefinition {
      * @param messages  the messages
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Send inline message (.*) for event (.*) on (.*) with type (.*)$")
+    @Given("send inline message (.*) for event (.*) on (.*) with type (.*)$")
     public void produceMessage(String dummy, String eventName, String resource, String type,
                                List<String> messages) throws MessageNotDefinedException {
         if (!this.skipScenario) {
@@ -251,7 +251,7 @@ public class MsgBaseStepDefinition {
      * @param messages  the messages
      * @throws UnableToProcessException the message not defined exception
      */
-    @Given("Send inline message (.*) for messageQ (.*) on (.*) with type (.*)$")
+    @Given("send inline message (.*) for messageQ (.*) on (.*) with type (.*)$")
     public void produceJMSMessage(String dummy, String queueName, String resource, String queueType, List<String> messages)
             throws UnableToProcessException {
         if (!this.skipScenario) {
@@ -277,7 +277,7 @@ public class MsgBaseStepDefinition {
      * @param messages  the messages
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Send mapson message (.*) for event (.*) on (.*) with type (.*)$")
+    @Given("send mapson message (.*) for event (.*) on (.*) with type (.*)$")
     public void produceMessageMapson(String dummy, String eventName, String resource, String type,
                                      Map<String, String> messages) throws MessageNotDefinedException {
         if (!this.skipScenario) {
@@ -319,7 +319,7 @@ public class MsgBaseStepDefinition {
      * @throws BadInputDataException      bad input data exception
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Verify (.*) for receiveQ (.*) contains (.*) on (.*) with type (.*)$")
+    @Given("verify (.*) for receiveQ (.*) contains (.*) on (.*) with type (.*)$")
     public void verifyConsumedJMSJSONObject(String dummy, String receiveQ, String id, String resource, String type,
                                             List<String> csvson)
             throws Exception {
@@ -363,7 +363,7 @@ public class MsgBaseStepDefinition {
      * @throws BadInputDataException      bad input data exception
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Verify (.*) for receiveQ (.*) find (.*) message on (.*) with type (.*)$")
+    @Given("verify (.*) for receiveQ (.*) find (.*) message on (.*) with type (.*)$")
     public void verifyConsumedJMSJSONObjectWithOutId(String dummy, String receiveQ, String jsonpath, String resource, String type,
                                                      List<String> csvson)
             throws InterruptedException, BadInputDataException, MessageNotDefinedException, IOException, JMSException, SkipMessageException {
@@ -408,7 +408,7 @@ public class MsgBaseStepDefinition {
      * @throws BadInputDataException      bad input data exception
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Verify (.*) for event (.*) contains (.*) on (.*) with type (.*)$")
+    @Given("verify (.*) for event (.*) contains (.*) on (.*) with type (.*)$")
     public void verifyConsumedJSONObject(String dummy, String eventName, String id, String resource, String type,
                                          List<String> csvson)
             throws InterruptedException, BadInputDataException, MessageNotDefinedException {
@@ -461,7 +461,7 @@ public class MsgBaseStepDefinition {
      * @throws InterruptedException       interrupted exception
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("Verify-by-elements (.*) for event (.*) contains (.*) on (.*) with type (.*)$")
+    @Given("verify-by-elements (.*) for event (.*) contains (.*) on (.*) with type (.*)$")
     public void consumeMessage(String dummy, String eventName, String id, String resource, String type,
                                Map<String, String> keyValue)
             throws InterruptedException, MessageNotDefinedException {
@@ -498,12 +498,12 @@ public class MsgBaseStepDefinition {
         }
     }
 
-    @Given("^Store (.*) as key and message's (.*) as value")
+    @Given("^store (.*) as key and message's (.*) as value")
     public void storeMessageResponseAskeySwap(String key, String responseKey) throws JSONException {
         storeMessageResponseAskey(responseKey, key);
     }
 
-    @Given("^Store-message's (.*) value of the key as (.*)")
+    @Given("^store-message's (.*) value of the key as (.*)")
     public void storeMessageResponseAskey(String responseKey, String key) throws JSONException {
         if (!this.skipScenario) {
             if (msgJson != null) {
