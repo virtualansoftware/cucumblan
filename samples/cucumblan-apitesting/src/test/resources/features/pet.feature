@@ -5,13 +5,13 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user get application/json in pets_petId resource on pet
-    Then Verify the status code is 500
-    And Verify across response includes following in the response
+    Then verify the status code is 500
+    And verify across response includes following in the response
       | code    | MISSING_MOCK_DATA                                   |
       | message | Mock response was not added for the given parameter |
 
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
-    Given Create Pet Mock data for the with given input
+    Given create Pet Mock data for the with given input
       | url            | /pets         |
       | type           | Response      |
       | resource       | pets          |
@@ -22,12 +22,12 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
-    Then Verify the status code is 400
-    And Verify across response includes following in the response
+    Then verify the status code is 400
+    And verify across response includes following in the response
       | code | Check input Json for the "Mock Request Body", Correct the input/Json!!! |
 
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
-    Given Create Pet Mock data for the with given input
+    Given create Pet Mock data for the with given input
       | url            | /pets                                                                                                                                                                                                                                      |
       | type           | Response                                                                                                                                                                                                                                   |
       | resource       | pets                                                                                                                                                                                                                                       |
@@ -38,14 +38,14 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
-    Then Verify the status code is 201
-    And Verify across response includes following in the response
+    Then verify the status code is 201
+    And verify across response includes following in the response
       | mockStatus.code | Mock created successfully |
-    And Add the 100 value of the key as petId_post
-    And Store the id value of the key as petId_post_mock
+    And add the 100 value of the key as petId_post
+    And store the id value of the key as petId_post_mock
 
   Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
-    Given Create Pet Mock data for the with given input
+    Given create Pet Mock data for the with given input
       | url            | /pets                                                                                                                                                                                                                                      |
       | type           | Response                                                                                                                                                                                                                                   |
       | resource       | pets                                                                                                                                                                                                                                       |
@@ -56,12 +56,12 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
-    Then Verify the status code is 400
-    And Verify across response includes following in the response
+    Then verify the status code is 400
+    And verify across response includes following in the response
       | code | This Mock request already Present, Change the input Data!!! |
 
   Scenario: User calls service to CREATE and Create Pet
-    Given Create a pet with given input
+    Given create a pet with given input
       | category.id   | i~[petId_post] |
       | category.name | Fish-POST      |
       | id            | i~[petId_post] |
@@ -73,13 +73,13 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in pets resource on pet
-    Then Verify the status code is 201
-    And Verify across response includes following in the response
+    Then verify the status code is 201
+    And verify across response includes following in the response
       | id   | [petId_post]  |
       | name | GoldFish-POST |
 
   Scenario: Setup a mock service for  Pet with READ API
-    Given Create Pet Mock data for the with given input
+    Given create Pet Mock data for the with given input
       | url                      | /pets/{petId}                                                                                                                                                                                                                           |
       | type                     | Response                                                                                                                                                                                                                                |
       | resource                 | pets                                                                                                                                                                                                                                    |
@@ -91,8 +91,8 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
-    Then Verify the status code is 201
-    And Verify response with mockStatus includes following in the response
+    Then verify the status code is 201
+    And verify response with mockStatus includes following in the response
       | mockStatus.code | Mock created successfully |
 
   Scenario: User calls service to READ a pet by its id
@@ -100,13 +100,13 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user get application/json in pets_petId resource on pet
-    Then Verify the status code is 200
-    And Verify across response includes following in the response
+    Then verify the status code is 200
+    And verify across response includes following in the response
       | id   | 110          |
       | name | GoldFish-GET |
 
   Scenario: Setup a mock service for Pet with DELETE API
-    Given Create Pet Mock data for the with given input
+    Given create Pet Mock data for the with given input
       | url                      | /pets/{petId}                                                                                                                                                                                                                                    |
       | type                     | Response                                                                                                                                                                                                                                         |
       | resource                 | pets                                                                                                                                                                                                                                             |
@@ -118,20 +118,20 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
-    Then Verify the status code is 201
-    And Verify response with mockStatus includes following in the response
+    Then verify the status code is 201
+    And verify response with mockStatus includes following in the response
       | mockStatus.code | Mock created successfully |
 
   Scenario: User calls service to DELETE a pet by its id
     Given pet with an path param petId of 120
     When a user delete application/json in pets_petId resource on pet
-    Then Verify the status code is 200
-    And Verify across response includes following in the response
+    Then verify the status code is 200
+    And verify across response includes following in the response
       | id   | 120             |
       | name | GoldFish-DELETE |
 
   Scenario: Setup a mock service for  Pet with PUT API
-    Given Create PUT Pet Mock data for the with given input
+    Given create PUT Pet Mock data for the with given input
       | url                      | /pets/{petId}                                                                                                                                                                                                                           |
       | type                     | Response                                                                                                                                                                                                                                |
       | resource                 | pets                                                                                                                                                                                                                                    |
@@ -144,13 +144,13 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
-    Then Verify the status code is 201
-    And Verify response with mockStatus includes following in the response
+    Then verify the status code is 201
+    And verify response with mockStatus includes following in the response
       | mockStatus.code | Mock created successfully |
 
   Scenario: User calls service to PUT and Create Pet
     Given pet with an path param petId of 130
-    And Update with mock data with given input
+    And update with mock data with given input
       | category.id   | i~130        |
       | category.name | Fish-PUT     |
       | id            | i~130        |
@@ -162,8 +162,8 @@ Feature: Test Pet API
     And add request with given header params
       | contentType | application/json |
     When a user put application/json in pets_petId resource on pet
-    Then Verify the status code is 200
-    And Verify across response includes following in the response
+    Then verify the status code is 200
+    And verify across response includes following in the response
       | id   | 130          |
       | name | GoldFish-PUT |
 
@@ -182,5 +182,5 @@ Feature: Test Pet API
       | reportTitle | DemoTestReport                     |
     When a user post multipart/form-data in /test resource on idai
     Then the status code is 201
-    And Verify across response includes following in the response
+    And verify across response includes following in the response
       | testExecuted | true |
