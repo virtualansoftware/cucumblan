@@ -141,8 +141,8 @@ public class DBBaseStepDefinition {
      * @param dummy the dummy
      * @throws Exception the exception
      */
-    @Given("As a user perform query (.*) action$")
-    @Given("As a user perform sql (.*) action$")
+    @Given("as a user perform query (.*) action$")
+    @Given("as a user perform sql (.*) action$")
     public void dummyGiven(String dummy) throws Exception {
     }
 
@@ -154,14 +154,14 @@ public class DBBaseStepDefinition {
      * @param sqls     the sqls
      * @throws Exception the exception
      */
-    @Given("Execute DDL for the given query (.*) on (.*)$")
-    @Given("Execute UPDATE for the given query (.*) on (.*)$")
-    @Given("Execute DELETE for the given query (.*) on (.*)$")
-    @Given("Execute INSERT for the given query (.*) on (.*)$")
-    @Given("Execute DDL for the given sql (.*) on (.*)$")
-    @Given("Execute UPDATE for the given sql (.*) on (.*)$")
-    @Given("Execute DELETE for the given sql (.*) on (.*)$")
-    @Given("Execute INSERT for the given sql (.*) on (.*)$")
+    @Given("execute DDL for the given query (.*) on (.*)$")
+    @Given("execute UPDATE for the given query (.*) on (.*)$")
+    @Given("execute DELETE for the given query (.*) on (.*)$")
+    @Given("execute INSERT for the given query (.*) on (.*)$")
+    @Given("execute DDL for the given sql (.*) on (.*)$")
+    @Given("execute UPDATE for the given (.*) on (.*)$")
+    @Given("execute DELETE for the given (.*) on (.*)$")
+    @Given("execute INSERT for the given (.*) on (.*)$")
     public void insertSql(String dummy, String resource, List<String> sqls) throws Exception {
         if (!this.skipScenario) {
             JdbcTemplate jdbcTemplate = getJdbcTemplate(resource);
@@ -202,12 +202,12 @@ public class DBBaseStepDefinition {
         }
     }
 
-    @Given("^Store (.*) as key and query's (.*) as value")
+    @Given("^store (.*) as key and query's (.*) as value")
     public void storeSqlResponseAskeySwap(String key, String responseKey) throws JSONException {
         storeSqlResponseAskey(responseKey, key);
     }
 
-    @Given("^Store-sql's (.*) value of the key as (.*)")
+    @Given("^store-sql's (.*) value of the key as (.*)")
     public void storeSqlResponseAskey(String responseKey, String key) throws JSONException {
         if (!this.skipScenario) {
             if (sqlJson != null) {
@@ -235,8 +235,8 @@ public class DBBaseStepDefinition {
      * @param selectSql the select sql
      * @throws Exception the exception
      */
-    @Given("Verify (.*) with the given sql (.*) on (.*)$")
-    @Given("Validate (.*) given (.*) on (.*)$")
+    @Given("verify (.*) with the given sql (.*) on (.*)$")
+    @Given("validate (.*) given (.*) on (.*)$")
     public void verify(String dummy1, String dummy, String resource, List<String> selectSql)
             throws Exception {
         if (!this.skipScenario) {
@@ -284,7 +284,7 @@ public class DBBaseStepDefinition {
      * @param selectSql the select sql
      * @throws Exception the exception
      */
-    @Given("Select (.*) with the given sql (.*) on (.*)$")
+    @Given("select (.*) with the given sql (.*) on (.*)$")
     @Given("read (.*) given (.*) on (.*)$")
     public void select(String dummy1, String dummy, String resource, List<String> selectSql)
             throws Exception {
