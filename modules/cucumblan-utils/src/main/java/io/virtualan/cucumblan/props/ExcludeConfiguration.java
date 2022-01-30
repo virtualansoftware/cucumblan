@@ -41,7 +41,7 @@ public class ExcludeConfiguration {
             if (stream != null) {
                 excludeProperties.load(stream);
             } else {
-                LOGGER.warning("exclude-response.properties is not configured yet? Do you need?");
+                LOGGER.fine("exclude-response.properties is not configured yet? Do you need?");
             }
         } catch (Exception e) {
             LOGGER.warning("exclude-response.properties is not loaded");

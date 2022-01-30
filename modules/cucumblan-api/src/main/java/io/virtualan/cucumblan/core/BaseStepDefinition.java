@@ -177,13 +177,14 @@ public class BaseStepDefinition {
         }
     }
 
+
     /**
      * Read request by path param.
      *
      * @param dummy the dummy
      */
-    @Given("^(.*) perform a api action")
-    public void readRequestByPathParam(String dummy) {
+    @Given("^(.*) perform (.*) api action")
+    public void readRequestByPathParam(String dummy, String dummy1) {
         if (!this.skipScenario) {
             request = given();
         }
@@ -321,12 +322,17 @@ public class BaseStepDefinition {
     /**
      * Validate global param.
      */
-    @Then("^Verify all the feature level parameters exists")
+    @Then("^Verify all the feature level parameters exists$")
     public void validateGlobalParam() {
         if (!this.skipScenario) {
             assertTrue("Valid Global Parameters are present ", ScenarioContext
                     .hasContextValues(String.valueOf(Thread.currentThread().getId())));
         }
+    }
+
+    @Given("^create variable (.*) as key and (.*) as value$")
+    public void addVariableSwap(String key, String responseValue) {
+        addVariable(responseValue, key);
     }
 
     /**
@@ -335,8 +341,7 @@ public class BaseStepDefinition {
      * @param responseValue the response value
      * @param key           the key
      */
-    @Given("^Add (.*) as key and (.*) as value")
-    @Given("^Add the (.*) value of the key as (.*)")
+    @Given("^Add the (.*) value of the key as (.*)$")
     public void addVariable(String responseValue, String key) {
         if (!this.skipScenario) {
             if (responseValue.startsWith("[") && responseValue.endsWith("]")) {
@@ -352,6 +357,11 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as decimal value$")
+    public void modifyDecimalVariableSwap(String key, String responseValue) throws Exception {
+        modifyDecimalVariable(responseValue, key);
+    }
+
     /**
      * Modify variable.
      *
@@ -359,7 +369,7 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) decimal value of the key as (.*)")
+    @Given("^evaluate the (.*) decimal value of the key as (.*)$")
     public void modifyDecimalVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
@@ -369,6 +379,11 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as integer value$")
+    public void modifyIntVariableSwap(String key, String responseValue) throws Exception {
+        modifyIntVariable(responseValue, key);
+    }
+
 
     /**
      * Modify variable.
@@ -377,7 +392,7 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) integer value of the key as (.*)")
+    @Given("^evaluate the (.*) integer value of the key as (.*)$")
     public void modifyIntVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
@@ -387,6 +402,12 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as function value$")
+    public void modifyfunctionVariableSwap(String key, String responseValue) throws Exception {
+        modifyfunctionVariable(responseValue, key);
+    }
+
+
     /**
      * Modify variable.
      *
@@ -394,7 +415,7 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) function value of the key as (.*)")
+    @Given("^evaluate the (.*) function value of the key as (.*)$")
     public void modifyfunctionVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
@@ -411,7 +432,7 @@ public class BaseStepDefinition {
      * @param condition the response value excel based
      * @throws IOException the io exception
      */
-    @Given("^perform the (.*) condition to skip scenario")
+    @Given("^perform the (.*) condition to skip scenario$")
     public void modifyBooleanVariable(String condition) throws Exception {
         skipScenario = (Boolean) ExcelAndMathHelper
                 .evaluateWithVariables(Boolean.class, condition, ScenarioContext
@@ -454,6 +475,12 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as boolean value$")
+    public void modifyBooleanVariableSwap(String key, String responseValue) throws Exception {
+        modifyBooleanVariable(responseValue, key);
+    }
+
+
     /**
      * Modify variable.
      *
@@ -461,7 +488,7 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) boolean value of the key as (.*)")
+    @Given("^evaluate the (.*) boolean value of the key as (.*)$")
     public void modifyBooleanVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
@@ -471,6 +498,10 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^Modify key as (.*) and (.*) as value$")
+    public void modifyStringVariableSwap(String responseValue, String key) throws IOException {
+        modifyStringVariable(responseValue, key);
+    }
 
     /**
      * Modify variable.
@@ -479,7 +510,7 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^Modify the (.*) value of the key as (.*)")
+    @Given("^Modify the (.*) value of the key as (.*)$")
     public void modifyStringVariable(String responseValue, String key) throws IOException {
         if (!this.skipScenario) {
             ScenarioContext
@@ -489,13 +520,17 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^Store (.*) as key and api's (.*) as value$")
+    public void storeResponseAskeySwap( String key, String responseKey) {
+        storeResponseAskey(responseKey, key);
+    }
     /**
      * Load as global param.
      *
      * @param responseKey the response key
      * @param key         the key
      */
-    @Given("^Store the (.*) value of the key as (.*)")
+    @Given("^Store the (.*) value of the key as (.*)$")
     public void storeResponseAskey(String responseKey, String key) {
         if (!this.skipScenario) {
             if (".".equalsIgnoreCase(responseKey)) {

@@ -141,6 +141,7 @@ public class DBBaseStepDefinition {
      * @param dummy the dummy
      * @throws Exception the exception
      */
+    @Given("As a user perform query (.*) action$")
     @Given("As a user perform sql (.*) action$")
     public void dummyGiven(String dummy) throws Exception {
     }
@@ -153,6 +154,10 @@ public class DBBaseStepDefinition {
      * @param sqls     the sqls
      * @throws Exception the exception
      */
+    @Given("Execute DDL for the given query (.*) on (.*)$")
+    @Given("Execute UPDATE for the given query (.*) on (.*)$")
+    @Given("Execute DELETE for the given query (.*) on (.*)$")
+    @Given("Execute INSERT for the given query (.*) on (.*)$")
     @Given("Execute DDL for the given sql (.*) on (.*)$")
     @Given("Execute UPDATE for the given sql (.*) on (.*)$")
     @Given("Execute DELETE for the given sql (.*) on (.*)$")
@@ -197,8 +202,8 @@ public class DBBaseStepDefinition {
         }
     }
 
-    @Given("^Store-sql's (.*) as key and (.*) as value")
-    public void storeSqlResponseAskey(String key, String responseKey, String dummy) throws JSONException {
+    @Given("^Store (.*) as key and query's (.*) as value")
+    public void storeSqlResponseAskeySwap(String key, String responseKey) throws JSONException {
         storeSqlResponseAskey(responseKey, key);
     }
 
@@ -280,7 +285,7 @@ public class DBBaseStepDefinition {
      * @throws Exception the exception
      */
     @Given("Select (.*) with the given sql (.*) on (.*)$")
-    @Given("Read (.*) given (.*) on (.*)$")
+    @Given("read (.*) given (.*) on (.*)$")
     public void select(String dummy1, String dummy, String resource, List<String> selectSql)
             throws Exception {
         if (!this.skipScenario) {
