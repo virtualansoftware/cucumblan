@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 
 /**
  * The type Click action.
+ *
  * @author Elan Thangamani
  */
 public class ClickActionImpl implements Action {

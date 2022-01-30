@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 
 /**
  * The interface Action.
+ *
  * @author Elan Thangmani
  */
 public interface Action {

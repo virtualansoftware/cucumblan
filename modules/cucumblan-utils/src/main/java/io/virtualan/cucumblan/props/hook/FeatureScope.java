@@ -13,23 +13,22 @@ import java.util.HashMap;
 @Slf4j
 public class FeatureScope implements ConcurrentEventListener {
 
+    private EventHandler<TestRunStarted> setup = event -> {
+        beforeAll();
+    };
+    private EventHandler<TestRunFinished> teardown = event -> {
+        afterAll();
+    };
+
     @Override
     public void setEventPublisher(EventPublisher eventPublisher) {
         eventPublisher.registerHandlerFor(TestRunStarted.class, setup);
         eventPublisher.registerHandlerFor(TestRunFinished.class, teardown);
     }
 
-    private EventHandler<TestRunStarted> setup = event -> {
-        beforeAll();
-    };
-
     private void beforeAll() {
         ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId()), new HashMap<>());
     }
-
-    private EventHandler<TestRunFinished> teardown = event -> {
-        afterAll();
-    };
 
     private void afterAll() {
         ScenarioContext.remove(String.valueOf(Thread.currentThread().getId()));

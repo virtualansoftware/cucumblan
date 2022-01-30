@@ -1,9 +1,10 @@
 package io.virtualan.cucumblan.props.util;
 
+import org.json.JSONException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.json.JSONException;
 
 /**
  * The type Scenario context.
@@ -31,7 +32,7 @@ public class ScenarioContext {
      * @param parentScenarioContext the parent scenario context
      */
     public static void setParentScenarioContext(
-        Map<String, Map<String, String>> parentScenarioContext) {
+            Map<String, Map<String, String>> parentScenarioContext) {
         ScenarioContext.parentScenarioContext = parentScenarioContext;
     }
 
@@ -63,9 +64,9 @@ public class ScenarioContext {
      * @param globalParams the global params
      */
     public static void setContext(String id, Map<String, String> globalParams) {
-        if(getScenarioContext(id) != null) {
+        if (getScenarioContext(id) != null) {
             getScenarioContext(id).putAll(globalParams);
-        }else {
+        } else {
             parentScenarioContext.put(id, globalParams);
         }
     }
@@ -90,9 +91,9 @@ public class ScenarioContext {
      */
     public static Map<String, String> getPrintableContextObject(String id) throws JSONException {
         Map<String, String> resultValues = getScenarioContext(id).entrySet().stream()
-            .collect(
-                Collectors.toMap( entry -> entry.getKey(),
-                    entry -> entry.getKey().contains("password") ? "xxxxxxxxxxxx" : entry.getValue()));
+                .collect(
+                        Collectors.toMap(entry -> entry.getKey(),
+                                entry -> entry.getKey().contains("password") ? "xxxxxxxxxxxx" : entry.getValue()));
 
         return resultValues;
     }

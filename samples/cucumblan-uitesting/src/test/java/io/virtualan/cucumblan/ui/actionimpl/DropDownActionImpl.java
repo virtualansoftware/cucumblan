@@ -20,13 +20,16 @@
 package io.virtualan.cucumblan.ui.actionimpl;
 
 import io.virtualan.cucumblan.ui.action.Action;
+
 import javax.xml.xpath.XPath;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
  * The type Click action.
+ *
  * @author Elan Thangamani
  */
 public class DropDownActionImpl implements Action {
@@ -51,7 +54,7 @@ public class DropDownActionImpl implements Action {
     @Override
     public void perform(WebDriver driver, String key, WebElement webelement, Object value) {
         webelement.click();
-        driver.findElement(By.xpath("//div[@role='option'  and span/text()='"+value.toString()+"']")).click();
+        driver.findElement(By.xpath("//div[@role='option'  and span/text()='" + value.toString() + "']")).click();
         return;
     }
 }
