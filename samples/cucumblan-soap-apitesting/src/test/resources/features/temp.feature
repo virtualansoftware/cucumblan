@@ -9,12 +9,12 @@ Feature: virtualan.json - API Contract validation status
       | Content-Type | text/xml |
     And add input.xml data file with text/xml given input
     When a user post application/json in /xml/tempconvert.asmx resource on xml
-    Then Verify the status code is 200
-    And Verify api response XML File response.xml includes in the response
+    Then verify the status code is 200
+    And verify api response XML File response.xml includes in the response
 
   Scenario: EDI-271 API test - POST api call
     Given a user perform a api action
-    And Add the grey value of the key as tag
+    And add the grey value of the key as tag
     And add request with given header params
       | contentType      | application/xml |
       | VirtualanStdType | EDI-271         |
@@ -45,7 +45,7 @@ Feature: virtualan.json - API Contract validation status
       | </soap:Body>                                                           |
       | </soap:Envelope>                                                       |
     When a user post text/xml in /bin/3f64e65d-c657-42d5-bcc9-5b13e71ca493 resource on bin
-    Then Verify the status code is 200
+    Then verify the status code is 200
 #    And Verify-standard EDI-271 all inline /bin/3f64e65d-c657-42d5-bcc9-5b13e71ca493 api includes following in the response
 #      | <soap:envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> |
 #      | <soap:body> |
@@ -62,5 +62,5 @@ Feature: virtualan.json - API Contract validation status
       | Content-Type | text/xml |
     And add input.xml data file with text/xml given input
     When a user post text/xml in /bin/3f64e65d-c657-42d5-bcc9-5b13e71ca493 resource on bin
-    Then Verify the status code is 200
+    Then verify the status code is 200
     #And Verify-standard EDI-271 all 271_response_actual_sample.xml file xml api includes following in the response
