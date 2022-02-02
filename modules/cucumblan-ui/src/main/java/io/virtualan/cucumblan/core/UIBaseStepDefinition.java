@@ -20,7 +20,6 @@
 
 package io.virtualan.cucumblan.core;
 
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
@@ -33,8 +32,6 @@ import io.virtualan.cucumblan.props.util.UIHelper;
 import io.virtualan.cucumblan.ui.action.Action;
 import io.virtualan.cucumblan.ui.core.PageElement;
 import io.virtualan.cucumblan.ui.core.PagePropLoader;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -55,6 +52,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * The type Ui base step definition.
  *
@@ -69,8 +69,9 @@ public class UIBaseStepDefinition {
         loadActionProcessors();
     }
 
+    Map<String, WebDriver> webDrivers = new HashMap();
     private AppiumServer appiumServer;
-    private WebDriver webDriver = null;
+    //private WebDriver webDriver = null;
     private Scenario scenario;
 
     /**
@@ -105,11 +106,12 @@ public class UIBaseStepDefinition {
     /**
      * Load driver and url.
      *
-     * @param driverName the driver name
-     * @param resource   the url
+     * @param dummy1   the driver name
+     * @param dummy2   the driver name
+     * @param resource the url
      */
-    @Given("user wants to create (.*) on (.*)$")
-    public void givenStatement(String driverName, String resource) {
+    @Given("(.*) want to validate (.*) on (.*)$")
+    public void givenStatement(String dummy1, String dummy2, String resource) {
 
     }
 
@@ -151,10 +153,11 @@ public class UIBaseStepDefinition {
             }
         } catch (Exception e) {
         }
-        webDriver = appiumServer.startServer(resource, driverName);
+        webDrivers.put(resource, appiumServer.startServer(resource, driverName));
     }
 
     private void firefoxDriverBuilder(String resource) throws MalformedURLException {
+        WebDriver webDriver = null;
         DesiredCapabilities capabilities = DesiredCapabilities.firefox();
         UIHelper.additionalConfigResource(resource, capabilities);
         FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
@@ -167,10 +170,12 @@ public class UIBaseStepDefinition {
         }
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(MobileHelper.getWaitTime(resource), TimeUnit.SECONDS);
+        webDrivers.put(resource, webDriver);
         loadUrl(resource);
     }
 
     private void chromeDriverBuilder(String resource) throws MalformedURLException {
+        WebDriver webDriver = null;
         ChromeOptions options = new ChromeOptions();
         UIHelper.additionalConfigArguments(resource, options);
         if (UIHelper.getServerUrl(resource) == null) {
@@ -185,6 +190,7 @@ public class UIBaseStepDefinition {
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(UIHelper.getWaitTime(resource), TimeUnit.SECONDS);
         webDriver.manage().timeouts().pageLoadTimeout(UIHelper.getPageLoadWaitTime(resource), TimeUnit.SECONDS);
+        webDrivers.put(resource, webDriver);
         loadUrl(resource);
     }
 
@@ -196,16 +202,17 @@ public class UIBaseStepDefinition {
         } else {
             scenario.log("Url for " + resource + " : " + url);
         }
-        webDriver.get(url);
+        webDrivers.get(resource).get(url);
     }
 
-    @After
-    public void embedScreenshotOnFail(Scenario s) {
-        if (s.isFailed()) {
+
+    @Given("Capture (.*) screen on (.*)$")
+    public void embedScreenshotOnFail(String dummy, String resource) {
+        if (scenario.isFailed()) {
             try {
-                final byte[] screenshot = ((TakesScreenshot) webDriver)
+                final byte[] screenshot = ((TakesScreenshot) webDrivers.get(resource))
                         .getScreenshotAs(OutputType.BYTES);
-                s.attach(screenshot, "image/png", "Failed-Image :" + UUID.randomUUID().toString());
+                scenario.attach(screenshot, "image/png", "Failed-Image :" + UUID.randomUUID().toString());
             } catch (ClassCastException cce) {
                 LOGGER.warning(" Error Message : " + cce.getMessage());
             }
@@ -227,9 +234,11 @@ public class UIBaseStepDefinition {
 
             pageMap.forEach((k, v) -> {
                 String elementValue = data.get(v.getName());
-                if (elementValue != null && "DATA".equalsIgnoreCase(v.getType()) || "NAVIGATION".equalsIgnoreCase(v.getType())) {
+                if ("DATA".equalsIgnoreCase(v.getType()) && elementValue == null && v.getName() != null) {
+                    //Skip the parameter.. its optional
+                } else if (elementValue != null && "DATA".equalsIgnoreCase(v.getType()) || "NAVIGATION".equalsIgnoreCase(v.getType())) {
                     try {
-                        actionProcessor(v.getName(), elementValue, v);
+                        actionProcessor(v.getName(), elementValue, v, resource);
                     } catch (InterruptedException e) {
                         LOGGER.warning("Unable to process this page: " + pageName);
                         assertTrue(
@@ -239,7 +248,7 @@ public class UIBaseStepDefinition {
                         LOGGER.warning("Unable to process this page: " + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                        + elementValue + ":" + v + "): " + e.getMessage(),false);
+                                        + elementValue + ":" + v + "): " + e.getMessage(), false);
                     }
                 } else {
                     assertTrue(
@@ -249,7 +258,7 @@ public class UIBaseStepDefinition {
 
             });
         } else {
-            assertTrue( pageName + " Page is not found for resource " + resource, false);
+            assertTrue(pageName + " Page is not found for resource " + resource, false);
         }
     }
 
@@ -259,8 +268,8 @@ public class UIBaseStepDefinition {
      * @param name  the name
      * @param value the value
      */
-    @Then("verify (.*) has (.*) data in the page$")
-    public void verify(String name, String value) {
+    @Then("verify (.*) has (.*) data in the screen on (.*)$")
+    public void verify(String name, String value, String resource) {
         assertEquals(value, StepDefinitionHelper.getActualValue(name));
     }
 
@@ -269,10 +278,10 @@ public class UIBaseStepDefinition {
      *
      * @param name the name
      */
-    @Then("verify (.*) contains data in the page$")
-    public void verify(String name, Map<String, String> xpathWithValue) {
+    @Then("verify (.*) contains data in the screen on (.*)$")
+    public void verify(String name, String resource, Map<String, String> xpathWithValue) {
         for (Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
-            WebElement webelement = webDriver.findElement(By.xpath(xpathMaps.getKey()));
+            WebElement webelement = webDrivers.get(resource).findElement(By.xpath(xpathMaps.getKey()));
             assertEquals(xpathMaps.getKey() + " is not Matched.", StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText());
         }
     }
@@ -285,20 +294,33 @@ public class UIBaseStepDefinition {
      * @param element the element
      * @throws InterruptedException the interrupted exception
      */
-    public void actionProcessor(String key, String value, PageElement element)
+    public void actionProcessor(String key, String value, PageElement element, String resource)
             throws InterruptedException {
-        WebElement webelement = webDriver.findElement(element.findElement());
+        WebElement webelement = webDrivers.get(resource).findElement(element.findElement());
         Action action = actionProcessorMap.get(element.getAction());
-        action.perform(webDriver, key, webelement, value);
+        action.perform(webDrivers.get(resource), key, webelement, value);
     }
+
+    /**
+     * Produce message.
+     *
+     * @param sleep the sleep
+     * @throws InterruptedException the interrupted exception
+     */
+    @Given("pause ui (.*) for process for (.*) milliseconds$")
+    public void pauseUI(String dummy, long sleep) throws InterruptedException {
+        Thread.sleep(sleep);
+    }
+
 
     /**
      * Clean up.
      */
-    @After
-    public void cleanUp() {
-        if (webDriver != null && ApplicationConfiguration.isProdMode()) {
-            webDriver.close();
+
+    @Given("Close the driver on (.*)$")
+    public void cleanUp(String resource) {
+        if (webDrivers.get(resource) != null && ApplicationConfiguration.isProdMode()) {
+            webDrivers.get(resource).close();
         } else {
             LOGGER.warning(" Driver not loaded/Closed : ");
         }
