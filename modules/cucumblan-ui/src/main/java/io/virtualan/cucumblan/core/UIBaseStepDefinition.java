@@ -69,7 +69,7 @@ public class UIBaseStepDefinition {
         loadActionProcessors();
     }
 
-    Map<String, WebDriver> webDrivers = new HashMap();
+
     private AppiumServer appiumServer;
     //private WebDriver webDriver = null;
     private Scenario scenario;
@@ -153,7 +153,7 @@ public class UIBaseStepDefinition {
             }
         } catch (Exception e) {
         }
-        webDrivers.put(resource, appiumServer.startServer(resource, driverName));
+        UIDriverManager.addDriver(resource, appiumServer.startServer(resource, driverName));
     }
 
     private void firefoxDriverBuilder(String resource) throws MalformedURLException {
@@ -170,7 +170,7 @@ public class UIBaseStepDefinition {
         }
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(MobileHelper.getWaitTime(resource), TimeUnit.SECONDS);
-        webDrivers.put(resource, webDriver);
+        UIDriverManager.addDriver(resource, webDriver);
         loadUrl(resource);
     }
 
@@ -190,7 +190,7 @@ public class UIBaseStepDefinition {
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(UIHelper.getWaitTime(resource), TimeUnit.SECONDS);
         webDriver.manage().timeouts().pageLoadTimeout(UIHelper.getPageLoadWaitTime(resource), TimeUnit.SECONDS);
-        webDrivers.put(resource, webDriver);
+        UIDriverManager.addDriver(resource, webDriver);
         loadUrl(resource);
     }
 
@@ -202,7 +202,7 @@ public class UIBaseStepDefinition {
         } else {
             scenario.log("Url for " + resource + " : " + url);
         }
-        webDrivers.get(resource).get(url);
+        UIDriverManager.getDriver(resource).get(url);
     }
 
 
@@ -210,7 +210,7 @@ public class UIBaseStepDefinition {
     public void embedScreenshotOnFail(String dummy, String resource) {
         if (scenario.isFailed()) {
             try {
-                final byte[] screenshot = ((TakesScreenshot) webDrivers.get(resource))
+                final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
                         .getScreenshotAs(OutputType.BYTES);
                 scenario.attach(screenshot, "image/png", "Failed-Image :" + UUID.randomUUID().toString());
             } catch (ClassCastException cce) {
@@ -234,9 +234,7 @@ public class UIBaseStepDefinition {
 
             pageMap.forEach((k, v) -> {
                 String elementValue = data.get(v.getName());
-                if ("DATA".equalsIgnoreCase(v.getType()) && elementValue == null && v.getName() != null) {
-                    //Skip the parameter.. its optional
-                } else if (elementValue != null && "DATA".equalsIgnoreCase(v.getType()) || "NAVIGATION".equalsIgnoreCase(v.getType())) {
+                if ((elementValue != null && "DATA".equalsIgnoreCase(v.getType()))|| "NAVIGATION".equalsIgnoreCase(v.getType())) {
                     try {
                         actionProcessor(v.getName(), elementValue, v, resource);
                     } catch (InterruptedException e) {
@@ -250,10 +248,6 @@ public class UIBaseStepDefinition {
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
                                         + elementValue + ":" + v + "): " + e.getMessage(), false);
                     }
-                } else {
-                    assertTrue(
-                            pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                    + elementValue + ":" + v + "): incorrect field name", false);
                 }
 
             });
@@ -281,7 +275,7 @@ public class UIBaseStepDefinition {
     @Then("verify (.*) contains data in the screen on (.*)$")
     public void verify(String name, String resource, Map<String, String> xpathWithValue) {
         for (Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
-            WebElement webelement = webDrivers.get(resource).findElement(By.xpath(xpathMaps.getKey()));
+            WebElement webelement = UIDriverManager.getDriver(resource).findElement(By.xpath(xpathMaps.getKey()));
             assertEquals(xpathMaps.getKey() + " is not Matched.", StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText());
         }
     }
@@ -296,9 +290,9 @@ public class UIBaseStepDefinition {
      */
     public void actionProcessor(String key, String value, PageElement element, String resource)
             throws InterruptedException {
-        WebElement webelement = webDrivers.get(resource).findElement(element.findElement());
+        WebElement webelement = UIDriverManager.getDriver(resource).findElement(element.findElement());
         Action action = actionProcessorMap.get(element.getAction());
-        action.perform(webDrivers.get(resource), key, webelement, value);
+        action.perform(UIDriverManager.getDriver(resource), key, webelement, value);
     }
 
     /**
@@ -319,8 +313,8 @@ public class UIBaseStepDefinition {
 
     @Given("Close the driver on (.*)$")
     public void cleanUp(String resource) {
-        if (webDrivers.get(resource) != null && ApplicationConfiguration.isProdMode()) {
-            webDrivers.get(resource).close();
+        if (UIDriverManager.isDriverExists(resource) != null && ApplicationConfiguration.isProdMode()) {
+            UIDriverManager.getDriver(resource).close();
         } else {
             LOGGER.warning(" Driver not loaded/Closed : ");
         }
