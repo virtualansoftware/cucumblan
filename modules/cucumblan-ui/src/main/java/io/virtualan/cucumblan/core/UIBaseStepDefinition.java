@@ -252,23 +252,25 @@ public class UIBaseStepDefinition {
         if (scenario.isFailed() && resourceId != null) {
             embedScreenshot("Failed", resourceId);
         }
-        if (screenRecorder != null && ApplicationConfiguration.isRecorderMode() && scenario.isFailed()) {
+        if (screenRecorder != null && ApplicationConfiguration.isRecorderMode()) {
             try {
                 screenRecorder.stop();
-                java.io.File file = getAviFile(ApplicationConfiguration.getRecorderPath()
-                        + java.io.File.separator + recordedFile);
-                if (file != null && file.exists()) {
-                    byte[] bytes = new byte[(int) file.length()];
-                    java.io.DataInputStream dis = new java.io.DataInputStream(new java.io.FileInputStream(file));
-                    dis.readFully(bytes);
-                    scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
-                    file.deleteOnExit();
-                    new java.io.File(ApplicationConfiguration.getRecorderPath()
-                            + java.io.File.separator + recordedFile).deleteOnExit();
+                if(scenario.isFailed()) {
+                    java.io.File file = getAviFile(ApplicationConfiguration.getRecorderPath()
+                            + java.io.File.separator + recordedFile);
+                    if (file != null && file.exists()) {
+                        byte[] bytes = new byte[(int) file.length()];
+                        java.io.DataInputStream dis = new java.io.DataInputStream(new java.io.FileInputStream(file));
+                        dis.readFully(bytes);
+                        scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
+                        file.deleteOnExit();
+                        new java.io.File(ApplicationConfiguration.getRecorderPath()
+                                + java.io.File.separator + recordedFile).deleteOnExit();
 
+                    }
                 }
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                LOGGER.warning("Recorder issue " + e.getMessage());
             }
         }
     }
