@@ -166,7 +166,12 @@ public class PageElement {
 
     public By findElement(java.util.Map<String, String> contextValue) {
         String valueStr = io.virtualan.cucumblan.props.util.UIHelper.getUIActualValue(value, contextValue);
-        LOGGER.info("actual Element >> " + valueStr);
+        LOGGER.info("pageElementName='" + name + '\'' +
+                ", pageElementAction='" + action + '\'' +
+                ", pageElementValue='" + value + '\'' +
+                ", pageElementType'" + type + '\'' +
+                ", findElementType'" + findElementType + '\'' +
+                " of actual Element >> " + valueStr);
         switch (findElementType) {
             case "BY_ID":
                 return By.id(valueStr);

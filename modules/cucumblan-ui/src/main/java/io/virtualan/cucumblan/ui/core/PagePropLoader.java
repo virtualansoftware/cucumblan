@@ -47,8 +47,8 @@ public class PagePropLoader {
      * @return the map
      * @throws IOException the io exception
      */
-    public static Map<String, PageElement> readPageElement(String resource, String fileName) throws IOException {
-        Map<String, PageElement> pageMap = new TreeMap<>();
+    public static Map<Integer, PageElement> readPageElement(String resource, String fileName) throws IOException {
+        Map<Integer, PageElement> pageMap = new TreeMap<>();
         InputStream inputStream = null;
         prop = new Properties();
         String propFileName = "pages/" + resource + "/" + fileName + ".page";
@@ -56,10 +56,10 @@ public class PagePropLoader {
             inputStream = PagePropLoader.class.getClassLoader().getResourceAsStream(propFileName);
             if (inputStream != null) {
                 prop.load(inputStream);
-                for (Entry<Object, Object> p : prop.entrySet()) {
+                for (Entry p : prop.entrySet()) {
                     String[] page = ((String) p.getValue()).split("<~~>");
                     if (page.length == 5) {
-                        pageMap.put(p.getKey().toString(),
+                        pageMap.put(Integer.parseInt(p.getKey().toString()),
                                 new PageElement(page[0], page[1], page[2], page[3], page[4]));
                     } else {
                         LOGGER.warning(propFileName + " >> page element does not match.. revisit the page definition ");

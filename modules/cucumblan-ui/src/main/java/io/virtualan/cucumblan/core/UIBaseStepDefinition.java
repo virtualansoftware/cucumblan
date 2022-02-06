@@ -73,6 +73,7 @@ public class UIBaseStepDefinition {
     private AppiumServer appiumServer;
     private Scenario scenario;
     private String resourceId;
+
     /**
      * Load action processors.
      */
@@ -212,7 +213,7 @@ public class UIBaseStepDefinition {
 
     @org.junit.After
     public void embedScreenshotOnFail() {
-        if(scenario.isFailed() && resourceId != null ) {
+        if (scenario.isFailed() && resourceId != null) {
             embedScreenshot("Failed", resourceId);
         }
     }
@@ -239,8 +240,7 @@ public class UIBaseStepDefinition {
     @Given("(.*) the (.*) page on (.*)$")
     public void loadPage(String dummy, String pageName, String resource, Map<String, String> data) throws Exception {
         resourceId = resource;
-        Map<String, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
-
+        Map<Integer, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
         if (pageMap != null && !pageMap.isEmpty()) {
             java.util.List<String> dataElements =
                     pageMap.values().stream()
@@ -252,6 +252,10 @@ public class UIBaseStepDefinition {
                 io.virtualan.cucumblan.props.util.ScenarioContext.setContext(
                         String.valueOf(Thread.currentThread().getId()), x, data.get(x));
             });
+            scenario.attach(io.virtualan.cucumblan.props.util.ScenarioContext.getContext(
+                    String.valueOf(Thread.currentThread().getId())).toString(),
+                    "plain/text", "ContextObject: " + pageName);
+            scenario.attach(data.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8), "plain/text", "PageName: " + pageName);
             pageMap.forEach((k, v) -> {
                 String name = StepDefinitionHelper.getActualValue(v.getName());
                 String elementValue = data.get(name);
@@ -260,12 +264,12 @@ public class UIBaseStepDefinition {
                     try {
                         actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, data);
                     } catch (InterruptedException e) {
-                        LOGGER.warning("Unable to process this page:("+e.getMessage()+") " + pageName);
+                        LOGGER.warning("Unable to process this page:(" + e.getMessage() + ") " + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
                                         + elementValue + ":" + v + "): " + e.getMessage(), false);
                     } catch (Exception e) {
-                        LOGGER.warning("Unable to process this page:("+e.getMessage()+"):" + pageName);
+                        LOGGER.warning("Unable to process this page:(" + e.getMessage() + "):" + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
                                         + elementValue + ":" + v + "): " + e.getMessage(), false);
@@ -349,5 +353,21 @@ public class UIBaseStepDefinition {
             appiumServer.stopServer();
         }
     }
+
+    @Given("^add variable as (.*) and (.*) as value$")
+    public void addVariable(String key, String responseValue) throws Exception {
+        io.virtualan.cucumblan.props.util.ScenarioContext
+                .setContext(String.valueOf(Thread.currentThread().getId()), key, StepDefinitionHelper.getActualValue(responseValue));
+    }
+
+
+    @Given("^add variable as (.*) and (.*) as function value$")
+    public void modifyFunctionVariable(String key, String responseValue) throws Exception {
+        io.virtualan.cucumblan.props.util.ScenarioContext
+                .setContext(String.valueOf(Thread.currentThread().getId()), key, io.virtualan.cucumblan.script.ExcelAndMathHelper.evaluateWithVariableType(
+                        responseValue, io.virtualan.cucumblan.props.util.ScenarioContext
+                                .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
+    }
+
 
 }   
