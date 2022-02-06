@@ -77,6 +77,44 @@ public class UIHelper {
     }
 
 
+    /**
+     * Gets actual value.
+     *
+     * @param object the object
+     * @return the actual value
+     */
+    public static String getUIActualValue(String object, Map<String, String> currentContext) {
+        if (object == null) {
+            return null;
+        }
+
+        String returnValue =  object;
+        String key = "";
+        if (returnValue.contains("[") && returnValue.contains("]")) {
+            key = returnValue.substring(returnValue.indexOf("[") + 1, returnValue.indexOf("]"));
+            if (key.contains(",")) {
+                StringBuffer keys = new StringBuffer();
+                for (String token : key.split(",")) {
+                    if (!currentContext.containsKey(token)) {
+                        return object;
+                    }
+                    keys.append(currentContext.get(token)).append(",");
+                }
+                returnValue = keys.toString().substring(0, keys.toString().length() - 1);
+            } else {
+                if (!currentContext.containsKey(key)) {
+                    LOGGER.warn(object + " has Value missing... for the key : " + key);
+                    return object.toString();
+                } else {
+                    returnValue = currentContext.get(key);
+                }
+            }
+        }
+        String response = object.replace("[" + key + "]", returnValue);
+        return response.indexOf("[") != -1 ? getUIActualValue(response, currentContext) : response;
+    }
+
+
     public static String getFireboxDriverPath() {
         String value = ApplicationConfiguration.getProperty("firefox.driver.path");
         if (value != null) {

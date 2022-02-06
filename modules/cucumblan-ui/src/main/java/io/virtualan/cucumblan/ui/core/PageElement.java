@@ -20,7 +20,7 @@
 package io.virtualan.cucumblan.ui.core;
 
 import org.openqa.selenium.By;
-
+import  io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 /**
  * The type Page element.
  *
@@ -62,11 +62,11 @@ public class PageElement {
     public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
                        String findElementType, String type) {
         super();
-        this.name = pageElementName;
-        this.action = pageElementAction;
-        this.value = pageElementXPath;
-        this.findElementType = findElementType;
-        this.type = type;
+        this.name = pageElementName != null ? StepDefinitionHelper.getActualValue(pageElementName) : pageElementName;
+        this.action =  pageElementAction != null ? StepDefinitionHelper.getActualValue(pageElementAction) : pageElementAction;
+        this.value = pageElementXPath != null ? StepDefinitionHelper.getActualValue(pageElementXPath) : pageElementXPath;
+        this.findElementType = findElementType != null ? StepDefinitionHelper.getActualValue((findElementType)) : findElementType;
+        this.type = type != null ? StepDefinitionHelper.getActualValue(type) : type;
     }
 
     /**
@@ -158,31 +158,31 @@ public class PageElement {
                 ", pageElementValue='" + value + '\'' +
                 ", pageElementType'" + type + '\'' +
                 ", findElementType'" + findElementType + '\'' +
-                ", pageElement'" + findElement() + '\'' +
                 '}';
     }
 
 
-    public By findElement() {
+    public By findElement(java.util.Map<String, String> contextValue) {
+        String valueStr = io.virtualan.cucumblan.props.util.UIHelper.getUIActualValue(value, contextValue);
         switch (findElementType) {
             case "BY_ID":
-                return By.id(value);
+                return By.id(valueStr);
             case "BY_NAME":
-                return By.name(value);
+                return By.name(valueStr);
             case "BY_TAG_NAME":
-                return By.tagName(value);
+                return By.tagName(valueStr);
             case "BY_LINK_TEXT":
-                return By.linkText(value);
+                return By.linkText(valueStr);
             case "BY_PARTIAL_LINK_TEXT":
-                return By.partialLinkText(value);
+                return By.partialLinkText(valueStr);
             case "BY_X_PATH":
-                return By.xpath(value);
+                return By.xpath(valueStr);
             case "BY_CSS":
-                return By.cssSelector(value);
+                return By.cssSelector(valueStr);
             case "BY_CLASS_NAME":
-                return By.className(value);
+                return By.className(valueStr);
             default:
-                return By.id(value); // Build Intelligence - self heal later
+                return By.id(valueStr); // Build Intelligence - self heal later
         }
     }
 }
