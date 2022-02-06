@@ -71,9 +71,8 @@ public class UIBaseStepDefinition {
 
 
     private AppiumServer appiumServer;
-    //private WebDriver webDriver = null;
     private Scenario scenario;
-
+    private String resourceId;
     /**
      * Load action processors.
      */
@@ -112,7 +111,7 @@ public class UIBaseStepDefinition {
      */
     @Given("(.*) want to validate (.*) on (.*)$")
     public void givenStatement(String dummy1, String dummy2, String resource) {
-
+        resourceId = resource;
     }
 
     /**
@@ -123,6 +122,7 @@ public class UIBaseStepDefinition {
      */
     @Given("Load driver (.*) and url on (.*)$")
     public void loadDriverAndURL(String driverName, String resource) throws Exception {
+        resourceId = resource;
         switch (driverName) {
             case "CHROME":
                 chromeDriverBuilder(resource);
@@ -143,6 +143,7 @@ public class UIBaseStepDefinition {
     }
 
     private void mobilebuilder(String driverName, String resource) throws Exception {
+        resourceId = resource;
         try {
             appiumServer = new AppiumServer();
             if (!appiumServer.checkIfServerIsRunnning(MobileHelper.getMobilePort())) {
@@ -157,6 +158,7 @@ public class UIBaseStepDefinition {
     }
 
     private void firefoxDriverBuilder(String resource) throws MalformedURLException {
+        resourceId = resource;
         WebDriver webDriver = null;
         DesiredCapabilities capabilities = DesiredCapabilities.firefox();
         UIHelper.additionalConfigResource(resource, capabilities);
@@ -175,6 +177,7 @@ public class UIBaseStepDefinition {
     }
 
     private void chromeDriverBuilder(String resource) throws MalformedURLException {
+        resourceId = resource;
         WebDriver webDriver = null;
         ChromeOptions options = new ChromeOptions();
         UIHelper.additionalConfigArguments(resource, options);
@@ -195,6 +198,7 @@ public class UIBaseStepDefinition {
     }
 
     private void loadUrl(String resource) {
+        resourceId = resource;
         String url = UIHelper.getUrl(resource);
         if (url == null) {
             scenario.log("Url missing for " + resource);
@@ -206,16 +210,21 @@ public class UIBaseStepDefinition {
     }
 
 
-    @Given("Capture (.*) screen on (.*)$")
-    public void embedScreenshotOnFail(String dummy, String resource) {
-        if (scenario.isFailed()) {
-            try {
-                final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
-                        .getScreenshotAs(OutputType.BYTES);
-                scenario.attach(screenshot, "image/png", "Failed-Image :" + UUID.randomUUID().toString());
-            } catch (ClassCastException cce) {
-                LOGGER.warning(" Error Message : " + cce.getMessage());
-            }
+    @org.junit.After
+    public void embedScreenshotOnFail() {
+        if(scenario.isFailed() && resourceId != null ) {
+            embedScreenshot("Failed", resourceId);
+        }
+    }
+
+    @Given("capture (.*) screen on (.*)$")
+    public void embedScreenshot(String dummy, String resource) {
+        try {
+            final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
+                    .getScreenshotAs(OutputType.BYTES);
+            scenario.attach(screenshot, "image/png", "Image :" + UUID.randomUUID().toString());
+        } catch (ClassCastException cce) {
+            LOGGER.warning(" Error Message : " + cce.getMessage());
         }
     }
 
@@ -229,14 +238,27 @@ public class UIBaseStepDefinition {
      */
     @Given("(.*) the (.*) page on (.*)$")
     public void loadPage(String dummy, String pageName, String resource, Map<String, String> data) throws Exception {
+        resourceId = resource;
         Map<String, PageElement> pageMap = PagePropLoader.readPageElement(resource, pageName);
-        if (pageMap != null && !pageMap.isEmpty()) {
 
+        if (pageMap != null && !pageMap.isEmpty()) {
+            java.util.List<String> dataElements =
+                    pageMap.values().stream()
+                            .filter(x -> x.getType().equalsIgnoreCase("DATA"))
+                            .map(x -> x.getName()).collect(java.util.stream.Collectors.toList());
+
+            java.util.Set<String> findParams = data.keySet();
+            findParams.stream().filter(x -> !dataElements.contains(x)).forEach(x -> {
+                io.virtualan.cucumblan.props.util.ScenarioContext.setContext(
+                        String.valueOf(Thread.currentThread().getId()), x, data.get(x));
+            });
             pageMap.forEach((k, v) -> {
-                String elementValue = data.get(v.getName());
-                if ((elementValue != null && "DATA".equalsIgnoreCase(v.getType()))|| "NAVIGATION".equalsIgnoreCase(v.getType())) {
+                String name = StepDefinitionHelper.getActualValue(v.getName());
+                String elementValue = data.get(name);
+                if ((elementValue != null && "DATA".equalsIgnoreCase(v.getType()))
+                        || "NAVIGATION".equalsIgnoreCase(v.getType())) {
                     try {
-                        actionProcessor(v.getName(), elementValue, v, resource);
+                        actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, data);
                     } catch (InterruptedException e) {
                         LOGGER.warning("Unable to process this page: " + pageName);
                         assertTrue(
@@ -264,6 +286,7 @@ public class UIBaseStepDefinition {
      */
     @Then("verify (.*) has (.*) data in the screen on (.*)$")
     public void verify(String name, String value, String resource) {
+        resourceId = resource;
         assertEquals(value, StepDefinitionHelper.getActualValue(name));
     }
 
@@ -274,6 +297,7 @@ public class UIBaseStepDefinition {
      */
     @Then("verify (.*) contains data in the screen on (.*)$")
     public void verify(String name, String resource, Map<String, String> xpathWithValue) {
+        resourceId = resource;
         for (Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
             WebElement webelement = UIDriverManager.getDriver(resource).findElement(By.xpath(xpathMaps.getKey()));
             assertEquals(xpathMaps.getKey() + " is not Matched.", StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText());
@@ -288,9 +312,10 @@ public class UIBaseStepDefinition {
      * @param element the element
      * @throws InterruptedException the interrupted exception
      */
-    public void actionProcessor(String key, String value, PageElement element, String resource)
+    public void actionProcessor(String key, String value, PageElement element, String resource, Map<String, String> dataMap)
             throws InterruptedException {
-        WebElement webelement = UIDriverManager.getDriver(resource).findElement(element.findElement());
+        resourceId = resource;
+        WebElement webelement = UIDriverManager.getDriver(resource).findElement(element.findElement(dataMap));
         Action action = actionProcessorMap.get(element.getAction());
         action.perform(UIDriverManager.getDriver(resource), key, webelement, value);
     }
@@ -311,10 +336,12 @@ public class UIBaseStepDefinition {
      * Clean up.
      */
 
-    @Given("Close the driver on (.*)$")
+    @Given("close the driver for (.*)$")
     public void cleanUp(String resource) {
-        if (UIDriverManager.isDriverExists(resource) != null && ApplicationConfiguration.isProdMode()) {
+        resourceId = resource;
+        if (UIDriverManager.isDriverExists(resource) != null) {
             UIDriverManager.getDriver(resource).close();
+            UIDriverManager.removeDriver(resource);
         } else {
             LOGGER.warning(" Driver not loaded/Closed : ");
         }
