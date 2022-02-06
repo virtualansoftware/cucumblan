@@ -72,7 +72,8 @@ public class StepDefinitionHelper {
                 }
                 returnValue = keys.toString().substring(0, keys.toString().length() - 1);
             } else {
-                if (!ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(key)) {
+                if (ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())) != null
+                        && !ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())).containsKey(key)) {
                     LOGGER.warning(object + " has Value missing... for the key : " + key);
                     return object.toString();
                 } else {
