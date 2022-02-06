@@ -6,7 +6,7 @@
     <name>cucumblan-api</name>
     <version>1.4.1-SNAPSHOT</version>
     <properties>
-        <cucumblan-utils.version>1.1.1-SNAPSHOT</cucumblan-utils.version>
+        <cucumblan-utils.version>1.1.2-SNAPSHOT</cucumblan-utils.version>
     </properties>
     <description>
         Cucumblan is a test automation framework that supports Behavior Driven Development (BDD),
