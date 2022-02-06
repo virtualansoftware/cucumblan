@@ -20,6 +20,7 @@
 
 package io.virtualan.cucumblan.core;
 
+import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
@@ -32,6 +33,7 @@ import io.virtualan.cucumblan.props.util.UIHelper;
 import io.virtualan.cucumblan.ui.action.Action;
 import io.virtualan.cucumblan.ui.core.PageElement;
 import io.virtualan.cucumblan.ui.core.PagePropLoader;
+import org.monte.media.Format;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -54,6 +56,14 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.monte.media.AudioFormatKeys.EncodingKey;
+import static org.monte.media.AudioFormatKeys.FrameRateKey;
+import static org.monte.media.AudioFormatKeys.KeyFrameIntervalKey;
+import static org.monte.media.AudioFormatKeys.MIME_AVI;
+import static org.monte.media.AudioFormatKeys.MediaTypeKey;
+import static org.monte.media.AudioFormatKeys.MimeTypeKey;
+import static org.monte.media.VideoFormatKeys.MediaType;
+import static org.monte.media.VideoFormatKeys.*;
 
 /**
  * The type Ui base step definition.
@@ -69,10 +79,13 @@ public class UIBaseStepDefinition {
         loadActionProcessors();
     }
 
+    org.monte.screenrecorder.ScreenRecorder screenRecorder = null;
+
 
     private AppiumServer appiumServer;
     private Scenario scenario;
     private String resourceId;
+    private String recordedFile;
 
     /**
      * Load action processors.
@@ -101,6 +114,29 @@ public class UIBaseStepDefinition {
     @Before
     public void before(Scenario scenario) {
         this.scenario = scenario;
+        recordedFile = UUID.randomUUID().toString();
+        if (ApplicationConfiguration.isRecorderMode()) {
+            java.awt.GraphicsConfiguration gc = java.awt.GraphicsEnvironment//
+                    .getLocalGraphicsEnvironment()//
+                    .getDefaultScreenDevice()//
+                    .getDefaultConfiguration();
+            try {
+                screenRecorder = new org.monte.screenrecorder.ScreenRecorder(gc, null,
+                        new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
+                        new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE,
+                                CompressorNameKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE,
+                                DepthKey, 24, FrameRateKey, org.monte.media.math.Rational.valueOf(15),
+                                QualityKey, 1.0f,
+                                KeyFrameIntervalKey, 15 * 60),
+                        new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black",
+                                FrameRateKey, org.monte.media.math.Rational.valueOf(30)),
+                        null, new java.io.File(ApplicationConfiguration.getRecorderPath()
+                        + java.io.File.separator + recordedFile));
+                screenRecorder.start();
+            } catch (Exception e) {
+                LOGGER.warning(" Error recording" + e.getMessage());
+            }
+        }
     }
 
     /**
@@ -211,10 +247,29 @@ public class UIBaseStepDefinition {
     }
 
 
-    @org.junit.After
+    @After
     public void embedScreenshotOnFail() {
         if (scenario.isFailed() && resourceId != null) {
             embedScreenshot("Failed", resourceId);
+        }
+        if (screenRecorder != null && ApplicationConfiguration.isRecorderMode() && scenario.isFailed()) {
+            try {
+                screenRecorder.stop();
+                java.io.File file = getAviFile(ApplicationConfiguration.getRecorderPath()
+                        + java.io.File.separator + recordedFile);
+                if (file != null && file.exists()) {
+                    byte[] bytes = new byte[(int) file.length()];
+                    java.io.DataInputStream dis = new java.io.DataInputStream(new java.io.FileInputStream(file));
+                    dis.readFully(bytes);
+                    scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
+                    file.deleteOnExit();
+                    new java.io.File(ApplicationConfiguration.getRecorderPath()
+                            + java.io.File.separator + recordedFile).deleteOnExit();
+
+                }
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -352,6 +407,18 @@ public class UIBaseStepDefinition {
         if (appiumServer != null) {
             appiumServer.stopServer();
         }
+    }
+
+    public static java.io.File getAviFile(String dir) {
+        java.io.File file = new java.io.File(dir);
+        if (file != null && file.exists()) {
+            for (java.io.File file1 : file.listFiles()) {
+                if (file1.isFile()) {
+                    return file1;
+                }
+            }
+        }
+        return null;
     }
 
     @Given("^add variable as (.*) and (.*) as value$")

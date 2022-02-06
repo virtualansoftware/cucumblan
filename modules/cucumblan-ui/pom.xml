@@ -133,5 +133,11 @@
             <artifactId>cucumblan-utils</artifactId>
             <version>${cucumblan-utils.version}</version>
         </dependency>
+        <!-- screen recorder -->
+        <dependency>
+            <groupId>com.pojosontheweb</groupId>
+            <artifactId>monte-repack</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 </project>

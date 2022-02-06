@@ -68,6 +68,30 @@ public class ApplicationConfiguration {
      *
      * @return the property
      */
+    public static boolean isRecorderMode() {
+        return properties.getProperty("recorder-mode") != null ?
+                properties.getProperty("recorder-mode").equalsIgnoreCase("true") : true;
+    }
+
+
+
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static String getRecorderPath() {
+        return properties.getProperty("recorder-path") != null ?
+                properties.getProperty("recorder-mode") : System.getProperty("user.dir");
+    }
+
+
+
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
     public static String getStandardPackage() {
         return properties.getProperty("standard-package") != null ?
                 properties.getProperty("standard-package") : "io.virtualan.cucumblan.standard";
