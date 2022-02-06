@@ -255,20 +255,20 @@ public class UIBaseStepDefinition {
         if (screenRecorder != null && ApplicationConfiguration.isRecorderMode()) {
             try {
                 screenRecorder.stop();
-                if(scenario.isFailed()) {
-                    java.io.File file = getAviFile(ApplicationConfiguration.getRecorderPath()
-                            + java.io.File.separator + recordedFile);
-                    if (file != null && file.exists()) {
-                        byte[] bytes = new byte[(int) file.length()];
-                        java.io.DataInputStream dis = new java.io.DataInputStream(new java.io.FileInputStream(file));
-                        dis.readFully(bytes);
-                        scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
-                        file.deleteOnExit();
-                        new java.io.File(ApplicationConfiguration.getRecorderPath()
-                                + java.io.File.separator + recordedFile).deleteOnExit();
-
-                    }
+                java.io.File file = getAviFile(ApplicationConfiguration.getRecorderPath()
+                        + java.io.File.separator + recordedFile);
+                if ((file != null && file.exists()) && (scenario.isFailed() || ApplicationConfiguration.isRecordAll())) {
+                    byte[] bytes = new byte[(int) file.length()];
+                    java.io.DataInputStream dis = new java.io.DataInputStream(new java.io.FileInputStream(file));
+                    dis.readFully(bytes);
+                    scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
+                    dis.close();
                 }
+                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getRecorderPath()
+                        + java.io.File.separator + recordedFile).toPath());
+                java.nio.file.Files.delete(java.nio.file.Paths.get(io.virtualan.cucumblan.props.ApplicationConfiguration.getRecorderPath()
+                        + java.io.File.separator + recordedFile));
+
             } catch (Exception e) {
                 LOGGER.warning("Recorder issue " + e.getMessage());
             }

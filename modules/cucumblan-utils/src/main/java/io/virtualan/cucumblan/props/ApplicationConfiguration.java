@@ -158,9 +158,18 @@ public class ApplicationConfiguration {
      */
     public static boolean isRecorderMode() {
         return properties.getProperty("recorder-mode") != null ?
-                properties.getProperty("recorder-mode").equalsIgnoreCase("true") : true;
+                properties.getProperty("recorder-mode").equalsIgnoreCase("true") : false;
     }
 
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static boolean isRecordAll() {
+        return properties.getProperty("record-all") != null ?
+                properties.getProperty("record-all").equalsIgnoreCase("true") : false;
+    }
 
     /**
      * Gets property.
