@@ -90,8 +90,8 @@ public class UIHelper {
 
         String returnValue =  object;
         String key = "";
-        if (returnValue.contains("[") && returnValue.contains("]")) {
-            key = returnValue.substring(returnValue.indexOf("[") + 1, returnValue.indexOf("]"));
+        if (returnValue.contains("{") && returnValue.contains("}")) {
+            key = returnValue.substring(returnValue.indexOf("{") + 1, returnValue.indexOf("}"));
             if (key.contains(",")) {
                 StringBuffer keys = new StringBuffer();
                 for (String token : key.split(",")) {
@@ -110,8 +110,8 @@ public class UIHelper {
                 }
             }
         }
-        String response = object.replace("[" + key + "]", returnValue);
-        return response.indexOf("[") != -1 ? getUIActualValue(response, currentContext) : response;
+        String response = object.replace("{" + key + "}", returnValue);
+        return response.indexOf("{") != -1 ? getUIActualValue(response, currentContext) : response;
     }
 
 

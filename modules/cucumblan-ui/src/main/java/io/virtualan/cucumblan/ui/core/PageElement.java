@@ -26,7 +26,9 @@ import  io.virtualan.cucumblan.props.util.StepDefinitionHelper;
  *
  * @author Elan Thangamani
  */
+
 public class PageElement {
+    private final static java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PageElement.class.getName());
 
     /**
      * The Page element name.
@@ -64,7 +66,7 @@ public class PageElement {
         super();
         this.name = pageElementName != null ? StepDefinitionHelper.getActualValue(pageElementName) : pageElementName;
         this.action =  pageElementAction != null ? StepDefinitionHelper.getActualValue(pageElementAction) : pageElementAction;
-        this.value = pageElementXPath != null ? StepDefinitionHelper.getActualValue(pageElementXPath) : pageElementXPath;
+        this.value = pageElementXPath;
         this.findElementType = findElementType != null ? StepDefinitionHelper.getActualValue((findElementType)) : findElementType;
         this.type = type != null ? StepDefinitionHelper.getActualValue(type) : type;
     }
@@ -164,6 +166,7 @@ public class PageElement {
 
     public By findElement(java.util.Map<String, String> contextValue) {
         String valueStr = io.virtualan.cucumblan.props.util.UIHelper.getUIActualValue(value, contextValue);
+        LOGGER.info("actual Element >> " + valueStr);
         switch (findElementType) {
             case "BY_ID":
                 return By.id(valueStr);

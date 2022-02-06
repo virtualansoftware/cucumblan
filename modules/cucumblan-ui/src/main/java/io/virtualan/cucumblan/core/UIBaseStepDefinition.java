@@ -260,12 +260,12 @@ public class UIBaseStepDefinition {
                     try {
                         actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, data);
                     } catch (InterruptedException e) {
-                        LOGGER.warning("Unable to process this page: " + pageName);
+                        LOGGER.warning("Unable to process this page:("+e.getMessage()+") " + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
                                         + elementValue + ":" + v + "): " + e.getMessage(), false);
                     } catch (Exception e) {
-                        LOGGER.warning("Unable to process this page: " + pageName);
+                        LOGGER.warning("Unable to process this page:("+e.getMessage()+"):" + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
                                         + elementValue + ":" + v + "): " + e.getMessage(), false);
@@ -326,7 +326,7 @@ public class UIBaseStepDefinition {
      * @param sleep the sleep
      * @throws InterruptedException the interrupted exception
      */
-    @Given("pause ui (.*) for process for (.*) milliseconds$")
+    @Given("wait ui (.*) for process for (.*) milliseconds$")
     public void pauseUI(String dummy, long sleep) throws InterruptedException {
         Thread.sleep(sleep);
     }
