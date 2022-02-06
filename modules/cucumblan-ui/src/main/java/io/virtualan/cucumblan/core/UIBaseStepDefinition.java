@@ -130,7 +130,7 @@ public class UIBaseStepDefinition {
                                 KeyFrameIntervalKey, 15 * 60),
                         new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black",
                                 FrameRateKey, org.monte.media.math.Rational.valueOf(30)),
-                        null, new java.io.File(ApplicationConfiguration.getRecorderPath()
+                        null, new java.io.File(ApplicationConfiguration.getPath()
                         + java.io.File.separator + recordedFile));
                 screenRecorder.start();
             } catch (Exception e) {
@@ -255,7 +255,7 @@ public class UIBaseStepDefinition {
         if (screenRecorder != null && ApplicationConfiguration.isRecorderMode()) {
             try {
                 screenRecorder.stop();
-                java.io.File file = getAviFile(ApplicationConfiguration.getRecorderPath()
+                java.io.File file = getAviFile(ApplicationConfiguration.getPath()
                         + java.io.File.separator + recordedFile);
                 if ((file != null && file.exists()) && (scenario.isFailed() || ApplicationConfiguration.isRecordAll())) {
                     byte[] bytes = new byte[(int) file.length()];
@@ -264,9 +264,9 @@ public class UIBaseStepDefinition {
                     scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
                     dis.close();
                 }
-                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getRecorderPath()
+                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getPath()
                         + java.io.File.separator + recordedFile).toPath());
-                java.nio.file.Files.delete(java.nio.file.Paths.get(io.virtualan.cucumblan.props.ApplicationConfiguration.getRecorderPath()
+                java.nio.file.Files.delete(java.nio.file.Paths.get(io.virtualan.cucumblan.props.ApplicationConfiguration.getPath()
                         + java.io.File.separator + recordedFile));
 
             } catch (Exception e) {

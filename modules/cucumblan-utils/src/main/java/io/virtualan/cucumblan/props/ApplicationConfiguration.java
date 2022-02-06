@@ -176,9 +176,9 @@ public class ApplicationConfiguration {
      *
      * @return the property
      */
-    public static String getRecorderPath() {
-        return properties.getProperty("recorder-path") != null ?
-                properties.getProperty("recorder-mode") : System.getProperty("user.dir");
+    public static String getPath() {
+        return properties.getProperty("base-path") != null ?
+                properties.getProperty("base-path") : System.getProperty("user.dir");
     }
 
 

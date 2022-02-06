@@ -45,7 +45,7 @@ public class UploadActionImpl implements io.virtualan.cucumblan.ui.action.Action
      */
     @Override
     public void perform(org.openqa.selenium.WebDriver driver, String key, org.openqa.selenium.WebElement webelement, Object value) {
-        webelement.sendKeys((String) value);
+        webelement.sendKeys(io.virtualan.cucumblan.props.ApplicationConfiguration.getPath()+ java.io.File.separator +(String) value);
         return;
     }
 }
