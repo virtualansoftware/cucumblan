@@ -39,28 +39,6 @@ public class ApplicationConfiguration {
         properties.put(key, value);
     }
 
-    /**
-     * Gets property.
-     *
-     * @return the property
-     */
-    public static boolean getInline() {
-        ApplicationConfiguration.reload();
-        return properties.getProperty("data-inline") != null ?
-                properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
-    }
-
-    /**
-     * Gets property.
-     *
-     * @return the property
-     */
-    public static boolean isProdMode() {
-        ApplicationConfiguration.reload();
-        return properties.getProperty("prod-mode") != null ?
-                properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
-    }
-
 
     /**
      * Gets property.
@@ -150,4 +128,49 @@ public class ApplicationConfiguration {
         return properties.getProperty("wait-message-count") != null ?
                 Integer.parseInt(properties.getProperty("wait-message-count")) : 2;
     }
+
+
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static boolean getInline() {
+        return properties.getProperty("data-inline") != null ?
+                properties.getProperty("data-inline").equalsIgnoreCase("true") : true;
+    }
+
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static boolean isProdMode() {
+        return properties.getProperty("prod-mode") != null ?
+                properties.getProperty("prod-mode").equalsIgnoreCase("true") : false;
+    }
+
+
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static boolean isRecorderMode() {
+        return properties.getProperty("recorder-mode") != null ?
+                properties.getProperty("recorder-mode").equalsIgnoreCase("true") : true;
+    }
+
+
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static String getRecorderPath() {
+        return properties.getProperty("recorder-path") != null ?
+                properties.getProperty("recorder-mode") : System.getProperty("user.dir");
+    }
+
+
 }
