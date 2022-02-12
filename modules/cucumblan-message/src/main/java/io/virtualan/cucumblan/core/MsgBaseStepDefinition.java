@@ -482,7 +482,7 @@ public class MsgBaseStepDefinition {
                 if (expectedJson.getMessageAsJson() != null) {
                     this.msgJson = expectedJson.getMessageAsJson().toString();
                 }
-                scenario.attach(expectedJson.getMessage().toString(), "application/json",
+                scenario.attach(expectedJson.getMessageAsJson().toString(), "application/json",
                         "ActualResponse");
                 MessageType finalExpectedJson = expectedJson;
                 keyValue.forEach((k, v) -> {
