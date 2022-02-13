@@ -1,6 +1,6 @@
 Feature: Create Quote
 
-  Scenario: Login validator
+  Scenario: Create Quote
     Given Load driver CHROME and url on css-lakeside
     When enter user information the login page on css-lakeside
       | Username | admin     |
@@ -20,14 +20,14 @@ Feature: Create Quote
       | Address    | 2052 Albin St. |
       | PostalCode | 62345          |
       | City       | Nashville      |
-    And capture enter the address screen on css-lakeside
+    And capture after enter the address screen on css-lakeside
     And populate required insurance quote information for the request_quote page on css-lakeside
       | StartDate     | 01/01/2022     |
       | InsuranceType | Life Insurance |
       | Deductible    | 300 CHF        |
     And verify the page contains data in the screen on css-lakeside
       | //*[text()='Waiting for Quote'] | Waiting for Quote |
-    And capture Waiting for Quote screen on css-lakeside
+    And capture waiting for Quote screen on css-lakeside
     And close the driver for css-lakeside
 
   Scenario: Accept Quote for existing user
@@ -35,6 +35,6 @@ Feature: Create Quote
     When user accepts policy on the accept page on policy-management
       | Premium     | 1000 |
       | PolicyLimit | 1000 |
-    And capture Waiting for Quote screen on policy-management
+    And capture accept quote screen on policy-management
     And close the driver for policy-management
 
