@@ -1,0 +1,5 @@
+1=Click Profile<~~>CLICK<~~>//*[@id="root"]/div/div[1]/div/div/a[2]<~~>BY_X_PATH<~~>NAVIGATION
+2=Click Change Address<~~>CLICK<~~>//a[text()='Change Address']<~~>BY_X_PATH<~~>NAVIGATION
+3=Address<~~>SET_TEXT<~~>//input[@name='streetAddress']<~~>BY_X_PATH<~~>DATA
+4=PostalCode<~~>SET_TEXT<~~>//input[@name='postalCode']<~~>BY_X_PATH<~~>DATA
+5=Next<~~>CLICK<~~>//button[text()='Save Changes']<~~>BY_X_PATH<~~>NAVIGATION

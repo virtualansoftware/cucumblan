@@ -27,7 +27,10 @@ Feature: Create Quote
       | Deductible    | 300 CHF        |
     And verify the page contains data in the screen on css-lakeside
       | //*[text()='Waiting for Quote'] | Waiting for Quote |
-    And capture waiting for Quote screen on css-lakeside
+    And update profile info for the profile page on css-lakeside
+      | Address    | 20 Wolf Rd |
+      | PostalCode | 88888      |
+    And capture after updated screen on css-lakeside
     And close the driver for css-lakeside
 
   Scenario: Accept Quote for existing user
@@ -35,6 +38,6 @@ Feature: Create Quote
     When user accepts policy on the accept page on policy-management
       | Premium     | 1000 |
       | PolicyLimit | 1000 |
-    And capture accept quote screen on policy-management
+    And capture Waiting for Quote screen on policy-management
     And close the driver for policy-management
 
