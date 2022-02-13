@@ -278,9 +278,13 @@ public class UIBaseStepDefinition {
     @Given("capture (.*) screen on (.*)$")
     public void embedScreenshot(String dummy, String resource) {
         try {
-            final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
-                    .getScreenshotAs(OutputType.BYTES);
-            scenario.attach(screenshot, "image/png", "Image :" + UUID.randomUUID().toString());
+            if(UIDriverManager.getDriver(resource) != null){
+                final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
+                        .getScreenshotAs(OutputType.BYTES);
+                scenario.attach(screenshot, "image/png", "Image :" + UUID.randomUUID().toString());
+            } else {
+                LOGGER.warning(" Driver not loade for resource : " + resource );
+            }
         } catch (ClassCastException cce) {
             LOGGER.warning(" Error Message : " + cce.getMessage());
         }
