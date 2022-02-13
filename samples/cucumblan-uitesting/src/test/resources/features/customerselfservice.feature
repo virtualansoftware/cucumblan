@@ -5,21 +5,18 @@ Feature: Create Quote
     When enter user information the login page on css-lakeside
       | Username | admin     |
       | Password | 1password |
-    And verify the page contains data in the page
+    And verify the page contains data in the screen on css-lakeside
       | //*[text()='Invalid email address or password'] | Invalid email address or password |
     When enter user information the login page on css-lakeside
       | Username | sddsfds          |
       | Password | 1passsdfsddsword |
-    And verify the page contains data in the page
+    And verify the page contains data in the screen on css-lakeside
       | //*[text()='Invalid email address or password'] | Invalid email address or password |
     When enter user information the login page on css-lakeside
       | Username | sddsfds          |
       | Password | 1passsdfsddsword |
-    And verify the page contains data in the page
+    And verify the page contains data in the screen on css-lakeside
       | //*[text()='Invalid email address or password'] | Invalid email address or password |
-
-  Scenario: Create Quote for existing user
-    Given Load driver CHROME and url on css-lakeside
     When enter user information the login page on css-lakeside
       | Username | admin@example.com |
       | Password | 1password         |
@@ -31,11 +28,14 @@ Feature: Create Quote
       | StartDate     | 01/01/2022     |
       | InsuranceType | Life Insurance |
       | Deductible    | 300 CHF        |
-    And verify the page contains data in the page
+    And verify the page contains data in the screen on css-lakeside
       | //*[text()='Waiting for Quote'] | Waiting for Quote |
+    And close the driver for css-lakeside
 
-  Scenario: Accept Quote for existing user
-    Given Load driver CHROME and url on policy-management
-    When user accepts policy on the accept page on policy-management
-      | Premium     | 1000 |
-      | PolicyLimit | 1000 |
+#  Scenario: Accept Quote for existing user
+#    Given Load driver CHROME and url on policy-management
+#    When user accepts policy on the accept page on policy-management
+#      | Premium     | 1000 |
+#      | PolicyLimit | 1000 |
+#    And close the driver for css-lakeside
+#
