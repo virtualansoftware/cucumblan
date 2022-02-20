@@ -76,11 +76,10 @@ public class UIBaseStepDefinition {
     private static Map<String, Action> actionProcessorMap = new HashMap<>();
 
     static {
-        loadActionProcessors();
+      loadActionProcessors();
     }
 
     org.monte.screenrecorder.ScreenRecorder screenRecorder = null;
-
 
     private AppiumServer appiumServer;
     private Scenario scenario;
@@ -91,6 +90,7 @@ public class UIBaseStepDefinition {
      * Load action processors.
      */
     public static void loadActionProcessors() {
+
         Reflections reflections = new Reflections("io.virtualan.cucumblan.ui.actionimpl",
                 new SubTypesScanner(false));
         Set<Class<? extends Action>> buildInclasses = reflections.getSubTypesOf(Action.class);
@@ -109,6 +109,33 @@ public class UIBaseStepDefinition {
                 LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
             }
         });
+        dynamicActionLoading();
+    }
+
+    private static void dynamicActionLoading() {
+        //Load dynamic action
+        try {
+            java.util.Properties prop = new java.util.Properties();
+            String propFileName = "actions/page.action";
+            java.io.InputStream inputStream =  UIBaseStepDefinition.class.getClassLoader().getResourceAsStream(propFileName);
+            if (inputStream != null) {
+                prop.load(inputStream);
+                for (java.util.Map.Entry p : prop.entrySet()) {
+                    String className = io.virtualan.cucumblan.props.util.UIHelper.toCamel((String) p.getKey()) +"Impl";
+                    String javaCode = "package " + io.virtualan.cucumblan.props.ApplicationConfiguration.getActionPackage() + ";\n" +
+                            "import io.virtualan.cucumblan.props.util.ScenarioContext; import io.virtualan.cucumblan.ui.action.Action; import org.openqa.selenium.WebDriver; import org.openqa.selenium.WebElement;  " +
+                            "public class " + className + " implements Action {      @Override     public String getType() {         " +
+                            "return \"" + (String) p.getKey() + "\";     }      @Override     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)                 " +
+                            "throws  Exception{         Thread.sleep(element.getSleep()); " + (String) p.getValue() + "   return;     } }";
+                    Class aClass = net.openhft.compiler.CompilerUtils.CACHED_COMPILER.
+                            loadFromJava(io.virtualan.cucumblan.props.ApplicationConfiguration.getActionPackage() + "." + className, javaCode);
+                    io.virtualan.cucumblan.ui.action.Action action = (io.virtualan.cucumblan.ui.action.Action) aClass.getDeclaredConstructor().newInstance();
+                    actionProcessorMap.put(action.getType(), action);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Unable to process dynamic action >>> " + e.getMessage());
+        }
     }
 
     @Before
@@ -130,11 +157,11 @@ public class UIBaseStepDefinition {
                                 KeyFrameIntervalKey, 15 * 60),
                         new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black",
                                 FrameRateKey, org.monte.media.math.Rational.valueOf(30)),
-                        null, new java.io.File(ApplicationConfiguration.getPath()
+                        null, new java.io.File(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile));
                 screenRecorder.start();
             } catch (Exception e) {
-                LOGGER.warning(" Error recording" + e.getMessage());
+                LOGGER.warning(" Error recording " + e.getMessage());
             }
         }
     }
@@ -255,7 +282,7 @@ public class UIBaseStepDefinition {
         if (screenRecorder != null && ApplicationConfiguration.isRecorderMode()) {
             try {
                 screenRecorder.stop();
-                java.io.File file = getAviFile(ApplicationConfiguration.getPath()
+                java.io.File file = getAviFile(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile);
                 if ((file != null && file.exists()) && (scenario.isFailed() || ApplicationConfiguration.isRecordAll())) {
                     byte[] bytes = new byte[(int) file.length()];
@@ -264,9 +291,9 @@ public class UIBaseStepDefinition {
                     scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
                     dis.close();
                 }
-                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getPath()
+                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile).toPath());
-                java.nio.file.Files.delete(java.nio.file.Paths.get(io.virtualan.cucumblan.props.ApplicationConfiguration.getPath()
+                java.nio.file.Files.delete(java.nio.file.Paths.get(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile));
 
             } catch (Exception e) {
@@ -278,14 +305,14 @@ public class UIBaseStepDefinition {
     @Given("capture (.*) screen on (.*)$")
     public void embedScreenshot(String dummy, String resource) {
         try {
-            if(UIDriverManager.getDriver(resource) != null){
+            if (UIDriverManager.getDriver(resource) != null) {
                 final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
                         .getScreenshotAs(OutputType.BYTES);
                 scenario.attach(screenshot, "image/png", "Image :" + UUID.randomUUID().toString());
             } else {
-                LOGGER.warning(" Driver not loade for resource : " + resource );
+                LOGGER.warning(" Driver not loade for resource : " + resource);
             }
-        } catch (ClassCastException cce) {
+        } catch (Exception cce) {
             LOGGER.warning(" Error Message : " + cce.getMessage());
         }
     }
@@ -324,12 +351,8 @@ public class UIBaseStepDefinition {
                         || "NAVIGATION".equalsIgnoreCase(v.getType())) {
                     try {
                         actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, data);
-                    } catch (InterruptedException e) {
-                        LOGGER.warning("Unable to process this page:(" + e.getMessage() + ") " + pageName);
-                        assertTrue(
-                                pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                        + elementValue + ":" + v + "): " + e.getMessage(), false);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         LOGGER.warning("Unable to process this page:(" + e.getMessage() + "):" + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "
@@ -378,11 +401,11 @@ public class UIBaseStepDefinition {
      * @throws InterruptedException the interrupted exception
      */
     public void actionProcessor(String key, String value, PageElement element, String resource, Map<String, String> dataMap)
-            throws InterruptedException {
+            throws Exception {
         resourceId = resource;
         WebElement webelement = UIDriverManager.getDriver(resource).findElement(element.findElement(dataMap));
         Action action = actionProcessorMap.get(element.getAction());
-        action.perform(UIDriverManager.getDriver(resource), key, webelement, value);
+        action.perform(UIDriverManager.getDriver(resource), key, webelement, value, element);
     }
 
     /**

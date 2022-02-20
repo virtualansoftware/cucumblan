@@ -48,7 +48,9 @@ public class SendKeyActionImpl implements Action {
      * @param value      the value
      */
     @Override
-    public void perform(WebDriver driver, String key, WebElement webelement, Object value) {
+    public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
+            throws  Exception{
+        Thread.sleep(element.getSleep());
         webelement.clear();
         webelement.sendKeys((String) value);
         return;

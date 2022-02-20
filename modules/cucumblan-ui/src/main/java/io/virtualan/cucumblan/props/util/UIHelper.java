@@ -20,6 +20,26 @@ public class UIHelper {
         }
     }
 
+    public static String toCamel(String str)
+    {
+        // Capitalize first letter of string
+        str = str.substring(0, 1).toUpperCase()
+                + str.substring(1);
+
+        while (str.contains("_")) {
+
+            str = str
+                    .replaceFirst(
+                            "_[a-z]",
+                            String.valueOf(
+                                    Character.toUpperCase(
+                                            str.charAt(
+                                                    str.indexOf("_") + 1))));
+        }
+
+        return str;
+    }
+
     public static String getUrl(String resource) {
         missingLog("service.ui." + resource);
         return ApplicationConfiguration.getProperty("service.ui." + resource);

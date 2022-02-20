@@ -28,6 +28,7 @@ import  io.virtualan.cucumblan.props.util.StepDefinitionHelper;
  */
 
 public class PageElement {
+
     private final static java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PageElement.class.getName());
 
     /**
@@ -46,12 +47,40 @@ public class PageElement {
     /**
      * The Page element x path.
      */
+    java.util.Map<String, String> additionalValues;
+
+    /**
+     * load after.
+     */
+    long sleep;
+
+
+    /**
+     * The Page element x path.
+     */
     String type;
 
     /**
      * The Page element Type.
      */
     String findElementType;
+
+
+    public java.util.Map<String, String> getAdditionalValues() {
+        return additionalValues;
+    }
+
+    public void setAdditionalValues(java.util.Map<String, String> additionalValues) {
+        this.additionalValues = additionalValues;
+    }
+
+    public long getSleep() {
+        return sleep;
+    }
+
+    public void setSleep(long sleep) {
+        this.sleep = sleep;
+    }
 
     /**
      * Instantiates a new Page element.
@@ -69,6 +98,26 @@ public class PageElement {
         this.value = pageElementXPath;
         this.findElementType = findElementType != null ? StepDefinitionHelper.getActualValue((findElementType)) : findElementType;
         this.type = type != null ? StepDefinitionHelper.getActualValue(type) : type;
+        this.sleep = 0;
+    }
+
+    /**
+     * Instantiates a new Page element.
+     *
+     * @param pageElementName   the page element name
+     * @param pageElementAction the page element action
+     * @param pageElementXPath  the page element x path
+     * @param type              the type
+     */
+    public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
+                       String findElementType, String type, long sleep) {
+        super();
+        this.name = pageElementName != null ? StepDefinitionHelper.getActualValue(pageElementName) : pageElementName;
+        this.action =  pageElementAction != null ? StepDefinitionHelper.getActualValue(pageElementAction) : pageElementAction;
+        this.value = pageElementXPath;
+        this.findElementType = findElementType != null ? StepDefinitionHelper.getActualValue((findElementType)) : findElementType;
+        this.type = type != null ? StepDefinitionHelper.getActualValue(type) : type;
+        this.sleep = sleep;
     }
 
     /**
@@ -160,6 +209,8 @@ public class PageElement {
                 ", pageElementValue='" + value + '\'' +
                 ", pageElementType'" + type + '\'' +
                 ", findElementType'" + findElementType + '\'' +
+                ", additionalValues'" + additionalValues + '\'' +
+                ", sleep'" + sleep + '\'' +
                 '}';
     }
 
@@ -171,6 +222,8 @@ public class PageElement {
                 ", pageElementValue='" + value + '\'' +
                 ", pageElementType'" + type + '\'' +
                 ", findElementType'" + findElementType + '\'' +
+                ", additionalValues'" + additionalValues + '\'' +
+                ", sleep'" + sleep + '\'' +
                 " of actual Element >> " + valueStr);
         switch (findElementType) {
             case "BY_ID":
