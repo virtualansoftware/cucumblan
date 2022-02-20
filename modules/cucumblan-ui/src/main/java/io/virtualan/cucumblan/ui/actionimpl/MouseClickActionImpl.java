@@ -46,7 +46,7 @@ public class MouseClickActionImpl implements io.virtualan.cucumblan.ui.action.Ac
     @Override
     public void perform(org.openqa.selenium.WebDriver driver, String key, org.openqa.selenium.WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
             throws  Exception{
-        driver.wait(element.getSleep());
+        Thread.sleep(element.getSleep());
         org.openqa.selenium.interactions.Actions actions = new org.openqa.selenium.interactions.Actions(driver);
         actions.moveToElement(webelement);
         actions.click().build().perform();

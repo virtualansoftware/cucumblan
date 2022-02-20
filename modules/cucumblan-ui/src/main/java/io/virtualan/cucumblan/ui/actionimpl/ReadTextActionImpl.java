@@ -51,7 +51,7 @@ public class ReadTextActionImpl implements Action {
     @Override
     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
                 throws  Exception{
-        driver.wait(element.getSleep());
+        Thread.sleep(element.getSleep());
         String actualData = webelement.getText();
         ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId()), key, actualData);
         return;

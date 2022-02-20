@@ -119,12 +119,12 @@ public class UIBaseStepDefinition {
             if (inputStream != null) {
                 prop.load(inputStream);
                 for (java.util.Map.Entry p : prop.entrySet()) {
-                    String className = UIHelper.toCamel((String) p.getKey());
+                    String className = UIHelper.toCamel((String) p.getKey()) +"Impl";
                     String javaCode = "package " + ApplicationConfiguration.getActionPackage() + ";\n" +
                             "import io.virtualan.cucumblan.props.util.ScenarioContext; import io.virtualan.cucumblan.ui.action.Action; import org.openqa.selenium.WebDriver; import org.openqa.selenium.WebElement;  " +
-                            "public class " + className + "Impl implements Action {      @Override     public String getType() {         " +
-                            "return " + (String) p.getKey() + ";     }      @Override     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)                 " +
-                            "throws  Exception{         driver.wait(element.getSleep()); " + (String) p.getValue() + "   return;     } }";
+                            "public class " + className + " implements Action {      @Override     public String getType() {         " +
+                            "return \"" + (String) p.getKey() + "\";     }      @Override     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)                 " +
+                            "throws  Exception{         Thread.sleep(element.getSleep()); " + (String) p.getValue() + "   return;     } }";
                     Class aClass = net.openhft.compiler.CompilerUtils.CACHED_COMPILER.
                             loadFromJava(ApplicationConfiguration.getActionPackage() + "." + className, javaCode);
                     Action action = (io.virtualan.cucumblan.ui.action.Action) aClass.getDeclaredConstructor().newInstance();
@@ -157,7 +157,7 @@ public class UIBaseStepDefinition {
                                 KeyFrameIntervalKey, 15 * 60),
                         new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black",
                                 FrameRateKey, org.monte.media.math.Rational.valueOf(30)),
-                        null, new java.io.File(ApplicationConfiguration.getPath()
+                        null, new java.io.File(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile));
                 screenRecorder.start();
             } catch (Exception e) {
@@ -282,7 +282,7 @@ public class UIBaseStepDefinition {
         if (screenRecorder != null && ApplicationConfiguration.isRecorderMode()) {
             try {
                 screenRecorder.stop();
-                java.io.File file = getAviFile(ApplicationConfiguration.getPath()
+                java.io.File file = getAviFile(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile);
                 if ((file != null && file.exists()) && (scenario.isFailed() || ApplicationConfiguration.isRecordAll())) {
                     byte[] bytes = new byte[(int) file.length()];
@@ -291,9 +291,9 @@ public class UIBaseStepDefinition {
                     scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
                     dis.close();
                 }
-                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getPath()
+                java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile).toPath());
-                java.nio.file.Files.delete(java.nio.file.Paths.get(io.virtualan.cucumblan.props.ApplicationConfiguration.getPath()
+                java.nio.file.Files.delete(java.nio.file.Paths.get(ApplicationConfiguration.getBuildPath()
                         + java.io.File.separator + recordedFile));
 
             } catch (Exception e) {
@@ -312,7 +312,7 @@ public class UIBaseStepDefinition {
             } else {
                 LOGGER.warning(" Driver not loade for resource : " + resource);
             }
-        } catch (ClassCastException cce) {
+        } catch (Exception cce) {
             LOGGER.warning(" Error Message : " + cce.getMessage());
         }
     }
@@ -351,12 +351,8 @@ public class UIBaseStepDefinition {
                         || "NAVIGATION".equalsIgnoreCase(v.getType())) {
                     try {
                         actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, data);
-                    } catch (InterruptedException e) {
-                        LOGGER.warning("Unable to process this page:(" + e.getMessage() + ") " + pageName);
-                        assertTrue(
-                                pageName + " Page for resource " + resource + " (" + v.getName() + " : "
-                                        + elementValue + ":" + v + "): " + e.getMessage(), false);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         LOGGER.warning("Unable to process this page:(" + e.getMessage() + "):" + pageName);
                         assertTrue(
                                 pageName + " Page for resource " + resource + " (" + v.getName() + " : "

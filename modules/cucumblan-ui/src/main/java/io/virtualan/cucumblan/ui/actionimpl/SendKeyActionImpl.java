@@ -50,7 +50,7 @@ public class SendKeyActionImpl implements Action {
     @Override
     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
             throws  Exception{
-        driver.wait(element.getSleep());
+        Thread.sleep(element.getSleep());
         webelement.clear();
         webelement.sendKeys((String) value);
         return;
