@@ -21,11 +21,11 @@ package io.virtualan.cucumblan.ui.action;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
+import io.virtualan.cucumblan.ui.core.PageElement;
 /**
  * The interface Action.
  *
- * @author Elan Thangmani
+ * @author Elan Thangamani
  */
 public interface Action {
 
@@ -36,6 +36,7 @@ public interface Action {
      */
     String getType();
 
+
     /**
      * Perform.
      *
@@ -43,5 +44,5 @@ public interface Action {
      * @param webelement the webelement
      * @param value      the value
      */
-    void perform(WebDriver driver, String key, WebElement webelement, Object value);
+    void perform(WebDriver driver, String key, WebElement webelement, Object value, PageElement element) throws Exception;
 }

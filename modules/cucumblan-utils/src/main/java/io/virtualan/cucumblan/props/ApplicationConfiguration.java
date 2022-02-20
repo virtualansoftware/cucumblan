@@ -182,4 +182,15 @@ public class ApplicationConfiguration {
     }
 
 
+    /**
+     * Gets property.
+     *
+     * @return the property
+     */
+    public static String getBuildPath() {
+        return properties.getProperty("build-path") != null ?
+                properties.getProperty("build-path") : System.getProperty("user.dir");
+    }
+
+
 }

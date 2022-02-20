@@ -33,11 +33,11 @@ Feature: Create Quote
     And capture after updated screen on css-lakeside
     And close the driver for css-lakeside
 
-  Scenario: Accept Quote for existing user
-    Given Load driver CHROME and url on policy-management
-    When user accepts policy on the accept page on policy-management
-      | Premium     | 1000 |
-      | PolicyLimit | 1000 |
-    And capture Waiting for Quote screen on policy-management
-    And close the driver for policy-management
+#  Scenario: Accept Quote for existing user
+#    Given Load driver CHROME and url on policy-management
+#    When user accepts policy on the accept page on policy-management
+#      | Premium     | 1000 |
+#      | PolicyLimit | 1000 |
+#    And capture Waiting for Quote screen on policy-management
+#    And close the driver for policy-management
 
