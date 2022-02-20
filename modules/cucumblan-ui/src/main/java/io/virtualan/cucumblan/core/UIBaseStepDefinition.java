@@ -76,11 +76,10 @@ public class UIBaseStepDefinition {
     private static Map<String, Action> actionProcessorMap = new HashMap<>();
 
     static {
-        loadActionProcessors();
+      loadActionProcessors();
     }
 
     org.monte.screenrecorder.ScreenRecorder screenRecorder = null;
-
 
     private AppiumServer appiumServer;
     private Scenario scenario;
@@ -110,7 +109,10 @@ public class UIBaseStepDefinition {
                 LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
             }
         });
+        dynamicActionLoading();
+    }
 
+    private static void dynamicActionLoading() {
         //Load dynamic action
         try {
             java.util.Properties prop = new java.util.Properties();
@@ -119,23 +121,21 @@ public class UIBaseStepDefinition {
             if (inputStream != null) {
                 prop.load(inputStream);
                 for (java.util.Map.Entry p : prop.entrySet()) {
-                    String className = UIHelper.toCamel((String) p.getKey()) +"Impl";
-                    String javaCode = "package " + ApplicationConfiguration.getActionPackage() + ";\n" +
+                    String className = io.virtualan.cucumblan.props.util.UIHelper.toCamel((String) p.getKey()) +"Impl";
+                    String javaCode = "package " + io.virtualan.cucumblan.props.ApplicationConfiguration.getActionPackage() + ";\n" +
                             "import io.virtualan.cucumblan.props.util.ScenarioContext; import io.virtualan.cucumblan.ui.action.Action; import org.openqa.selenium.WebDriver; import org.openqa.selenium.WebElement;  " +
                             "public class " + className + " implements Action {      @Override     public String getType() {         " +
                             "return \"" + (String) p.getKey() + "\";     }      @Override     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)                 " +
                             "throws  Exception{         Thread.sleep(element.getSleep()); " + (String) p.getValue() + "   return;     } }";
                     Class aClass = net.openhft.compiler.CompilerUtils.CACHED_COMPILER.
-                            loadFromJava(ApplicationConfiguration.getActionPackage() + "." + className, javaCode);
-                    Action action = (io.virtualan.cucumblan.ui.action.Action) aClass.getDeclaredConstructor().newInstance();
+                            loadFromJava(io.virtualan.cucumblan.props.ApplicationConfiguration.getActionPackage() + "." + className, javaCode);
+                    io.virtualan.cucumblan.ui.action.Action action = (io.virtualan.cucumblan.ui.action.Action) aClass.getDeclaredConstructor().newInstance();
                     actionProcessorMap.put(action.getType(), action);
                 }
             }
-
         } catch (Exception e) {
-
+            LOGGER.warning("Unable to process dynamic action >>> " + e.getMessage());
         }
-
     }
 
     @Before
@@ -161,7 +161,7 @@ public class UIBaseStepDefinition {
                         + java.io.File.separator + recordedFile));
                 screenRecorder.start();
             } catch (Exception e) {
-                LOGGER.warning(" Error recording" + e.getMessage());
+                LOGGER.warning(" Error recording " + e.getMessage());
             }
         }
     }
