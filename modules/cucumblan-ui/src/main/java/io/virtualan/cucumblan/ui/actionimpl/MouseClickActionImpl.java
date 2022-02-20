@@ -19,17 +19,12 @@
 
 package io.virtualan.cucumblan.ui.actionimpl;
 
-import io.virtualan.cucumblan.props.util.ScenarioContext;
-import io.virtualan.cucumblan.ui.action.Action;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
 /**
- * The type Read text action.
+ * The type Send key action.
  *
  * @author Elan Thangamani
  */
-public class ReadTextActionImpl implements Action {
+public class MouseClickActionImpl implements io.virtualan.cucumblan.ui.action.Action {
 
     /**
      * Gets type.
@@ -38,7 +33,7 @@ public class ReadTextActionImpl implements Action {
      */
     @Override
     public String getType() {
-        return "GET_DATA";
+        return "MOUSE_CLICK";
     }
 
     /**
@@ -49,11 +44,12 @@ public class ReadTextActionImpl implements Action {
      * @param value      the value
      */
     @Override
-    public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
-                throws  Exception{
+    public void perform(org.openqa.selenium.WebDriver driver, String key, org.openqa.selenium.WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
+            throws  Exception{
         driver.wait(element.getSleep());
-        String actualData = webelement.getText();
-        ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId()), key, actualData);
+        org.openqa.selenium.interactions.Actions actions = new org.openqa.selenium.interactions.Actions(driver);
+        actions.moveToElement(webelement);
+        actions.click().build().perform();
         return;
     }
 }

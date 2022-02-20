@@ -58,7 +58,25 @@ public class PagePropLoader {
                 prop.load(inputStream);
                 for (Entry p : prop.entrySet()) {
                     String[] page = ((String) p.getValue()).split("<~~>");
-                    if (page.length == 5) {
+                    if (page.length == 7) {
+                        String[] values = page[7].split("(?<!\\\\);");
+                        Map<String, String> additionalValues = new java.util.HashMap<>();
+                        for (String value : values) {
+                            String[] addValues = value.split("(?<!\\\\)=");
+                            if (addValues.length == 2) {
+                                additionalValues.put(addValues[0], addValues[1]);
+                            } else {
+                                LOGGER.warning("page is not defined >>> " + propFileName);
+
+                            }
+                        }
+                        PageElement element = new PageElement(page[0], page[1], page[2], page[3], page[4], Integer.parseInt(page[5]));
+                        element.setAdditionalValues(additionalValues);
+                        pageMap.put(Integer.parseInt(p.getKey().toString()), element);
+                    } else if (page.length == 6) {
+                        pageMap.put(Integer.parseInt(p.getKey().toString()),
+                                new PageElement(page[0], page[1], page[2], page[3], page[4], Integer.parseInt(page[5])));
+                    } else if (page.length == 5) {
                         pageMap.put(Integer.parseInt(p.getKey().toString()),
                                 new PageElement(page[0], page[1], page[2], page[3], page[4]));
                     } else {
@@ -69,7 +87,7 @@ public class PagePropLoader {
                 LOGGER.warning("page is not defined >>> " + propFileName);
             }
         } catch (Exception ioe) {
-            LOGGER.warning("page is not defined/loaded >>> " + propFileName);
+            LOGGER.warning("page is not defined/loaded >>> " + propFileName + " >>> "+ ioe.getMessage());
         } finally {
             if (inputStream != null) {
                 inputStream.close();

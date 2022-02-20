@@ -44,7 +44,8 @@ public class EnterActionImpl implements io.virtualan.cucumblan.ui.action.Action 
      * @param value      the value
      */
     @Override
-    public void perform(org.openqa.selenium.WebDriver driver, String key, org.openqa.selenium.WebElement webelement, Object value) {
+    public void perform(org.openqa.selenium.WebDriver driver, String key, org.openqa.selenium.WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element) throws  Exception{
+        driver.wait(element.getSleep());
         webelement.sendKeys(org.openqa.selenium.Keys.RETURN);
         return;
     }

@@ -91,6 +91,7 @@ public class UIBaseStepDefinition {
      * Load action processors.
      */
     public static void loadActionProcessors() {
+
         Reflections reflections = new Reflections("io.virtualan.cucumblan.ui.actionimpl",
                 new SubTypesScanner(false));
         Set<Class<? extends Action>> buildInclasses = reflections.getSubTypesOf(Action.class);
@@ -109,6 +110,32 @@ public class UIBaseStepDefinition {
                 LOGGER.warning("Unable to process this action (" + action.getType() + ") class: " + action);
             }
         });
+
+        //Load dynamic action
+        try {
+            java.util.Properties prop = new java.util.Properties();
+            String propFileName = "actions/page.action";
+            java.io.InputStream inputStream =  UIBaseStepDefinition.class.getClassLoader().getResourceAsStream(propFileName);
+            if (inputStream != null) {
+                prop.load(inputStream);
+                for (java.util.Map.Entry p : prop.entrySet()) {
+                    String className = UIHelper.toCamel((String) p.getKey());
+                    String javaCode = "package " + ApplicationConfiguration.getActionPackage() + ";\n" +
+                            "import io.virtualan.cucumblan.props.util.ScenarioContext; import io.virtualan.cucumblan.ui.action.Action; import org.openqa.selenium.WebDriver; import org.openqa.selenium.WebElement;  " +
+                            "public class " + className + "Impl implements Action {      @Override     public String getType() {         " +
+                            "return " + (String) p.getKey() + ";     }      @Override     public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)                 " +
+                            "throws  Exception{         driver.wait(element.getSleep()); " + (String) p.getValue() + "   return;     } }";
+                    Class aClass = net.openhft.compiler.CompilerUtils.CACHED_COMPILER.
+                            loadFromJava(ApplicationConfiguration.getActionPackage() + "." + className, javaCode);
+                    Action action = (io.virtualan.cucumblan.ui.action.Action) aClass.getDeclaredConstructor().newInstance();
+                    actionProcessorMap.put(action.getType(), action);
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+
     }
 
     @Before
@@ -278,12 +305,12 @@ public class UIBaseStepDefinition {
     @Given("capture (.*) screen on (.*)$")
     public void embedScreenshot(String dummy, String resource) {
         try {
-            if(UIDriverManager.getDriver(resource) != null){
+            if (UIDriverManager.getDriver(resource) != null) {
                 final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
                         .getScreenshotAs(OutputType.BYTES);
                 scenario.attach(screenshot, "image/png", "Image :" + UUID.randomUUID().toString());
             } else {
-                LOGGER.warning(" Driver not loade for resource : " + resource );
+                LOGGER.warning(" Driver not loade for resource : " + resource);
             }
         } catch (ClassCastException cce) {
             LOGGER.warning(" Error Message : " + cce.getMessage());
@@ -378,11 +405,11 @@ public class UIBaseStepDefinition {
      * @throws InterruptedException the interrupted exception
      */
     public void actionProcessor(String key, String value, PageElement element, String resource, Map<String, String> dataMap)
-            throws InterruptedException {
+            throws Exception {
         resourceId = resource;
         WebElement webelement = UIDriverManager.getDriver(resource).findElement(element.findElement(dataMap));
         Action action = actionProcessorMap.get(element.getAction());
-        action.perform(UIDriverManager.getDriver(resource), key, webelement, value);
+        action.perform(UIDriverManager.getDriver(resource), key, webelement, value, element);
     }
 
     /**

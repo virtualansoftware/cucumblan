@@ -48,7 +48,8 @@ public class ClickActionImpl implements Action {
      * @param value      the value
      */
     @Override
-    public void perform(WebDriver driver, String key, WebElement webelement, Object value) {
+    public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element) throws Exception {
+        driver.wait(element.getSleep());
         webelement.click();
         return;
     }
