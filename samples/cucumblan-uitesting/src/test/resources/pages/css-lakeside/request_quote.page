@@ -1,7 +1,7 @@
 1=StartDate<~~>SET_TEXT<~~>//input[@type='date']<~~>BY_X_PATH<~~>DATA
 2=Select InsuranceType<~~>CLICK<~~>//*[@id="root"]/div/div[2]/form/div[2]/div/div[1]<~~>BY_X_PATH<~~>NAVIGATION
-4=InsuranceType<~~>CLICK<~~>//div[@role='option' and span/text()='{InsuranceType}']<~~>BY_X_PATH<~~>NAVIGATION
-4=Select Deductible<~~>CLICK<~~>//*[@id="root"]/div/div[2]/form/div[3]/div<~~>BY_X_PATH<~~>DATA
+3=InsuranceType<~~>CLICK<~~>//div[@role='option' and span/text()='{InsuranceType}']<~~>BY_X_PATH<~~>NAVIGATION
+4=Select Deductible<~~>CLICK<~~>//*[@id="root"]/div/div[2]/form/div[3]/div/div[1]<~~>BY_X_PATH<~~>NAVIGATION
 5=Deductible<~~>CLICK<~~>//div[@role='option' and span/text()='{Deductible}']<~~>BY_X_PATH<~~>NAVIGATION
 6=Next<~~>CLICK<~~>//button[text()='Next']<~~>BY_X_PATH<~~>NAVIGATION
 7=RequestQuote<~~>CLICK<~~>//button[text()='Request a Quote']<~~>BY_X_PATH<~~>NAVIGATION
