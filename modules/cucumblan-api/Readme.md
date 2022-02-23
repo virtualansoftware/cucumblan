@@ -1,12 +1,16 @@
 # Cucumblan-API
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/mapson.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22cucumblan-api%22) 
+[![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/mapson.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22cucumblan-api%22)
 
 ## What is it
-Cucumblan-api library contains predefined Gherkin step defination for Rest API testing. Cucumblan-api provides options to Test engineer, Manual Testers and Subject Matter Exports write feature files without having development excelency. This would **help lot more for Product Owner/Business analysts(Non technical team members) can create a features without knowing** the technical details. Simply knowing the Step definations.
-  
+
+Cucumblan-api library contains predefined Gherkin step defination for Rest API testing. Cucumblan-api provides options
+to Test engineer, Manual Testers and Subject Matter Exports write feature files without having development excelency.
+This would **help lot more for Product Owner/Business analysts(Non technical team members) can create a features without
+knowing** the technical details. Simply knowing the Step definations.
+
 ## Maven dependency:
-  
+
   ```mvn 
     <dependency>
       <groupId>io.virtualan</groupId>
@@ -14,8 +18,10 @@ Cucumblan-api library contains predefined Gherkin step defination for Rest API t
        <version>${cucumblan-api.version}</version>
     </dependency>
   ```  
-## How to Integrate: 
-1. cucumblan.properties  - Should be added in classpath
+
+## How to Integrate:
+
+1. cucumblan.properties - Should be added in classpath
 
     ```properties
     service.api.spec.pet=http://localhost:8800/yaml/PetStore/petstore.yaml  # api specification url
@@ -24,7 +30,8 @@ Cucumblan-api library contains predefined Gherkin step defination for Rest API t
     service.api.virtualan=http://localhost:8800
     ```
 
-2. endpoint.pet.properties 
+2. endpoint.pet.properties
+
 > The endpoint.*.properties would be auto genrated based on the input. * - meant for the resource of the rest api.
 
     ```properties
@@ -43,6 +50,7 @@ Cucumblan-api library contains predefined Gherkin step defination for Rest API t
     user_login=/user/login
     user_logout=/user/logout
     user_username=/user/{username}
+
 ```
 
 3. cucumblan-env.properties
@@ -57,6 +65,7 @@ basic_auth_password.api=test
 ```
 
 4. exclude-response.properties
+
 > Exculde specific field in the response during the validation or skip response validation for any given api. can skip for selected api based on the filter. This(.*=IGNORE) will skip all the responses. This supports wild card for any give any as well.
 
     ```properties
@@ -66,8 +75,9 @@ basic_auth_password.api=test
     ```
 
 ## Example project
-> REST API  - https://github.com/virtualansoftware/cucumblan/tree/master/samples/cucumblan-apitesting \
-> REST/SOAP xml API - https://github.com/virtualansoftware/cucumblan/tree/master/samples/cucumblan-soapapitesting 
+
+> REST API - https://github.com/virtualansoftware/cucumblan/tree/master/samples/cucumblan-apitesting \
+> REST/SOAP xml API - https://github.com/virtualansoftware/cucumblan/tree/master/samples/cucumblan-soapapitesting
 
 ## Predefined GET:
 
@@ -106,6 +116,7 @@ Scenario: User calls service to CREATE and Create Pet
       | name            | GoldFish-POST   |
       | <jsonpath>      | <value>         |
 ```
+
 ## Predefined DELETE:
 
 ```gherkin
@@ -141,9 +152,11 @@ Scenario: User calls service to CREATE and Create Pet
       | <jsonpath>        | <value>      |      
 
 ```
+
 ## Predefined Form Params:
->  And add \<api description> with \<content-type> given form params \
->   | key           | value         |
+
+> And add \<api description> with \<content-type> given form params \
+> | key | value |
 
 ```gherkin
   Scenario: post API Testing - POST api call with form parameters
@@ -161,10 +174,11 @@ Scenario: User calls service to CREATE and Create Pet
 ```
 
 ## Store response variables:
->  Store the \<json-path> value of the key as \<Variable-Name> \
->  Store the \<header-name> value of the key as \<Variable-Name> \
->  Store the \<cookie-name> value of the key as \<Variable-Name> 
-   
+
+> Store the \<json-path> value of the key as \<Variable-Name> \
+> Store the \<header-name> value of the key as \<Variable-Name> \
+> Store the \<cookie-name> value of the key as \<Variable-Name>
+
 ```gherkin
   Scenario: get API testing - GET api call
     Given <a user> perform a api action
@@ -189,9 +203,10 @@ Scenario: User calls service to CREATE and Create Pet
 ```
 
 ## Create variable
+
 > Add the <[petId]> value of the key as \<Id> \
 > Add the \<doggie> value of the key as \<petName>
-  
+
 ```gherkin
   Scenario: post API Testing - POST api call
     Given <a user> perform a api action
@@ -213,8 +228,9 @@ Scenario: User calls service to CREATE and Create Pet
 ```
 
 ## Add basic authentication
-> basic authentication with \<username> and \<password> 
-  
+
+> basic authentication with \<username> and \<password>
+
 ```gherkin
   Scenario: get API testing - GET api call
     Given <a user> perform a api action
@@ -228,8 +244,9 @@ Scenario: User calls service to CREATE and Create Pet
 ```
 
 ## Add Okta authentication:
->  And Bearer auth with [AccessToken.{{{resource}}}] token 
-  
+
+> And Bearer auth with [AccessToken.{{{resource}}}] token
+
 ```gherkin
 Scenario: Read the API token for {{{resource}}}
     Given a user perform a api action
@@ -258,6 +275,7 @@ Given a user perform a api action
 ## Predefined steps verification:
 
 ### Verify with json path:
+
 > And Verify (.*) includes following in the response
 
 ```gherkin
@@ -286,6 +304,7 @@ Scenario: post API Testing - POST api call
 ```
 
 ### Verify with Mapson jsonpath way:
+
 > And Verify-all (.*) api includes following in the response
 
 ```gherkin
@@ -309,7 +328,8 @@ Scenario: post API Testing - POST api call
 ```
 
 ### Verify:
->  And Verify (.*) response inline includes in the response
+
+> And Verify (.*) response inline includes in the response
 
 ```gherkin
   Scenario: xml testing - POST api call
@@ -339,6 +359,7 @@ Scenario: post API Testing - POST api call
 ```
 
 ### Verify CSVson:
+
 > Verify \<about> response csvson includes in the response
 
 ```gherkin
@@ -348,10 +369,11 @@ Scenario: post API Testing - POST api call
 ```
 
 ### Verify by JsonPath or XPath for the Actual and Expected XML or JSON used:
+
 > And Verify <about> response <contentType> include byPath <filename> includes in the response \
->       | \<xpath for xml>       |  \
->       | \<jsonpath for json>   |
-            
+> | \<xpath for xml>       |  \
+> | \<jsonpath for json>   |
+
 ```gherkin
     And Verify <api> response <aplication/json> include byPath <respose.json/xml> includes in the response
         | <xpath for xml>       |
@@ -362,19 +384,22 @@ Scenario: post API Testing - POST api call
 ```
 
 ### Verify single value response from api:
->  Verify \<resource> response with \<response value of api> includes in the response
+
+> Verify \<resource> response with \<response value of api> includes in the response
 
 ```gherkin
     And Verify pets response with 200 includes in the response
 ```
 
 ### Verify XML File:
+
 ```gherkin
     And Verify (.*) response XML File (.*) includes in the response
 ```
 
 ### Verify not standard responsed as json with inline:
->  And Verify-standard (.*) all inline (.*) api includes following in the response
+
+> And Verify-standard (.*) all inline (.*) api includes following in the response
 
 ```gherkin
       And Verify-standard EDI-271 all inline /bin/3f64e65d-c657-42d5-bcc9-5b13e71ca493 api includes following in the response
@@ -405,19 +430,24 @@ Scenario: post API Testing - POST api call
 ```
 
 ### Verify not standard responsed as json with file:
->  And Verify-standard (.*) all (.*) file (.*) api includes following in the response
+
+> And Verify-standard (.*) all (.*) file (.*) api includes following in the response
 
 ```gherkin
 And Verify-standard EDI-271 all /bin/3f64e65d-c657-42d5-bcc9-5b13e71ca493  file edi.response api includes following in the response
     
 ```
 
-## Non standard response support 
-The process to redefine the unstandard responses as JSON and compared with Actula response. Little coding needed for unstandard response. Like EDI response. EDI is not a standard reponse but can be compared like JSON to valdiate the data with Actual response. Example value: VirtualanStdType=EDI-271  [EDI270And271Parser](https://raw.githubusercontent.com/virtualansoftware/idaithalam/master/samples/idaithalam-excel-apitesting/src/test/java/io/virtualan/cucumblan/standard/EDI270And271Parser.java)   
- 
->    And add request with given header params    \
->        | contentType       | application/xml  |  \
->        | **VirtualanStdType**  | **EDI-271**          | 
+## Non standard response support
+
+The process to redefine the unstandard responses as JSON and compared with Actula response. Little coding needed for
+unstandard response. Like EDI response. EDI is not a standard reponse but can be compared like JSON to valdiate the data
+with Actual response. Example value:
+VirtualanStdType=EDI-271  [EDI270And271Parser](https://raw.githubusercontent.com/virtualansoftware/idaithalam/master/samples/idaithalam-excel-apitesting/src/test/java/io/virtualan/cucumblan/standard/EDI270And271Parser.java)
+
+> And add request with given header params    \
+> | contentType | application/xml |  \
+> | **VirtualanStdType**  | **EDI-271**          |
 
 ```gherkin
     Scenario: EDI-271 API test - POST api call

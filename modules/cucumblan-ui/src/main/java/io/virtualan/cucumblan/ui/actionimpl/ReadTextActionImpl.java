@@ -1,7 +1,7 @@
 /*
  *
  *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *    Copyright (c) 2022.  Virtualan Contributors (https://virtualan.io)
  *
  *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *     in compliance with the License. You may obtain a copy of the License at
@@ -21,13 +21,14 @@ package io.virtualan.cucumblan.ui.actionimpl;
 
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.ui.action.Action;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
  * The type Read text action.
- * @author Elan Thangamani
  *
- * */
+ * @author Elan Thangamani
+ */
 public class ReadTextActionImpl implements Action {
 
     /**
@@ -48,9 +49,11 @@ public class ReadTextActionImpl implements Action {
      * @param value      the value
      */
     @Override
-    public void perform(String key, WebElement webelement, Object value) {
+    public void perform(WebDriver driver, String key, WebElement webelement, Object value, io.virtualan.cucumblan.ui.core.PageElement element)
+                throws  Exception{
+        Thread.sleep(element.getSleep());
         String actualData = webelement.getText();
-        ScenarioContext.setContext(key, actualData);
+        ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId()), key, actualData);
         return;
     }
 }

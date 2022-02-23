@@ -1,7 +1,7 @@
 /*
  *
  *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *    Copyright (c) 2022.  Virtualan Contributors (https://virtualan.io)
  *
  *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *     in compliance with the License. You may obtain a copy of the License at
@@ -18,11 +18,6 @@
  */
 
 package io.virtualan.cucumblan.core;
-
-import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
@@ -43,30 +38,33 @@ import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
-import io.virtualan.cucumblan.props.util.*;
+import io.virtualan.cucumblan.props.util.ApiHelper;
+import io.virtualan.cucumblan.props.util.HelperApiUtil;
+import io.virtualan.cucumblan.props.util.ScenarioContext;
+import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.util.Helper;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+;
 
 
 /**
@@ -158,7 +156,7 @@ public class BaseStepDefinition {
     public void auth(String username, String password) {
         if (!this.skipScenario) {
             byte[] authBasic = Base64.getEncoder().encode(String
-                .format("%s:%s", StepDefinitionHelper.getActualValue(username),
+                    .format("%s:%s", StepDefinitionHelper.getActualValue(username),
                             StepDefinitionHelper.getActualValue(password)).getBytes());
             request.header("Authorization", String.format("Basic %s", new String(authBasic)));
         }
@@ -179,13 +177,14 @@ public class BaseStepDefinition {
         }
     }
 
+
     /**
      * Read request by path param.
      *
      * @param dummy the dummy
      */
-    @Given("^(.*) perform a api action")
-    public void readRequestByPathParam(String dummy) {
+    @Given("^(.*) perform (.*) api action")
+    public void readRequestByPathParam(String dummy, String dummy1) {
         if (!this.skipScenario) {
             request = given();
         }
@@ -221,6 +220,13 @@ public class BaseStepDefinition {
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 if ("Accept".equalsIgnoreCase(params.getKey())) {
                     acceptContentType = StepDefinitionHelper.getActualValue(params.getValue());
+                }
+                if ("contentType".equalsIgnoreCase(params.getKey()) &&
+                        StepDefinitionHelper.getActualValue(params.getValue()).contains("multipart/form-data")) {
+                    String boundary = Long.toHexString(System.currentTimeMillis());
+                    request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()) + "; boundary=" + boundary);
+                } else if ("contentType".equalsIgnoreCase(params.getKey())) {
+                    request = request.contentType(StepDefinitionHelper.getActualValue(params.getValue()));
                 }
                 request = request
                         .header(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -265,14 +271,14 @@ public class BaseStepDefinition {
      * @param globalParams the global params
      * @throws IOException the io exception
      */
-    @Given("^Provided all the feature level parameters$")
+    @Given("^provided all the feature level parameters$")
     public void loadGlobalParam(Map<String, String> globalParams) throws IOException {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), globalParams);
             scenario.attach(new JSONObject(ScenarioContext
-                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(),
-                    "application/json", "requestData :  ContextId" + String.valueOf(Thread.currentThread().getId()));
+                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(4),
+                    "application/json", "ContextId:" + String.valueOf(Thread.currentThread().getId()));
         }
     }
 
@@ -281,23 +287,23 @@ public class BaseStepDefinition {
      *
      * @throws IOException the io exception
      */
-    @Given("^Provided all the feature level parameters from file$")
+    @Given("^provided all the feature level parameters from file$")
     public void loadGlobalParamFromFile() throws IOException {
         Map<String, String> env = System.getenv();
-        if(env != null && !env.isEmpty()) {
+        if (env != null && !env.isEmpty()) {
             for (String envName : env.keySet()) {
                 if (envName.startsWith("cucumblan.")) {
                     ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()),
-                            envName.replace("cucumblan.", ""),
-                            env.get(envName));
+                            .setContext(String.valueOf(Thread.currentThread().getId()),
+                                    envName.replace("cucumblan.", ""),
+                                    env.get(envName));
                 }
             }
         }
         Properties properties = new Properties();
         InputStream stream = ApplicationConfiguration.class.getClassLoader()
                 .getResourceAsStream("cucumblan-env.properties");
-        if(stream == null){
+        if (stream == null) {
             stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cucumblan-env.properties");
         }
         if (stream != null) {
@@ -305,8 +311,8 @@ public class BaseStepDefinition {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), (Map) properties);
             scenario.attach(new JSONObject(ScenarioContext
-                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(),
-                    "application/json", "ContextId" + String.valueOf(Thread.currentThread().getId()));
+                            .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))).toString(4),
+                    "application/json", "ContextId:" + String.valueOf(Thread.currentThread().getId()));
         } else {
             LOGGER.warning(
                     "cucumblan-env.properties is not configured. Need to add if default data loaded");
@@ -316,12 +322,17 @@ public class BaseStepDefinition {
     /**
      * Validate global param.
      */
-    @Then("^Verify all the feature level parameters exists")
+    @Then("^verify all the feature level parameters exists$")
     public void validateGlobalParam() {
         if (!this.skipScenario) {
             assertTrue("Valid Global Parameters are present ", ScenarioContext
                     .hasContextValues(String.valueOf(Thread.currentThread().getId())));
         }
+    }
+
+    @Given("^create variable (.*) as key and (.*) as value$")
+    public void addVariableSwap(String key, String responseValue) {
+        addVariable(responseValue, key);
     }
 
     /**
@@ -330,8 +341,7 @@ public class BaseStepDefinition {
      * @param responseValue the response value
      * @param key           the key
      */
-    @Given("^Add (.*) as key and (.*) as value")
-    @Given("^Add the (.*) value of the key as (.*)")
+    @Given("^add the (.*) value of the key as (.*)$")
     public void addVariable(String responseValue, String key) {
         if (!this.skipScenario) {
             if (responseValue.startsWith("[") && responseValue.endsWith("]")) {
@@ -347,6 +357,11 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as decimal value$")
+    public void modifyDecimalVariableSwap(String key, String responseValue) throws Exception {
+        modifyDecimalVariable(responseValue, key);
+    }
+
     /**
      * Modify variable.
      *
@@ -354,8 +369,8 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) decimal value of the key as (.*)")
-    public void modifyDecimalVariable(String responseValue, String key) throws IOException {
+    @Given("^evaluate the (.*) decimal value of the key as (.*)$")
+    public void modifyDecimalVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Double.class,
@@ -364,6 +379,11 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as integer value$")
+    public void modifyIntVariableSwap(String key, String responseValue) throws Exception {
+        modifyIntVariable(responseValue, key);
+    }
+
 
     /**
      * Modify variable.
@@ -372,16 +392,22 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) integer value of the key as (.*)")
-    public void modifyIntVariable(String responseValue, String key) throws IOException {
+    @Given("^evaluate the (.*) integer value of the key as (.*)$")
+    public void modifyIntVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(Integer.class,
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Integer.class,
                             responseValue, ScenarioContext
                                     .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
         }
     }
 
+    @Given("^evaluate key as (.*) and (.*) as function value$")
+    public void modifyfunctionVariableSwap(String key, String responseValue) throws Exception {
+        modifyfunctionVariable(responseValue, key);
+    }
+
+
     /**
      * Modify variable.
      *
@@ -389,13 +415,13 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^evaluate the (.*) function value of the key as (.*)")
-    public void modifyfunctionVariable(String responseValue, String key) throws IOException {
+    @Given("^evaluate the (.*) function value of the key as (.*)$")
+    public void modifyfunctionVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
-                .setContext(String.valueOf(Thread.currentThread().getId()),key, ExcelAndMathHelper.evaluateWithVariables(String.class,
-                    responseValue, ScenarioContext
-                        .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(String.class,
+                            responseValue, ScenarioContext
+                                    .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
         }
     }
 
@@ -406,8 +432,8 @@ public class BaseStepDefinition {
      * @param condition the response value excel based
      * @throws IOException the io exception
      */
-    @Given("^perform the (.*) condition to skip scenario")
-    public void modifyBooleanVariable(String condition) throws IOException {
+    @Given("^perform the (.*) condition to skip scenario$")
+    public void modifyBooleanVariable(String condition) throws Exception {
         skipScenario = (Boolean) ExcelAndMathHelper
                 .evaluateWithVariables(Boolean.class, condition, ScenarioContext
                         .getContext(String.valueOf(Thread.currentThread().getId())));
@@ -421,7 +447,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) condition success$")
-    public void evaluateVariable(String condition) throws IOException {
+    public void evaluateVariable(String condition) throws Exception {
         if (!this.skipScenario) {
             boolean flag = (Boolean) ExcelAndMathHelper
                     .evaluateWithVariables(Boolean.class, condition, ScenarioContext
@@ -439,7 +465,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^evaluate the (.*) condition fail$")
-    public void evaluateVariableFail(String condition) throws IOException {
+    public void evaluateVariableFail(String condition) throws Exception {
         if (!this.skipScenario) {
             boolean flag = (Boolean) ExcelAndMathHelper
                     .evaluateWithVariables(Boolean.class, condition, ScenarioContext
@@ -449,21 +475,9 @@ public class BaseStepDefinition {
         }
     }
 
-    /**
-     * Modify variable.
-     *
-     * @param responseValue the response value
-     * @param key           the key
-     * @throws IOException the io exception
-     */
-    @Given("^evaluate the (.*) boolean value of the key as (.*)")
-    public void modifyBooleanVariable(String responseValue, String key) throws IOException {
-        if (!this.skipScenario) {
-            ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Boolean.class,
-                            responseValue, ScenarioContext
-                                    .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
-        }
+    @Given("^evaluate key as (.*) and (.*) as boolean value$")
+    public void modifyBooleanVariableSwap(String key, String responseValue) throws Exception {
+        modifyBooleanVariable(responseValue, key);
     }
 
 
@@ -474,7 +488,29 @@ public class BaseStepDefinition {
      * @param key           the key
      * @throws IOException the io exception
      */
-    @Given("^Modify the (.*) value of the key as (.*)")
+    @Given("^evaluate the (.*) boolean value of the key as (.*)$")
+    public void modifyBooleanVariable(String responseValue, String key) throws Exception {
+        if (!this.skipScenario) {
+            ScenarioContext
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariables(Boolean.class,
+                            responseValue, ScenarioContext
+                                    .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
+        }
+    }
+
+    @Given("^modify key as (.*) and (.*) as value$")
+    public void modifyStringVariableSwap(String responseValue, String key) throws IOException {
+        modifyStringVariable(responseValue, key);
+    }
+
+    /**
+     * Modify variable.
+     *
+     * @param responseValue the response value
+     * @param key           the key
+     * @throws IOException the io exception
+     */
+    @Given("^modify the (.*) value of the key as (.*)$")
     public void modifyStringVariable(String responseValue, String key) throws IOException {
         if (!this.skipScenario) {
             ScenarioContext
@@ -484,37 +520,41 @@ public class BaseStepDefinition {
         }
     }
 
+    @Given("^store (.*) as key and api's (.*) as value$")
+    public void storeResponseAskeySwap( String key, String responseKey) {
+        storeResponseAskey(responseKey, key);
+    }
     /**
      * Load as global param.
      *
      * @param responseKey the response key
      * @param key         the key
      */
-    @Given("^Store the (.*) value of the key as (.*)")
+    @Given("^store the (.*) value of the key as (.*)$")
     public void storeResponseAskey(String responseKey, String key) {
         if (!this.skipScenario) {
-            if(".".equalsIgnoreCase(responseKey)){
+            if (".".equalsIgnoreCase(responseKey)) {
                 ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                        validatableResponse.extract().body().asString());
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                validatableResponse.extract().body().asString());
             } else {
                 String value = validatableResponse.extract().body().jsonPath()
-                    .getString(responseKey);
+                        .getString(responseKey);
                 if (value != null) {
                     ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                            validatableResponse.extract().body().jsonPath().getString(responseKey));
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                    validatableResponse.extract().body().jsonPath().getString(responseKey));
                 } else if (response.getCookie(responseKey) != null) {
                     ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                            response.getCookie(responseKey));
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                    response.getCookie(responseKey));
                 } else if (response.getHeader(responseKey) != null) {
                     ScenarioContext
 
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                            response.getHeader(responseKey));
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                    response.getHeader(responseKey));
                 } else {
                     LOGGER.warning(responseKey + " :  for " + key + " not found");
                     scenario.log(responseKey + " :  for " + key + " not found");
@@ -532,7 +572,7 @@ public class BaseStepDefinition {
     @Given("^add (.*) with given path params$")
     public void readParamsRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
-            request = request.contentType("application/json");
+            //request = request.contentType("application/json");
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request
                         .pathParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -578,25 +618,18 @@ public class BaseStepDefinition {
                             .encodeContentTypeAs(contentType,
                                     ContentType.fromContentType(contentType))));
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
-                if (params.getKey().contains("MULTI-PART")) {
-                    if (params.getValue() != null) {
-                        String fileAndType = StepDefinitionHelper.getActualValue(params.getValue());
-                        if (params.getKey().split("=").length == 2 && fileAndType.split("=").length == 2) {
-                            request = request
-                                    .multiPart(params.getKey().split("=")[1],
-                                            new File(BaseStepDefinition.class.getClassLoader()
-                                                    .getResource(fileAndType.split("=")[0]).getFile()),
-                                            fileAndType.split("=")[1]);
-                        } else {
-                            scenario.log(
-                                    "MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
-                            LOGGER.warning(
-                                    "MULTI-PART was not set up correctly. should be like key => MULTI-PART => MULTI-PART=uploadtext.txt  value => filename.txt=plain/txt");
-                        }
-                    }
+                String fileAndType = StepDefinitionHelper.getActualValue(params.getValue());
+                if (BaseStepDefinition.class.getClassLoader()
+                        .getResource(fileAndType) != null &&
+                        new File(BaseStepDefinition.class.getClassLoader()
+                                .getResource(fileAndType).getFile()).exists()) {
+                    request = request
+                            .multiPart(params.getKey(),
+                                    new File(BaseStepDefinition.class.getClassLoader()
+                                            .getResource(fileAndType).getFile()));
                 } else {
                     request = request
-                            .param(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
+                            .multiPart(params.getKey(), fileAndType);
                 }
             }
         }
@@ -611,7 +644,7 @@ public class BaseStepDefinition {
     @Given("add (.*) with given query params$")
     public void readRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
-            request = request.contentType("application/json");
+            //request = request.contentType("application/json");
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request
                         .queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -644,7 +677,7 @@ public class BaseStepDefinition {
      * @param contentType  the content type
      * @param parameterMap the parameter map
      */
-    @Given("^Populate (.*) with contentType(.*) given input$")
+    @Given("^populate (.*) with contentType(.*) given input$")
     public void loadRequest(String nameIgnore, String contentType, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
             request = request.contentType(contentType);
@@ -661,10 +694,10 @@ public class BaseStepDefinition {
      * @param nameIgnore   the name ignore
      * @param parameterMap the parameter map
      */
-    @Given("^Populate (.*) with given input$")
+    @Given("^populate (.*) with given input$")
     public void loadRequest(String nameIgnore, Map<String, String> parameterMap) {
         if (!this.skipScenario) {
-            request = request.contentType("application/json");
+            //request = request.contentType("application/json");
             for (Map.Entry<String, String> params : parameterMap.entrySet()) {
                 request = request
                         .queryParam(params.getKey(), StepDefinitionHelper.getActualValue(params.getValue()));
@@ -739,14 +772,14 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Create (.*) with contentType (.*) given input$")
+    @Given("^create (.*) with contentType (.*) given input$")
     public void createRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
             throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                    , contentType, "requestData :  ");
+                    , contentType, "Request:");
             request = request.contentType(contentType).body(jsonBody);
         }
     }
@@ -759,20 +792,20 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Create (.*) with given input$")
+    @Given("^create (.*) with given input$")
     public void createRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
 
-            if(StepDefinitionHelper.getJSON(jsonBody) instanceof  JSONArray){
+            if (StepDefinitionHelper.getJSON(jsonBody) instanceof JSONArray) {
                 scenario.attach(new JSONArray(jsonBody).toString(4)
-                        , "application/json", "requestData :  ");
+                        , "application/json", "RequestData:");
             } else {
                 scenario.attach(new JSONObject(jsonBody).toString(4)
-                        , "application/json", "requestData :  ");
+                        , "application/json", "RequestData:");
             }
-            request = request.contentType("application/json").body(jsonBody);
+            request = request.body(jsonBody);
         }
     }
 
@@ -783,13 +816,13 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Update (.*) with given input$")
+    @Given("^update (.*) with given input$")
     public void updateRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             request = request.contentType("application/json").body(jsonBody);
         }
     }
@@ -801,13 +834,13 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Delete (.*) with given input$")
+    @Given("^delete (.*) with given input$")
     public void deleteRequest(String nameIgnore, Map<String, String> parameterMap) throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
-                .getContext(String.valueOf(Thread.currentThread().getId())));
+                    .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             request = request.contentType("application/json").body(jsonBody);
         }
     }
@@ -820,14 +853,14 @@ public class BaseStepDefinition {
      * @param parameterMap the parameter map
      * @throws Exception the exception
      */
-    @Given("^Update (.*) with contentType (.*) given input$")
+    @Given("^update (.*) with contentType (.*) given input$")
     public void updateRequest(String nameIgnore, String contentType, Map<String, String> parameterMap)
             throws Exception {
         if (!this.skipScenario) {
             jsonBody = Mapson.buildMAPsonAsJson(parameterMap, ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())));
             scenario.attach(jsonBody
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             request = request.contentType(contentType).body(jsonBody);
         }
     }
@@ -843,7 +876,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) post (.*) in (.*) resource on (.*)")
     public void createRequest(String dummyString, String acceptContentType, String resource,
-                              String system) {
+                              String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -858,7 +891,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
 
             response = request.baseUri(url).when()
                     .log().all()
@@ -877,7 +910,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) get (.*) in (.*) resource on (.*)")
     public void readRequest(String dummyString, String acceptContentType, String resource,
-                            String system) {
+                            String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -892,7 +925,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .get(ApiHelper.getActualResource(resource, system));
@@ -909,7 +942,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) put (.*) in (.*) resource on (.*)")
     public void modifyRequest(String dummyString, String acceptContentType, String resource,
-                              String system) {
+                              String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -924,7 +957,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .put(ApiHelper.getActualResource(resource, system));
@@ -941,7 +974,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) patch (.*) in (.*) resource on (.*)")
     public void patchRequest(String dummyString, String acceptContentType, String resource,
-                             String system) {
+                             String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -956,7 +989,7 @@ public class BaseStepDefinition {
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
 
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .patch(ApiHelper.getActualResource(resource, system));
@@ -973,7 +1006,7 @@ public class BaseStepDefinition {
      */
     @When("^(.*) delete (.*) in (.*) resource on (.*)")
     public void deleteById(String dummyString, String acceptContentType, String resource,
-                           String system) {
+                           String system) throws Exception {
         resource = StepDefinitionHelper.getActualValue(resource);
         if (!this.skipScenario) {
             String url = ApiHelper.getHostName(resource, system);
@@ -987,7 +1020,7 @@ public class BaseStepDefinition {
             object.put("context", new JSONObject(ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
             scenario.attach(object.toString(4)
-                    , "application/json", "requestData :  ");
+                    , "application/json", "RequestData:");
             response = request.baseUri(ApiHelper.getHostName(resource, system)).when()
                     .log().all().accept(acceptContentType)
                     .delete(ApiHelper.getActualResource(resource, system));
@@ -1012,13 +1045,13 @@ public class BaseStepDefinition {
      *
      * @param statusCode the status code
      */
-    @Then("^Verify the status code is (\\d+)")
+    @Then("^verify the status code is (\\d+)")
     @Then("^the status code is (\\d+)")
     public void verifyStatusCode(int statusCode) {
         if (!this.skipScenario) {
             ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()),"STATUS_CODE", String.valueOf(response.getStatusCode()));
-            if(response.getStatusCode() != statusCode){
+                    .setContext(String.valueOf(Thread.currentThread().getId()), "STATUS_CODE", String.valueOf(response.getStatusCode()));
+            if (response.getStatusCode() != statusCode) {
                 scenario.log(response.asPrettyString());
             }
             validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
@@ -1028,7 +1061,7 @@ public class BaseStepDefinition {
             scenario.attach(
                     new JSONObject(ScenarioContext.getPrintableContextObject(
                             String.valueOf(Thread.currentThread().getId()))).toString(4), "application/json",
-                    "contextual-dataset ");
+                    "Contextual-Dataset:");
         }
     }
 
@@ -1037,7 +1070,7 @@ public class BaseStepDefinition {
             String xmlType =
                     response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
             scenario.attach(validatableResponse.extract().body().asString(), xmlType,
-                    "actual-response ");
+                    "Actual-Response");
         }
     }
 
@@ -1045,7 +1078,7 @@ public class BaseStepDefinition {
         String xmlType =
                 response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
         scenario
-                .attach(actual, xmlType, "expected-response ");
+                .attach(actual, xmlType, "Expected-Response:");
     }
 
     /**
@@ -1056,7 +1089,7 @@ public class BaseStepDefinition {
      * @param readData the data
      * @throws Throwable the throwable
      */
-    @And("^Verify-standard (.*) all inline (.*) api includes following in the response$")
+    @And("^verify-standard (.*) all inline (.*) api includes following in the response$")
     public void verifyFormatedMapson(String type, String resource, List<String> readData)
             throws Throwable {
         if (!this.skipScenario) {
@@ -1100,7 +1133,7 @@ public class BaseStepDefinition {
      * @param resource the resource
      * @throws Throwable the throwable
      */
-    @Given("^Verify-standard (.*) all (.*) file (.*) api includes following in the response$")
+    @Given("^verify-standard (.*) all (.*) file (.*) api includes following in the response$")
     public void verifyFormatedMapson(String type, String file, String resource)
             throws Throwable {
         if (!this.skipScenario) {
@@ -1140,7 +1173,7 @@ public class BaseStepDefinition {
      * @param data     the data
      * @throws Throwable the throwable
      */
-    @And("^Verify-all (.*) api includes following in the response$")
+    @And("^verify-all (.*) api includes following in the response$")
     public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
@@ -1206,7 +1239,7 @@ public class BaseStepDefinition {
                     object.put(x.getKey(), x.getValue());
                     array.put(object);
                 });
-                scenario.attach(array.toString(4), "application/json", "Comparison Failure");
+                scenario.attach(array.toString(4), "application/json", "Comparison Failure:");
 
             } else {
                 return values.isEmpty();
@@ -1223,7 +1256,7 @@ public class BaseStepDefinition {
      * @param xmlString the xml string
      * @throws Throwable the throwable
      */
-    @And("^Verify (.*) response inline includes in the response$")
+    @And("^verify (.*) response inline includes in the response$")
     public void verifyFileResponse(String resource, List<String> xmlString) throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
@@ -1240,7 +1273,7 @@ public class BaseStepDefinition {
      * @param fileBody the file body
      * @throws Throwable the throwable
      */
-    @And("^Verify (.*) response XML File (.*) includes in the response$")
+    @And("^verify (.*) response XML File (.*) includes in the response$")
     public void verifyXMLResponse(String resource, String fileBody)
             throws Throwable {
         if (!this.skipScenario) {
@@ -1264,7 +1297,7 @@ public class BaseStepDefinition {
      * @param xpaths      the xpaths
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response (.*) include byPath (.*) includes in the response$")
+    @And("^verify (.*) response (.*) include byPath (.*) includes in the response$")
     public void verifyXMLByPathResponse(String resource, String contentType,
                                         String fileBody, List<String> xpaths) throws Exception {
         if (!this.skipScenario) {
@@ -1289,7 +1322,7 @@ public class BaseStepDefinition {
      * @param resource the resource
      * @param context  the context
      */
-    @And("^Verify (.*) response with (.*) includes in the response$")
+    @And("^verify (.*) response with (.*) includes in the response$")
     public void verifySingleResponse(String resource, String context) {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);
@@ -1307,11 +1340,11 @@ public class BaseStepDefinition {
      * @param csvson the csvson
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response csvson includes in the response$")
+    @And("^verify (.*) response csvson includes in the response$")
     public void verify(String path, List<String> csvson)
-        throws Exception {
+            throws Exception {
         HelperApiUtil
-            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
+                .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.LENIENT, scenario);
     }
 
     /**
@@ -1321,11 +1354,11 @@ public class BaseStepDefinition {
      * @param csvson the csvson
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response csvson includes exact-order-match in the response$")
+    @And("^verify (.*) response csvson includes exact-order-match in the response$")
     public void verifyExactOrderMatch(String path, List<String> csvson)
-        throws Exception {
+            throws Exception {
         HelperApiUtil
-            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
+                .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT_ORDER, scenario);
     }
 
     /**
@@ -1335,10 +1368,10 @@ public class BaseStepDefinition {
      * @param csvson the csvson
      * @throws Exception the exception
      */
-    @And("^Verify (.*) response csvson includes exact-match in the response$")
-    public void verifyExactMatch(String path, List<String> csvson) throws  Exception{
+    @And("^verify (.*) response csvson includes exact-match in the response$")
+    public void verifyExactMatch(String path, List<String> csvson) throws Exception {
         HelperApiUtil
-            .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
+                .verifyCSVSON(validatableResponse, path, csvson, JSONCompareMode.STRICT, scenario);
     }
 
 
@@ -1349,7 +1382,7 @@ public class BaseStepDefinition {
      * @param data        the data
      * @throws Throwable the throwable
      */
-    @And("^Verify (.*) includes following in the response$")
+    @And("^verify (.*) includes following in the response$")
     public void verifyResponse(String dummyString, DataTable data) throws Throwable {
         if (!this.skipScenario) {
             attachResponse(validatableResponse);

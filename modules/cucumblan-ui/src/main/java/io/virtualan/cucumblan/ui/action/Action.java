@@ -1,7 +1,7 @@
 /*
  *
  *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *    Copyright (c) 2022.  Virtualan Contributors (https://virtualan.io)
  *
  *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *     in compliance with the License. You may obtain a copy of the License at
@@ -19,11 +19,13 @@
 
 package io.virtualan.cucumblan.ui.action;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
+import io.virtualan.cucumblan.ui.core.PageElement;
 /**
  * The interface Action.
- * @author Elan Thangmani
+ *
+ * @author Elan Thangamani
  */
 public interface Action {
 
@@ -34,6 +36,7 @@ public interface Action {
      */
     String getType();
 
+
     /**
      * Perform.
      *
@@ -41,5 +44,5 @@ public interface Action {
      * @param webelement the webelement
      * @param value      the value
      */
-    void perform(String key, WebElement webelement, Object value);
+    void perform(WebDriver driver, String key, WebElement webelement, Object value, PageElement element) throws Exception;
 }

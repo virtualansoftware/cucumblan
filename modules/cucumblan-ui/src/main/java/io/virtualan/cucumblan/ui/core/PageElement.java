@@ -1,7 +1,7 @@
 /*
  *
  *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *    Copyright (c) 2022.  Virtualan Contributors (https://virtualan.io)
  *
  *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *     in compliance with the License. You may obtain a copy of the License at
@@ -19,128 +19,231 @@
 
 package io.virtualan.cucumblan.ui.core;
 
+import org.openqa.selenium.By;
+import  io.virtualan.cucumblan.props.util.StepDefinitionHelper;
 /**
  * The type Page element.
  *
  * @author Elan Thangamani
  */
+
 public class PageElement {
 
-  /**
-   * The Page element name.
-   */
-  String name;
-  /**
-   * The Page element action.
-   */
-  String action;
-  /**
-   * The Page element x path.
-   */
-  String xPath;
+    private final static java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PageElement.class.getName());
 
-  /**
-   * The Page element x path.
-   */
-  String type;
+    /**
+     * The Page element name.
+     */
+    String name;
+    /**
+     * The Page element action.
+     */
+    String action;
+    /**
+     * The Page element x path.
+     */
+    String value;
 
-  /**
-   * Instantiates a new Page element.
-   *
-   * @param pageElementName   the page element name
-   * @param pageElementAction the page element action
-   * @param pageElementXPath  the page element x path
-   * @param type              the type
-   */
-  public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
-      String type) {
-    super();
-    this.name = pageElementName;
-    this.action = pageElementAction;
-    this.xPath = pageElementXPath;
-    this.type = type;
-  }
+    /**
+     * The Page element x path.
+     */
+    java.util.Map<String, String> additionalValues;
 
-  /**
-   * Gets page element name.
-   *
-   * @return the page element name
-   */
-  public String getName() {
-    return name;
-  }
+    /**
+     * load after.
+     */
+    long sleep;
 
 
-  /**
-   * Gets type.
-   *
-   * @return the type
-   */
-  public String getType() {
-    return type;
-  }
+    /**
+     * The Page element x path.
+     */
+    String type;
 
-  /**
-   * Sets type.
-   *
-   * @param type the type
-   */
-  public void setType(String type) {
-    this.type = type;
-  }
+    /**
+     * The Page element Type.
+     */
+    String findElementType;
 
-  /**
-   * Sets page element name.
-   *
-   * @param name the page element name
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
 
-  /**
-   * Gets page element action.
-   *
-   * @return the page element action
-   */
-  public String getAction() {
-    return action;
-  }
+    public java.util.Map<String, String> getAdditionalValues() {
+        return additionalValues;
+    }
 
-  /**
-   * Sets page element sction.
-   *
-   * @param action the page element action
-   */
-  public void setAction(String action) {
-    this.action = action;
-  }
+    public void setAdditionalValues(java.util.Map<String, String> additionalValues) {
+        this.additionalValues = additionalValues;
+    }
 
-  /**
-   * Gets page element x path.
-   *
-   * @return the page element x path
-   */
-  public String getXPath() {
-    return xPath;
-  }
+    public long getSleep() {
+        return sleep;
+    }
 
-  /**
-   * Sets page element x path.
-   *
-   * @param xPath the page element x path
-   */
-  public void setXPath(String xPath) {
-    this.xPath = xPath;
-  }
+    public void setSleep(long sleep) {
+        this.sleep = sleep;
+    }
 
-  @Override
-  public String toString() {
-    return "PageElement{" +
-        "pageElementName='" + name + '\'' +
-        ", pageElementAction='" + action + '\'' +
-        ", pageElementXPath='" + xPath + '\'' +
-        ", pageElementType'" + type + '\'' +
-        '}';
-  }
+    /**
+     * Instantiates a new Page element.
+     *
+     * @param pageElementName   the page element name
+     * @param pageElementAction the page element action
+     * @param pageElementXPath  the page element x path
+     * @param type              the type
+     */
+    public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
+                       String findElementType, String type) {
+        super();
+        this.name = pageElementName != null ? StepDefinitionHelper.getActualValue(pageElementName) : pageElementName;
+        this.action =  pageElementAction != null ? StepDefinitionHelper.getActualValue(pageElementAction) : pageElementAction;
+        this.value = pageElementXPath;
+        this.findElementType = findElementType != null ? StepDefinitionHelper.getActualValue((findElementType)) : findElementType;
+        this.type = type != null ? StepDefinitionHelper.getActualValue(type) : type;
+        this.sleep = 0;
+    }
+
+    /**
+     * Instantiates a new Page element.
+     *
+     * @param pageElementName   the page element name
+     * @param pageElementAction the page element action
+     * @param pageElementXPath  the page element x path
+     * @param type              the type
+     */
+    public PageElement(String pageElementName, String pageElementAction, String pageElementXPath,
+                       String findElementType, String type, long sleep) {
+        super();
+        this.name = pageElementName != null ? StepDefinitionHelper.getActualValue(pageElementName) : pageElementName;
+        this.action =  pageElementAction != null ? StepDefinitionHelper.getActualValue(pageElementAction) : pageElementAction;
+        this.value = pageElementXPath;
+        this.findElementType = findElementType != null ? StepDefinitionHelper.getActualValue((findElementType)) : findElementType;
+        this.type = type != null ? StepDefinitionHelper.getActualValue(type) : type;
+        this.sleep = sleep;
+    }
+
+    /**
+     * Gets page element name.
+     *
+     * @return the page element name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets page element name.
+     *
+     * @param name the page element name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Sets type.
+     *
+     * @param type the type
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * Gets page element action.
+     *
+     * @return the page element action
+     */
+    public String getAction() {
+        return action;
+    }
+
+    /**
+     * Sets page element sction.
+     *
+     * @param action the page element action
+     */
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    /**
+     * Gets page element path.
+     *
+     * @return the page element path
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Sets page element x path.
+     *
+     * @param path the page element x path
+     */
+    public void setValue(String path) {
+        this.value = path;
+    }
+
+
+    public String getFindElementType() {
+        return findElementType;
+    }
+
+    public void setFindElementType(String findElementType) {
+        this.findElementType = findElementType;
+    }
+
+    @Override
+    public String toString() {
+        return "PageElement{" +
+                "pageElementName='" + name + '\'' +
+                ", pageElementAction='" + action + '\'' +
+                ", pageElementValue='" + value + '\'' +
+                ", pageElementType'" + type + '\'' +
+                ", findElementType'" + findElementType + '\'' +
+                ", additionalValues'" + additionalValues + '\'' +
+                ", sleep'" + sleep + '\'' +
+                '}';
+    }
+
+
+    public By findElement(java.util.Map<String, String> contextValue) {
+        String valueStr = io.virtualan.cucumblan.props.util.UIHelper.getUIActualValue(value, contextValue);
+        LOGGER.info("pageElementName='" + name + '\'' +
+                ", pageElementAction='" + action + '\'' +
+                ", pageElementValue='" + value + '\'' +
+                ", pageElementType'" + type + '\'' +
+                ", findElementType'" + findElementType + '\'' +
+                ", additionalValues'" + additionalValues + '\'' +
+                ", sleep'" + sleep + '\'' +
+                " of actual Element >> " + valueStr);
+        switch (findElementType) {
+            case "BY_ID":
+                return By.id(valueStr);
+            case "BY_NAME":
+                return By.name(valueStr);
+            case "BY_TAG_NAME":
+                return By.tagName(valueStr);
+            case "BY_LINK_TEXT":
+                return By.linkText(valueStr);
+            case "BY_PARTIAL_LINK_TEXT":
+                return By.partialLinkText(valueStr);
+            case "BY_X_PATH":
+                return By.xpath(valueStr);
+            case "BY_CSS":
+                return By.cssSelector(valueStr);
+            case "BY_CLASS_NAME":
+                return By.className(valueStr);
+            default:
+                return By.id(valueStr); // Build Intelligence - self heal later
+        }
+    }
 }

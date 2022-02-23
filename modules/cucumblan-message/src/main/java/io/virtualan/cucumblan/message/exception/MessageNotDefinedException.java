@@ -2,7 +2,7 @@ package io.virtualan.cucumblan.message.exception;
 /*
  *
  *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *    Copyright (c) 2022.  Virtualan Contributors (https://virtualan.io)
  *
  *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *     in compliance with the License. You may obtain a copy of the License at
@@ -21,22 +21,22 @@ package io.virtualan.cucumblan.message.exception;
 /**
  * The type Message not defined exception.
  */
-public class MessageNotDefinedException extends  Exception{
+public class MessageNotDefinedException extends Exception {
 
-  /**
-   * Instantiates a new Message not defined exception.
-   */
-  public MessageNotDefinedException(){
-    super();
-  }
+    /**
+     * Instantiates a new Message not defined exception.
+     */
+    public MessageNotDefinedException() {
+        super();
+    }
 
-  /**
-   * Instantiates a new Message not defined exception.
-   *
-   * @param msg the msg
-   */
-  public MessageNotDefinedException(String msg){
-    super(msg);
-  }
+    /**
+     * Instantiates a new Message not defined exception.
+     *
+     * @param msg the msg
+     */
+    public MessageNotDefinedException(String msg) {
+        super(msg);
+    }
 
 }

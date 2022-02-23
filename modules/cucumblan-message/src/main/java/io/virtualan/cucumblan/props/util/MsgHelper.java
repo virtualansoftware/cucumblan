@@ -3,7 +3,7 @@ package io.virtualan.cucumblan.props.util;
 /*
  *
  *
- *    Copyright (c) 2021.  Virtualan Contributors (https://virtualan.io)
+ *    Copyright (c) 2022.  Virtualan Contributors (https://virtualan.io)
  *
  *     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *     in compliance with the License. You may obtain a copy of the License at
@@ -27,18 +27,18 @@ import com.jayway.jsonpath.JsonPath;
  */
 public class MsgHelper {
 
-  /**
-   * Get json object.
-   *
-   * @param jsonString the json string
-   * @param path       the path
-   * @return the object
-   */
-  public static Object getJSON(String jsonString, String path){
-    DocumentContext docCtx = JsonPath.parse(jsonString);
-    JsonPath jsonPath = JsonPath.compile(path);
-    Object value =docCtx.read(jsonPath);
-    return value;
-  }
+    /**
+     * Get json object.
+     *
+     * @param jsonString the json string
+     * @param path       the path
+     * @return the object
+     */
+    public static Object getJSON(String jsonString, String path) {
+        DocumentContext docCtx = JsonPath.parse(jsonString);
+        JsonPath jsonPath = JsonPath.compile(path);
+        Object value = docCtx.read(jsonPath);
+        return value;
+    }
 
 }
