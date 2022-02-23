@@ -1186,6 +1186,7 @@ public class BaseStepDefinition {
         }
     }
     
+    /** Author Oliver Glas, fix for issue #143 */
     private boolean checkEqualNumbers(String compareValue, String apiValue){
         boolean result = false;
         if ( compareValue == null && (apiValue == null || apiValue.equals(""))) return true;
@@ -1199,7 +1200,6 @@ public class BaseStepDefinition {
         } catch (NumberFormatException e) {
             LOGGER.severe("NOT a number.");
         }
-        //TODO
         return result;
     }
 
