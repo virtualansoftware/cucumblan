@@ -64,8 +64,6 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-;
-
 
 /**
  * The type Base step definition for api.
