@@ -76,7 +76,7 @@ public class UIBaseStepDefinition {
     private static Map<String, Action> actionProcessorMap = new HashMap<>();
 
     static {
-      loadActionProcessors();
+        loadActionProcessors();
     }
 
     org.monte.screenrecorder.ScreenRecorder screenRecorder = null;
@@ -130,7 +130,11 @@ public class UIBaseStepDefinition {
                     Class aClass = net.openhft.compiler.CompilerUtils.CACHED_COMPILER.
                             loadFromJava(io.virtualan.cucumblan.props.ApplicationConfiguration.getActionPackage() + "." + className, javaCode);
                     io.virtualan.cucumblan.ui.action.Action action = (io.virtualan.cucumblan.ui.action.Action) aClass.getDeclaredConstructor().newInstance();
-                    actionProcessorMap.put(action.getType(), action);
+                    try{
+                        actionProcessorMap.put(action.getType(), action);
+                    } catch (Exception e) {
+                        LOGGER.warning("Unable to Load dynamic action (" + action.getType() + " with ("+(String) p.getValue()+")) class: " + action);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -288,7 +292,7 @@ public class UIBaseStepDefinition {
                     byte[] bytes = new byte[(int) file.length()];
                     java.io.DataInputStream dis = new java.io.DataInputStream(new java.io.FileInputStream(file));
                     dis.readFully(bytes);
-                    scenario.attach(bytes, MIME_AVI, "Recorded :" + UUID.randomUUID().toString());
+                    scenario.attach(bytes, MIME_AVI, "Recorded:" + UUID.randomUUID().toString());
                     dis.close();
                 }
                 java.nio.file.Files.delete(getAviFile(ApplicationConfiguration.getBuildPath()
@@ -302,18 +306,60 @@ public class UIBaseStepDefinition {
         }
     }
 
+
     @Given("capture (.*) screen on (.*)$")
     public void embedScreenshot(String dummy, String resource) {
         try {
             if (UIDriverManager.getDriver(resource) != null) {
                 final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
                         .getScreenshotAs(OutputType.BYTES);
-                scenario.attach(screenshot, "image/png", "Image :" + UUID.randomUUID().toString());
+                scenario.attach(screenshot, "image/png", "Image:");
             } else {
-                LOGGER.warning(" Driver not loade for resource : " + resource);
+                LOGGER.warning(" Driver not loaded for resource:" + resource);
             }
         } catch (Exception cce) {
+            LOGGER.warning(" Error Message:" + cce.getMessage());
+        }
+    }
+
+
+    @Given("compare-screen (.*) with (.*) screen on (.*)$")
+    public void compareScreenshot(String dummy, String imageFileName, String resource) {
+        try {
+            if (UIDriverManager.getDriver(resource) != null) {
+                final byte[] screenshot = ((TakesScreenshot) UIDriverManager.getDriver(resource))
+                        .getScreenshotAs(OutputType.BYTES);
+                String expectedFile = ApplicationConfiguration.getPath()+ java.io.File.separator +  imageFileName;
+                java.io.File expected = new java.io.File( expectedFile);
+                if(expected != null && expected.exists()){
+                    expected = expected;
+                } else if(UIBaseStepDefinition.class.getClassLoader().getResource(imageFileName) != null) {
+                    expected = new java.io.File( UIBaseStepDefinition.class.getClassLoader().getResource(imageFileName).getFile());
+                } else {
+                    LOGGER.warning("ImageFileName not found:" + imageFileName);
+                    org.junit.Assert.assertTrue("ImageFileName not found:" + imageFileName, false);
+                    return;
+                }
+                java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(expected);
+                java.io.ByteArrayOutputStream outStreamObj = new java.io.ByteArrayOutputStream();
+                javax.imageio.ImageIO.write(image, "png", outStreamObj);
+                byte[] byteArray = outStreamObj.toByteArray();
+                scenario.attach(byteArray, "image/png", "ExpectedImage:" );
+                scenario.attach(screenshot, "image/png", "ActualImage:" );
+                if (UIHelper.compareScreenFile(byteArray, screenshot)) {
+                    org.junit.Assert.assertTrue("ComparisonSuccess:", true);
+                } else {
+                    org.junit.Assert.assertTrue("ComparisonFailed:", false);
+                }
+
+            } else {
+                LOGGER.warning(" Driver not loaded for resource : " + resource);
+                org.junit.Assert.assertTrue("Driver not loaded for resource:", false);
+            }
+        } catch (Exception cce) {
+            cce.printStackTrace();
             LOGGER.warning(" Error Message : " + cce.getMessage());
+            org.junit.Assert.assertTrue(cce.getMessage(), false);
         }
     }
 
@@ -335,22 +381,40 @@ public class UIBaseStepDefinition {
                             .filter(x -> x.getType().equalsIgnoreCase("DATA"))
                             .map(x -> x.getName()).collect(java.util.stream.Collectors.toList());
 
+
+
+            Map<String, String> tmpData = new HashMap(data);
+
+            for (String dataStr: data.keySet()) {
+                String value = data.get(dataStr);
+                if( value.contains("[") && value.contains("]")){
+                    tmpData.put(dataStr, StepDefinitionHelper.getActualValue(value));
+                } else {
+                    tmpData.put(dataStr, value);
+                }
+            }
+
             java.util.Set<String> findParams = data.keySet();
             findParams.stream().filter(x -> !dataElements.contains(x)).forEach(x -> {
                 io.virtualan.cucumblan.props.util.ScenarioContext.setContext(
-                        String.valueOf(Thread.currentThread().getId()), x, data.get(x));
+                        String.valueOf(Thread.currentThread().getId()), x, tmpData.get(x));
             });
-            scenario.attach(io.virtualan.cucumblan.props.util.ScenarioContext.getContext(
-                    String.valueOf(Thread.currentThread().getId())).toString(),
-                    "plain/text", "ContextObject: " + pageName);
-            scenario.attach(data.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8), "plain/text", "PageName: " + pageName);
+
+            org.json.JSONObject object = new org.json.JSONObject();
+            object.put("Context", new org.json.JSONObject(io.virtualan.cucumblan.props.util.ScenarioContext
+                    .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
+            object.put("LocalObject", new org.json.JSONObject(tmpData.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+            object.put("PageObject", new org.json.JSONObject(pageMap));
+
+            scenario.attach(object.toString(4)
+                    , "application/json", "ContextObject:" + pageName);
             pageMap.forEach((k, v) -> {
                 String name = StepDefinitionHelper.getActualValue(v.getName());
-                String elementValue = data.get(name);
+                String elementValue = tmpData.get(name);
                 if ((elementValue != null && "DATA".equalsIgnoreCase(v.getType()))
                         || "NAVIGATION".equalsIgnoreCase(v.getType())) {
                     try {
-                        actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, data);
+                        actionProcessor(name, StepDefinitionHelper.getActualValue(elementValue), v, resource, tmpData);
                     } catch (Exception e) {
                         e.printStackTrace();
                         LOGGER.warning("Unable to process this page:(" + e.getMessage() + "):" + pageName);
@@ -391,6 +455,22 @@ public class UIBaseStepDefinition {
             assertEquals(xpathMaps.getKey() + " is not Matched.", StepDefinitionHelper.getActualValue(xpathMaps.getValue()), webelement.getText());
         }
     }
+
+    /**
+     * Verify.
+     *
+     * @param name the name
+     */
+    @Then("store-ui's (.*) contains data in the screen on (.*)$")
+    public void store(String name, String resource, Map<String, String> xpathWithValue) {
+        resourceId = resource;
+        for (Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
+            WebElement webelement = UIDriverManager.getDriver(resource).findElement(By.xpath(xpathMaps.getKey()));
+            io.virtualan.cucumblan.props.util.ScenarioContext.setContext(String.valueOf(Thread.currentThread().getId())
+                    , xpathMaps.getKey(),  webelement.getText());
+        }
+    }
+
 
     /**
      * Action processor.

@@ -59,6 +59,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import com.jayway.jsonpath.JsonPath;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
@@ -522,8 +523,15 @@ public class BaseStepDefinition {
 
     @Given("^store (.*) as key and api's (.*) as value$")
     public void storeResponseAskeySwap( String key, String responseKey) {
-        storeResponseAskey(responseKey, key);
+        storeResponseAskey(null, responseKey, key);
     }
+
+    @Given("^store-standard type's (.*) with (.*) as key and api's (.*) as value$")
+    public void storeStandarReposne(String type, String key, String responseKey) {
+        storeResponseAskey(type,responseKey, key );
+    }
+
+
     /**
      * Load as global param.
      *
@@ -532,14 +540,35 @@ public class BaseStepDefinition {
      */
     @Given("^store the (.*) value of the key as (.*)$")
     public void storeResponseAskey(String responseKey, String key) {
+        storeResponseAskey(null,responseKey, key );
+    }
+    public void storeResponseAskey(String type,  String responseKey, String key) {
         if (!this.skipScenario) {
             if (".".equalsIgnoreCase(responseKey)) {
                 ScenarioContext
                         .setContext(String.valueOf(Thread.currentThread().getId()), key,
                                 validatableResponse.extract().body().asString());
             } else {
-                String value = validatableResponse.extract().body().jsonPath()
-                        .getString(responseKey);
+                String value  = null;
+                if(type != null) {
+                    StandardProcessing processing = stdProcessorMap.get(type);
+                    if (processing != null) {
+                        if (validatableResponse != null
+                                && validatableResponse.extract().body().asString() != null) {
+                            String jsonRequestActual = processing
+                                    .postResponseProcessing(validatableResponse.extract().body().asString());
+                            if (jsonRequestActual != null) {
+                                try {
+                                    value = JsonPath.read(jsonRequestActual, responseKey);
+                                }catch (Exception e){
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    value = validatableResponse.extract().body().jsonPath()
+                            .getString(responseKey);
+                }
                 if (value != null) {
                     ScenarioContext
 
@@ -1062,23 +1091,35 @@ public class BaseStepDefinition {
                     new JSONObject(ScenarioContext.getPrintableContextObject(
                             String.valueOf(Thread.currentThread().getId()))).toString(4), "application/json",
                     "Contextual-Dataset:");
+            attachResponse(validatableResponse);
         }
     }
 
     private void attachResponse(ValidatableResponse validatableResponse) {
         if (validatableResponse != null && validatableResponse.extract().body() != null) {
-            String xmlType =
-                    response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-            scenario.attach(validatableResponse.extract().body().asString(), xmlType,
-                    "Actual-Response");
+            attachResponse(validatableResponse.extract().body().asString(), "Actual-Response:");
         }
     }
 
-    private void attachActualResponse(String actual) {
+    private void attachActualResponse(String actual){
+        attachResponse(actual, "Expected-Response:");
+    }
+    private void attachResponse(String actual, String category) {
         String xmlType =
                 response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-        scenario
-                .attach(actual, xmlType, "Expected-Response:");
+        if(io.restassured.http.ContentType.JSON.matches(response.getContentType())) {
+            if(StepDefinitionHelper.getJSON(actual) instanceof  JSONArray) {
+                scenario
+                        .attach(new JSONArray(actual).toString(4), xmlType, category);
+            } else {
+                scenario
+                        .attach(new JSONObject(actual).toString(4), xmlType, category);
+            }
+
+        } else {
+            scenario
+                    .attach(actual, xmlType, category );
+        }
     }
 
     /**

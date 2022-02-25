@@ -31,6 +31,7 @@ Feature: Create Quote
       | Address    | 20 Wolf Rd |
       | PostalCode | 88888      |
     And capture after updated screen on css-lakeside
+    And compare-screen after updated with expected/expected_screen.png screen on css-lakeside
     And close the driver for css-lakeside
 
 #  Scenario: Accept Quote for existing user

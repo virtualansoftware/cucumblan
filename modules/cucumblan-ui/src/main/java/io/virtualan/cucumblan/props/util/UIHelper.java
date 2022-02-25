@@ -77,6 +77,30 @@ public class UIHelper {
         }
     }
 
+    public static java.awt.image.DataBufferByte getImages(byte[] bytess) throws java.io.IOException{
+        java.io.ByteArrayInputStream inStreamA = new java.io.ByteArrayInputStream(bytess);
+        java.awt.image.BufferedImage imageA = javax.imageio.ImageIO.read(inStreamA);
+        inStreamA.close();
+        return (java.awt.image.DataBufferByte)imageA.getRaster().getDataBuffer();
+    }
+
+    public static boolean compareScreenFile(byte[] expectedBytes, byte[] pngBytes) throws java.io.IOException {
+
+        java.awt.image.DataBufferByte dataBufferA = getImages(expectedBytes);
+        java.awt.image.DataBufferByte dataBufferB = getImages(pngBytes);
+
+        if (dataBufferA.getNumBanks() != dataBufferB.getNumBanks()) {
+            return false;
+        }
+
+        for (int bank = 0; bank < dataBufferA.getNumBanks(); bank++) {
+            if (!java.util.Arrays.equals(dataBufferA.getData(bank), dataBufferB.getData(bank))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public static void additionalConfigArguments(String resource, ChromeOptions options) {
         String readAddConf = ApplicationConfiguration.getProperty("service.ui.arguments." + resource);
