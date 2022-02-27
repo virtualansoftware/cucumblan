@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
         plugin = {"pretty",
                 "io.virtualan.cucumblan.props.hook.FeatureScope",
 
-                "json:target/cucumber-report.json"})
+                "json:target/cucumber/cucumber-report.json"})
 
 public class DemoTest {
 
