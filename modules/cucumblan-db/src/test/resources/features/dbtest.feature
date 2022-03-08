@@ -4,11 +4,11 @@ Feature: Testing the sql validation
     Given execute DDL for the given sql for employees on employee
       | create table employees (emp_no int, birth_date date,first_name VARCHAR(50),last_name VARCHAR(50), gender VARCHAR(50),hire_date date) |
     When execute INSERT for the given sql for employees on employee
-      | insert into employees (emp_no,birth_date,first_name,last_name, gender,hire_date) values  (2,'1978-01-08','Elan', 'Thangamani', 'Male', '2007-10-10') |
+      | insert into employees (emp_no,birth_date,first_name,last_name, gender,hire_date) values  (2,'1989-02-18','John', 'Ray', 'Male', '2007-10-10') |
     Then verify details with the given sql for employees on employee
       | select emp_no,first_name,last_name, gender from employees where emp_no = 2                |
       | EMP_NO,FIRST_NAME,LAST_NAME,GENDER |
-      | i~2,ELan,Thangamani,Male |
+      | i~2,John,Ray,Male |
     Then select details with the given sql for employees on employee
       | select * from employees where emp_no = 2 |
     Then store-sql's [0].FIRST_NAME value of the key as firstName
