@@ -64,8 +64,8 @@ import com.jayway.jsonpath.JsonPath;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static io.restassured.module.jsv.JsonSchemaValidatorSettings.settings;
 
 
 /**
@@ -1094,6 +1094,17 @@ public class BaseStepDefinition {
             attachResponse(validatableResponse);
         }
     }
+
+    @Given("^verify (.*) schema (.*) and set validation as (.*) resource on (.*)")
+    public void assertToSchema(String dummy, String file, boolean validation, String resource) {
+        String body = HelperApiUtil.readFileAsString(file);
+        scenario.attach(
+                new JSONObject(body).toString(4), "application/json", "Schema:");
+        response.then().assertThat()
+                .body(matchesJsonSchemaInClasspath(file).using(
+                        settings().with().checkedValidation(validation)));
+    }
+
 
     private void attachResponse(ValidatableResponse validatableResponse) {
         if (validatableResponse != null && validatableResponse.extract().body() != null) {
