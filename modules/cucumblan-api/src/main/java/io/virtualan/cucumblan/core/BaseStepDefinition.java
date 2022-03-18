@@ -1095,14 +1095,16 @@ public class BaseStepDefinition {
         }
     }
 
-    @Given("^verify (.*) schema (.*) and set validation as (.*) resource on (.*)")
-    public void assertToSchema(String dummy, String file, boolean validation, String resource) {
-        String body = HelperApiUtil.readFileAsString(file);
-        scenario.attach(
-                new JSONObject(body).toString(4), "application/json", "Schema:");
-        response.then().assertThat()
-                .body(matchesJsonSchemaInClasspath(file).using(
-                        settings().with().checkedValidation(validation)));
+    @Given("^verify (.*) schema validation for resource on (.*)")
+    public void assertToSchema(String dummy, String resource, DataTable schemaMap) {
+        schemaMap.asMap(String.class, String.class).forEach((k, v) -> {
+            String body = HelperApiUtil.readFileAsString(k);
+            scenario.attach(
+                    new JSONObject(body).toString(4), "application/json", "Schema:");
+            response.then().assertThat()
+                    .body(matchesJsonSchemaInClasspath(k).using(
+                            settings().with().checkedValidation(Boolean.valueOf(v))));
+        });
     }
 
 

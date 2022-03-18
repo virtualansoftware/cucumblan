@@ -12,12 +12,10 @@
   <java.version>11</java.version>
   <maven.compiler.source>${java.version}</maven.compiler.source>
   <maven.compiler.target>${java.version}</maven.compiler.target>
-  <virtualan.version>2.5.0</virtualan.version>
+  <virtualan.version>2.5.1</virtualan.version>
   <cucumber.version>7.0.0</cucumber.version>
-  <spring.boot.version>2.5.10</spring.boot.version>
+  <spring.boot.version>2.6.3</spring.boot.version>
   <hsqldb.version>2.6.0</hsqldb.version>
-  <springfox.version>2.9.2</springfox.version>
-  <groovy.version>3.0.7</groovy.version>
  </properties>
 
  <build>
@@ -38,7 +36,7 @@
    <plugin>
     <groupId>org.openapitools</groupId>
     <artifactId>openapi-generator-maven-plugin</artifactId>
-    <version>5.1.0</version>
+    <version>5.4.0</version>
     <executions>
      <execution>
       <id>Person-service-vs-api</id>
@@ -208,11 +206,6 @@
    <version>${cucumblan.version}</version>
   </dependency>
 
-  <dependency>
-   <groupId>net.masterthought</groupId>
-   <artifactId>cucumber-reporting</artifactId>
-   <version>5.6.1</version>
-  </dependency>
  </dependencies>
 
 </project>

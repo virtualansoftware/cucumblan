@@ -74,6 +74,8 @@ Feature: Test Pet API
       | contentType | application/json |
     When a user post application/json in pets resource on pet
     Then verify the status code is 201
+    And verify pet object schema validation for resource on pet
+      | pets_json.schema.json  | true  |
     And verify across response includes following in the response
       | id   | [petId_post]  |
       | name | GoldFish-POST |
