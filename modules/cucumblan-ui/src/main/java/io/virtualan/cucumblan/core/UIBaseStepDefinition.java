@@ -191,7 +191,8 @@ public class UIBaseStepDefinition {
     @Given("Load driver (.*) and url on (.*)$")
     public void loadDriverAndURL(String driverName, String resource) throws Exception {
         resourceId = resource;
-        switch (driverName) {
+        String actualDriverName = StepDefinitionHelper.getActualValue(driverName);
+        switch (actualDriverName) {
             case "CHROME":
                 chromeDriverBuilder(resource);
                 break;
