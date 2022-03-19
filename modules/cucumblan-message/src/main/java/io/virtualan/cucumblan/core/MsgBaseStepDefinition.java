@@ -53,7 +53,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import io.virtualan.cucumblan.standard.StandardProcessing;
 
 /**
 7 * The type Message base step definition.
@@ -66,6 +66,38 @@ public class MsgBaseStepDefinition {
     String msgJson = null;
     private boolean skipScenario = false;
     private Scenario scenario;
+    private static Map<String, StandardProcessing> stdProcessor = new java.util.HashMap<>();
+    private final static java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(MsgBaseStepDefinition.class.getName());
+
+    static {
+        try {
+            loadStandardProcessors();
+        } catch (Exception parserError) {
+            LOGGER
+                    .warning("Unable to load the process for standard processor for  message " + parserError.getMessage());
+        }
+    }
+
+    /**
+     * Load action processors.
+     */
+    public static void loadStandardProcessors() {
+        org.reflections.Reflections reflections = new org.reflections.Reflections(io.virtualan.cucumblan.props.ApplicationConfiguration.getStandardPackage(),
+                new org.reflections.scanners.SubTypesScanner(false));
+        java.util.Set<Class<? extends io.virtualan.cucumblan.standard.StandardProcessing>> classes = reflections
+                .getSubTypesOf(StandardProcessing.class);
+        classes.stream().forEach(x -> {
+            StandardProcessing action = null;
+            try {
+                action = x.newInstance();
+                stdProcessor.put(action.getType(), action);
+            } catch (InstantiationException e) {
+                LOGGER.warning("MSG:Unable to process this action (" + action.getType() + ") class: " + action);
+            } catch (IllegalAccessException e) {
+                LOGGER.warning("MSG:Unable to process this action (" + action.getType() + ") class: " + action);
+            }
+        });
+    }
 
     /**
      * Before.
@@ -391,6 +423,60 @@ public class MsgBaseStepDefinition {
             } else {
                 assertTrue(
                         " Unable to read message name (" + eventNameInput + ") with identifier : " + jsonpath, false);
+            }
+        }
+    }
+
+
+    /**
+     * Verify consumed json object.
+     *
+     * @param eventName the event name
+     * @param stdType  the stdType
+     * @param resource  the resource
+     * @param type      the type
+     * @param csvson    the csvson
+     * @throws InterruptedException       the interrupted exception
+     * @throws BadInputDataException      bad input data exception
+     * @throws MessageNotDefinedException the message not defined exception
+     */
+    @Given("verify (.*) for event (.*) aggregated with std-type (.*) on (.*) with type (.*)$")
+    public void verifyConsumedJSONObjectWithStdType(String dummy, String eventName, String stdType, String resource, String type,
+                                         List<String> csvson)
+            throws InterruptedException, BadInputDataException, MessageNotDefinedException {
+        if (!this.skipScenario) {
+            int recheck = 0;
+            String eventNameInput = StepDefinitionHelper.getActualValue(eventName);
+            String typeInput = StepDefinitionHelper.getActualValue(type);
+            String idInput = StepDefinitionHelper.getActualValue("SKIP_BY_ID");
+            EventRequest eventRequest = new EventRequest();
+            eventRequest.setRecheck(recheck);
+            eventRequest.setEventName(eventNameInput);
+            eventRequest.setType(typeInput);
+            eventRequest.setId(idInput);
+            eventRequest.setResource(resource);
+
+            KafkaConsumerClient.getEvent(eventRequest);
+            StandardProcessing processing = stdProcessor.get(stdType);
+            if (processing != null && processing.responseEvaluator() != null) {
+                Object expectedJson = processing.responseEvaluator();
+                JSONArray csvobject = Csvson.buildCSVson(csvson, ScenarioContext.getContext(String.valueOf(Thread.currentThread().getId())));
+                scenario.attach(csvobject.toString(4), "application/json",
+                        "ExpectedResponse:");
+                if (expectedJson instanceof JSONObject) {
+                    scenario.attach(((JSONObject) expectedJson).toString(4), "application/json",
+                            "ActualResponse:");
+                    JSONAssert
+                            .assertEquals(csvobject.getJSONObject(0), (JSONObject) expectedJson,
+                                    JSONCompareMode.LENIENT);
+                } else {
+                    scenario.attach(((JSONArray) expectedJson).toString(4), "application/json",
+                            "ActualResponse:");
+                    JSONAssert.assertEquals(csvobject, (JSONArray) expectedJson, JSONCompareMode.LENIENT);
+                }
+            } else {
+                assertTrue(
+                        " Unable to read event name (" + eventName + ") with std-type : " + stdType, false);
             }
         }
     }

@@ -107,12 +107,8 @@ public class JSONMessage implements MessageType<String, String> {
   @Override
   public MessageType buildConsumerMessage(ConsumerRecord<String, String> record, String key, String body)
       throws MessageNotDefinedException {
-    if ("virtualan.output".equalsIgnoreCase(record.topic())) {
       String id = String.valueOf(new JSONObject(body).getInt("id"));
       return new JSONMessage(id, body.toString());
-    } else {
-      throw new MessageNotDefinedException(key +" message is not defined");
-    }
   }
 
 
