@@ -1,4 +1,5 @@
 Feature: Test Kafka API
+
   Scenario: Setup a mock service for Kafka for POST 1
     Given create Pet Mock data for the with given input
       | brokerUrl                | localhost:9092                                                                                                                                                                                                                                                                         |
@@ -64,7 +65,7 @@ Feature: Test Kafka API
       | id,name, category/id:name,tags/id:name,status,photoUrls            |
       | i~101,Rocky,i~100:german shepherd,i~101:brown\|,available,string\| |
 
-  Scenario: check produce and consume event validation 2
+  Scenario: check produce and consume event for aggregation
     Given send inline message pets for event MOCK_REQUEST on pet with type JSON
       | {   "category": {     "id": 100,     "name": "Fish-POST"   },   "id": 110,   "name": "GoldFish-POST",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 100,       "name": "Fish-POST"     }   ] } |
     When verify-by-elements for pets for event MOCK_RESPONSE contains 102 on pet with type JSON
@@ -76,3 +77,6 @@ Feature: Test Kafka API
     And verify for pets for event MOCK_RESPONSE contains 102 on pet with type JSON
       | id,name, category/id:name,tags/id:name,status,photoUrls            |
       | i~102,Rocky,i~100:german shepherd,i~101:brown\|,available,string\| |
+    Then verify message for event MOCK_RESPONSE aggregated with std-type AGGREGATE on pet with type JSON
+      | totalMessageCount |
+      | i~2               |

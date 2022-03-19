@@ -3,7 +3,15 @@ package io.virtualan.cucumblan.standard;
 public interface StandardProcessing {
     String getType();
 
-    String preRequestProcessing(String jsonObject);
+    default String preRequestProcessing(String jsonObject) {
+        return null;
+    }
 
-    String postResponseProcessing(String jsonObject);
+    default String postResponseProcessing(String jsonObject) {
+        return null;
+    }
+
+    default Object responseEvaluator() {
+        return null;
+    }
 }

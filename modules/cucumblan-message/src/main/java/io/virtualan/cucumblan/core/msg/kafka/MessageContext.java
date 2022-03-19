@@ -104,6 +104,21 @@ public class MessageContext {
         return null;
     }
 
+
+    /**
+     * Gets event context map.
+     *
+     * @param eventName the event name
+     * @return the event context map
+     */
+    public static Map<String, Object> getEventContextMap(String eventName) {
+        if (isContains(eventName)) {
+            Map<String, Object> events = messageContext.get(eventName);
+            return events;
+        }
+        return null;
+    }
+
     /**
      * remove event context map.
      *
@@ -140,11 +155,10 @@ public class MessageContext {
     /**
      * Gets context.
      *
-     * @param key the key
      * @return the context
      */
-    public static Map<String, Object> getContext(String key) {
-        return messageContext.get(key);
+    public static Map<String, Map<String, Object>> getAllContext() {
+        return messageContext;
     }
 
     /**
