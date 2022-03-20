@@ -19,6 +19,7 @@
 
 package io.virtualan.cucumblan.core;
 
+import com.jayway.jsonpath.JsonPath;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -59,13 +60,12 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import com.jayway.jsonpath.JsonPath;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static io.restassured.module.jsv.JsonSchemaValidatorSettings.settings;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -522,13 +522,13 @@ public class BaseStepDefinition {
     }
 
     @Given("^store (.*) as key and api's (.*) as value$")
-    public void storeResponseAskeySwap( String key, String responseKey) {
+    public void storeResponseAskeySwap(String key, String responseKey) {
         storeResponseAskey(null, responseKey, key);
     }
 
     @Given("^store-standard type's (.*) with (.*) as key and api's (.*) as value$")
     public void storeStandarReposne(String type, String key, String responseKey) {
-        storeResponseAskey(type,responseKey, key );
+        storeResponseAskey(type, responseKey, key);
     }
 
 
@@ -540,17 +540,18 @@ public class BaseStepDefinition {
      */
     @Given("^store the (.*) value of the key as (.*)$")
     public void storeResponseAskey(String responseKey, String key) {
-        storeResponseAskey(null,responseKey, key );
+        storeResponseAskey(null, responseKey, key);
     }
-    public void storeResponseAskey(String type,  String responseKey, String key) {
+
+    public void storeResponseAskey(String type, String responseKey, String key) {
         if (!this.skipScenario) {
             if (".".equalsIgnoreCase(responseKey)) {
                 ScenarioContext
                         .setContext(String.valueOf(Thread.currentThread().getId()), key,
                                 validatableResponse.extract().body().asString());
             } else {
-                String value  = null;
-                if(type != null) {
+                String value = null;
+                if (type != null) {
                     StandardProcessing processing = stdProcessorMap.get(type);
                     if (processing != null) {
                         if (validatableResponse != null
@@ -560,7 +561,7 @@ public class BaseStepDefinition {
                             if (jsonRequestActual != null) {
                                 try {
                                     value = JsonPath.read(jsonRequestActual, responseKey);
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                 }
                             }
                         }
@@ -1101,7 +1102,7 @@ public class BaseStepDefinition {
             String body = HelperApiUtil.readFileAsString(k);
             scenario.attach(
                     new JSONObject(body).toString(4), "application/json", "Schema:");
-            if(response != null && response.body().asString() != null) {
+            if (response != null && response.body().asString() != null) {
                 response.then().assertThat()
                         .body(matchesJsonSchemaInClasspath(k).using(
                                 settings().with().checkedValidation(Boolean.valueOf(v))));
@@ -1118,9 +1119,10 @@ public class BaseStepDefinition {
         }
     }
 
-    private void attachActualResponse(String actual){
+    private void attachActualResponse(String actual) {
         attachResponse(actual, "Expected-Response:");
     }
+
     private void attachResponse(String actual, String category) {
         try {
             String xmlType =
@@ -1140,7 +1142,7 @@ public class BaseStepDefinition {
                 scenario
                         .attach(actual, xmlType, category);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             scenario.attach(actual, "text/plain", category);
         }
     }
@@ -1188,6 +1190,46 @@ public class BaseStepDefinition {
             }
         }
     }
+
+    /**
+     * Verify response.
+     *
+     * @param dummy    the desc
+     * @param type     the data
+     * @param resource the resource
+     * @param csvson the csvson
+     * @throws Throwable the throwable
+     */
+    @Given("verify (.*) for api-aggregated-std-type (.*) on (.*)$")
+    public void verifyAggregatorResponse(String dummy, String type, String resource, List<String> csvson)
+            throws Throwable {
+        if (!this.skipScenario) {
+            StandardProcessing processing = stdProcessorMap.get(type);
+            if (processing != null && processing.responseEvaluator() != null) {
+                Object aggregatedObject = processing.responseEvaluator();
+                JSONArray expectedArray = io.virtualan.csvson.Csvson.buildCSVson(csvson, ScenarioContext
+                        .getContext(String.valueOf(Thread.currentThread().getId())));
+
+                scenario.attach(expectedArray.toString(4), "application/json",
+                        "ExpectedResponse:");
+                if (aggregatedObject instanceof JSONObject) {
+                    scenario.attach(((JSONObject) aggregatedObject).toString(4), "application/json",
+                            "ActualResponse:");
+                    org.skyscreamer.jsonassert.JSONAssert
+                            .assertEquals(expectedArray.getJSONObject(0), (JSONObject) aggregatedObject,
+                                    JSONCompareMode.LENIENT);
+                } else {
+                    scenario.attach(((JSONArray) expectedArray).toString(4), "application/json",
+                            "ActualResponse:");
+                    org.skyscreamer.jsonassert.JSONAssert.assertEquals(expectedArray, (JSONArray) aggregatedObject, JSONCompareMode.LENIENT);
+                }
+
+            } else {
+                assertTrue("Aggregated Standard " + type + " is not implemented for response ", false);
+            }
+        }
+    }
+
 
     /**
      * Verify response.

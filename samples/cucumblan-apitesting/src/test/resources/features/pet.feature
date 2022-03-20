@@ -147,6 +147,7 @@ Feature: Test Pet API
       | contentType | application/json |
     When a user post application/json in virtualservices resource on virtualan
     Then verify the status code is 201
+    And store jsonString_1 as key and api's . as value
     And verify response with mockStatus includes following in the response
       | mockStatus.code | Mock created successfully |
 
@@ -165,6 +166,10 @@ Feature: Test Pet API
       | contentType | application/json |
     When a user put application/json in pets_petId resource on pet
     Then verify the status code is 200
+    And store jsonString_2 as key and api's . as value
+    And verify api response aggregation for api-aggregated-std-type API_AGGREGATE on pet
+      | totalMessageCount     |
+      | i~2 |
     And verify across response includes following in the response
       | id   | 130          |
       | name | GoldFish-PUT |
