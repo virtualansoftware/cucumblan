@@ -1101,9 +1101,13 @@ public class BaseStepDefinition {
             String body = HelperApiUtil.readFileAsString(k);
             scenario.attach(
                     new JSONObject(body).toString(4), "application/json", "Schema:");
-            response.then().assertThat()
-                    .body(matchesJsonSchemaInClasspath(k).using(
-                            settings().with().checkedValidation(Boolean.valueOf(v))));
+            if(response != null && response.body().asString() != null) {
+                response.then().assertThat()
+                        .body(matchesJsonSchemaInClasspath(k).using(
+                                settings().with().checkedValidation(Boolean.valueOf(v))));
+            } else {
+                assertTrue("Empty Response returned", false);
+            }
         });
     }
 
@@ -1118,20 +1122,26 @@ public class BaseStepDefinition {
         attachResponse(actual, "Expected-Response:");
     }
     private void attachResponse(String actual, String category) {
-        String xmlType =
-                response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
-        if(io.restassured.http.ContentType.JSON.matches(response.getContentType())) {
-            if(StepDefinitionHelper.getJSON(actual) instanceof  JSONArray) {
-                scenario
-                        .attach(new JSONArray(actual).toString(4), xmlType, category);
+        try {
+            String xmlType =
+                    response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+            if (io.restassured.http.ContentType.JSON.matches(response.getContentType())) {
+                if (StepDefinitionHelper.getJSON(actual) instanceof JSONArray) {
+                    scenario
+                            .attach(new JSONArray(actual).toString(4), xmlType, category);
+                } else if (StepDefinitionHelper.getJSON(actual) instanceof JSONObject) {
+                    scenario
+                            .attach(new JSONObject(actual).toString(4), xmlType, category);
+                } else {
+                    scenario
+                            .attach(actual, "text/plain", category);
+                }
             } else {
                 scenario
-                        .attach(new JSONObject(actual).toString(4), xmlType, category);
+                        .attach(actual, xmlType, category);
             }
-
-        } else {
-            scenario
-                    .attach(actual, xmlType, category );
+        } catch (Exception e){
+            scenario.attach(actual, "text/plain", category);
         }
     }
 
