@@ -440,7 +440,7 @@ public class MsgBaseStepDefinition {
      * @throws BadInputDataException      bad input data exception
      * @throws MessageNotDefinedException the message not defined exception
      */
-    @Given("verify (.*) for event (.*) aggregated with std-type (.*) on (.*) with type (.*)$")
+    @Given("verify (.*) for event (.*) message-aggregated-std-type (.*) on (.*) with type (.*)$")
     public void verifyConsumedJSONObjectWithStdType(String dummy, String eventName, String stdType, String resource, String type,
                                          List<String> csvson)
             throws InterruptedException, BadInputDataException, MessageNotDefinedException {
