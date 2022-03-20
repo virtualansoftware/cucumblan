@@ -4,7 +4,7 @@
     <artifactId>cucumblan-utils</artifactId>
     <packaging>jar</packaging>
     <name>cucumblan-utils</name>
-    <version>1.1.5-SNAPSHOT</version>
+    <version>1.1.5</version>
     <properties>
         <mapson.version>1.1.12</mapson.version>
         <java.version>1.8</java.version>
@@ -29,7 +29,7 @@
         <connection>scm:git:ssh://git@github.com:virtualansoftware/cucumblan.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/virtualansoftware/cucumblan.git</developerConnection>
         <url>https://github.com/virtualansoftware/cucumblan.git</url>
-        <tag>0.0.1</tag>
+        <tag>cucumblan-project-1.4.5</tag>
     </scm>
     <developers>
         <!-- original author of the project -->
