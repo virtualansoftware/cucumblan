@@ -77,6 +77,6 @@ Feature: Test Kafka API
     And verify for pets for event MOCK_RESPONSE contains 102 on pet with type JSON
       | id,name, category/id:name,tags/id:name,status,photoUrls            |
       | i~102,Rocky,i~100:german shepherd,i~101:brown\|,available,string\| |
-    Then verify message for event MOCK_RESPONSE aggregated with std-type AGGREGATE on pet with type JSON
+    Then verify message for event MOCK_RESPONSE message-aggregated-std-type AGGREGATE on pet with type JSON
       | totalMessageCount |
       | i~2               |
