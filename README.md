@@ -1,6 +1,7 @@
 <h1 align="center">Cucumblan</h1>
 
-**cucumblan-api:** [![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/cucumblan-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22cucumblan-api%22)  [![Build Status](https://travis-ci.com/virtualansoftware/cucumblan.svg?branch=master)](https://travis-ci.com/virtualansoftware/cucumblan)
+**cucumblan-api:** [![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/cucumblan-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22cucumblan-api%22)  [![Build status](https://ci.appveyor.com/api/projects/status/95wp3wet6kh0tn1o/branch/master?svg=true)](https://ci.appveyor.com/project/elans3/cucumblan/branch/master)
+
                           
 <div align="center">
    Cucumblan BDD API Testing tool  
