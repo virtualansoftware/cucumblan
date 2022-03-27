@@ -38,6 +38,7 @@ import io.virtualan.cucumblan.props.util.EventRequest;
 import io.virtualan.cucumblan.props.util.MsgHelper;
 import io.virtualan.cucumblan.props.util.ScenarioContext;
 import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
 import io.virtualan.mapson.exception.BadInputDataException;
 import lombok.extern.slf4j.Slf4j;
@@ -46,17 +47,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+
 import javax.jms.JMSException;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import io.virtualan.cucumblan.standard.StandardProcessing;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
-7 * The type Message base step definition.
+ * 7 * The type Message base step definition.
  *
  * @author Elan Thangamani
  */
@@ -137,7 +139,6 @@ public class MsgBaseStepDefinition {
     }
 
 
-
     /**
      * Produce message with partition.
      *
@@ -158,15 +159,28 @@ public class MsgBaseStepDefinition {
             MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
             if (topic != null && messageType != null) {
                 MessageType builtMessage = messageType.buildProducerMessage(messages);
-                scenario.log(builtMessage.toString());
-                if (builtMessage.getMessageAsJson() != null) {
-                    this.msgJson = builtMessage.getMessageAsJson().toString();
+                if (builtMessage == null) {
+                    java.util.HashMap contextParam = new java.util.HashMap();
+                    contextParam.put("EVENT_NAME", eventName);
+                    contextParam.put("RESOURCE", resource);
+                    contextParam.put("TYPE", type);
+                    builtMessage = messageType.buildProducerMessage(messages, contextParam);
                 }
-                KafkaProducerClient
-                        .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                                partition, builtMessage.getHeaders());
+                if (builtMessage != null) {
+                    scenario.log(builtMessage.toString());
+
+                    if (builtMessage.getMessageAsJson() != null) {
+                        this.msgJson = builtMessage.getMessageAsJson().toString();
+                    }
+                    KafkaProducerClient
+                            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                                    partition, builtMessage.getHeaders());
+                } else {
+                    assertTrue(type + " message was not built properly", false);
+                }
+
             } else {
-                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
+                assertTrue(eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -215,21 +229,32 @@ public class MsgBaseStepDefinition {
             MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
             if (topic != null && messageType != null) {
                 MessageType builtMessage = messageType.buildProducerMessage(messages);
-                if (builtMessage.getMessageAsJson() != null) {
-                    this.msgJson = builtMessage.getMessageAsJson().toString();
+                if (builtMessage == null) {
+                    java.util.HashMap contextParam = new java.util.HashMap();
+                    contextParam.put("EVENT_NAME", eventName);
+                    contextParam.put("RESOURCE", resource);
+                    contextParam.put("TYPE", type);
+                    builtMessage = messageType.buildProducerMessage(messages, contextParam);
                 }
-                scenario.log(builtMessage.toString());
-                if (builtMessage.getKey() != null) {
-                    KafkaProducerClient
-                            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                                    null, builtMessage.getHeaders());
+                if (builtMessage != null) {
+                    if (builtMessage.getMessageAsJson() != null) {
+                        this.msgJson = builtMessage.getMessageAsJson().toString();
+                    }
+                    scenario.log(builtMessage.toString());
+                    if (builtMessage.getKey() != null) {
+                        KafkaProducerClient
+                                .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                                        null, builtMessage.getHeaders());
+                    } else {
+                        KafkaProducerClient
+                                .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                                        null, builtMessage.getHeaders());
+                    }
                 } else {
-                    KafkaProducerClient
-                            .sendMessage(resource, topic, null, builtMessage.getMessage(),
-                                    null, builtMessage.getHeaders());
+                    assertTrue(type + " message was not built properly", false);
                 }
             } else {
-                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
+                assertTrue(eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -253,21 +278,32 @@ public class MsgBaseStepDefinition {
             MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
             if (topic != null && messageType != null) {
                 MessageType builtMessage = messageType.buildProducerMessage(messages);
-                if (builtMessage.getMessageAsJson() != null) {
-                    this.msgJson = builtMessage.getMessageAsJson().toString();
+                if (builtMessage == null) {
+                    java.util.HashMap contextParam = new java.util.HashMap();
+                    contextParam.put("EVENT_NAME", eventName);
+                    contextParam.put("RESOURCE", resource);
+                    contextParam.put("TYPE", type);
+                    builtMessage = messageType.buildProducerMessage(messages, contextParam);
                 }
-                scenario.log(builtMessage.toString());
-                if (builtMessage.getKey() != null) {
-                    KafkaProducerClient
-                            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                                    null, builtMessage.getHeaders());
+                if (builtMessage != null) {
+                    if (builtMessage.getMessageAsJson() != null) {
+                        this.msgJson = builtMessage.getMessageAsJson().toString();
+                    }
+                    scenario.log(builtMessage.toString());
+                    if (builtMessage.getKey() != null) {
+                        KafkaProducerClient
+                                .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                                        null, builtMessage.getHeaders());
+                    } else {
+                        KafkaProducerClient
+                                .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                                        null, builtMessage.getHeaders());
+                    }
                 } else {
-                    KafkaProducerClient
-                            .sendMessage(resource, topic, null, builtMessage.getMessage(),
-                                    null, builtMessage.getHeaders());
+                    assertTrue(type + " message was not built properly", false);
                 }
             } else {
-                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
+                assertTrue(eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -292,9 +328,9 @@ public class MsgBaseStepDefinition {
                 boolean message = false;
                 message = MQClient.postMessage(scenario, resource, eventNameInput,
                         StepDefinitionHelper.getActualValue(messages.stream().map(x -> x).collect(Collectors.joining())), queueType);
-                assertTrue( "message posting status", message);
+                assertTrue("message posting status", message);
             } else {
-                assertTrue( queueName + " is not configured.", false);
+                assertTrue(queueName + " is not configured.", false);
             }
         }
     }
@@ -319,21 +355,32 @@ public class MsgBaseStepDefinition {
             MessageType messageType = MessageContext.getMessageTypes().get(typeInput);
             if (topic != null && messageType != null) {
                 MessageType builtMessage = messageType.buildProducerMessage(messages);
-                scenario.log(builtMessage.toString());
-                if (builtMessage.getMessageAsJson() != null) {
-                    this.msgJson = builtMessage.getMessageAsJson().toString();
+                if (builtMessage == null) {
+                    java.util.HashMap contextParam = new java.util.HashMap();
+                    contextParam.put("EVENT_NAME", eventName);
+                    contextParam.put("RESOURCE", resource);
+                    contextParam.put("TYPE", type);
+                    builtMessage = messageType.buildProducerMessage(messages, contextParam);
                 }
-                if (builtMessage.getKey() != null) {
-                    KafkaProducerClient
-                            .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
-                                    null, builtMessage.getHeaders());
+                if (builtMessage != null) {
+                    scenario.log(builtMessage.toString());
+                    if (builtMessage.getMessageAsJson() != null) {
+                        this.msgJson = builtMessage.getMessageAsJson().toString();
+                    }
+                    if (builtMessage.getKey() != null) {
+                        KafkaProducerClient
+                                .sendMessage(resource, topic, builtMessage.getKey(), builtMessage.getMessage(),
+                                        null, builtMessage.getHeaders());
+                    } else {
+                        KafkaProducerClient
+                                .sendMessage(resource, topic, null, builtMessage.getMessage(),
+                                        null, builtMessage.getHeaders());
+                    }
                 } else {
-                    KafkaProducerClient
-                            .sendMessage(resource, topic, null, builtMessage.getMessage(),
-                                    null, builtMessage.getHeaders());
+                    assertTrue(type + " message was not built properly", false);
                 }
             } else {
-                assertTrue( eventName + " is not configured for any topic. or " + type + " is not configured", false);
+                assertTrue(eventName + " is not configured for any topic. or " + type + " is not configured", false);
             }
         }
     }
@@ -432,7 +479,7 @@ public class MsgBaseStepDefinition {
      * Verify consumed json object.
      *
      * @param eventName the event name
-     * @param stdType  the stdType
+     * @param stdType   the stdType
      * @param resource  the resource
      * @param type      the type
      * @param csvson    the csvson
@@ -442,7 +489,7 @@ public class MsgBaseStepDefinition {
      */
     @Given("verify (.*) for event (.*) message-aggregated-std-type (.*) on (.*) with type (.*)$")
     public void verifyConsumedJSONObjectWithStdType(String dummy, String eventName, String stdType, String resource, String type,
-                                         List<String> csvson)
+                                                    List<String> csvson)
             throws InterruptedException, BadInputDataException, MessageNotDefinedException {
         if (!this.skipScenario) {
             int recheck = 0;
@@ -599,10 +646,10 @@ public class MsgBaseStepDefinition {
                             .setContext(String.valueOf(Thread.currentThread().getId()), key,
                                     mapson.get(responseKey));
                 } else {
-                    assertTrue( responseKey + " not found in the read message ", false);
+                    assertTrue(responseKey + " not found in the read message ", false);
                 }
             } else {
-                assertTrue( " Message not found for the read message?  ", false);
+                assertTrue(" Message not found for the read message?  ", false);
             }
         }
     }
