@@ -85,16 +85,27 @@ public interface MessageType<T, TT> {
 
     /**
      * Build message object build logic for the application specific need. Build and produce events
-     * for your specific needs Refer io.virtualan.cucumblan.message.typeimpl.JSONMessage
      *
      * @param tt the tt
      * @return the message type
      */
-    MessageType buildProducerMessage(Object tt) throws MessageNotDefinedException;
+    default MessageType buildProducerMessage(Object tt) throws MessageNotDefinedException{
+        return null;
+    }
+
+    /**
+     * Build message object build logic for the application specific need. Build and produce events
+     *
+     * @param tt the tt
+     * @param contextParameter    context parameter
+     * @return the message type
+     */
+    default MessageType buildProducerMessage(Object tt, java.util.Map<String, Object> contextParameter) throws MessageNotDefinedException {
+        return null;
+    }
 
     /**
      * Build message while consuming the message
-     * for your specific needs Refer io.virtualan.cucumblan.message.typeimpl.JSONMessage
      *
      * @param record ConsumerRecord object available in the context
      * @param key    the kafka message key
@@ -102,9 +113,23 @@ public interface MessageType<T, TT> {
      * @return the message type used for Pre defined verification steps
      * @throws MessageNotDefinedException the message not defined exception
      */
-    MessageType buildConsumerMessage(ConsumerRecord<T, TT> record, T key, TT value)
-            throws MessageNotDefinedException, SkipMessageException;
+    default MessageType buildConsumerMessage(ConsumerRecord<T, TT> record, T key, TT value)
+            throws MessageNotDefinedException, SkipMessageException{
+        return null;
+    }
 
+    /**
+     * Build message while consuming the message
+     *
+     * @param record ConsumerRecord object available in the context
+     * @param contextParameter    context parameter
+     * @return the message type used for Pre defined verification steps
+     * @throws MessageNotDefinedException the message not defined exception
+     */
+    default  MessageType buildConsumerMessage(ConsumerRecord<T, TT> record, java.util.Map<String, Object> contextParameter)
+            throws MessageNotDefinedException, SkipMessageException {
+        return null;
+    }
 
     /**
      * Build message while consuming the message

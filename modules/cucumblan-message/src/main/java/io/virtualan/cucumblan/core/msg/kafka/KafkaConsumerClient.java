@@ -167,6 +167,12 @@ public class KafkaConsumerClient {
         if (messageType != null) {
             try {
                 obj = messageType.buildConsumerMessage(record, record.key(), record.value());
+                if (obj == null) {
+                    java.util.HashMap contextParam = new java.util.HashMap();
+                    contextParam.put("EVENT_NAME", eventName);
+                    contextParam.put("TYPE", type);
+                    obj = messageType.buildConsumerMessage(record, contextParam);
+                }
                 if (obj != null && obj.getId() != null) {
                     MessageContext.setEventContextMap(eventName, obj.getId().toString(), obj);
                     return true;
