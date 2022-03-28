@@ -332,7 +332,7 @@ public class BaseStepDefinition {
     }
 
     @Given("^create variable (.*) as key and (.*) as value$")
-    public void addVariableSwap(String key, String responseValue) {
+    public void addVariableSwap(String key, String responseValue) throws  Exception{
         addVariable(responseValue, key);
     }
 
@@ -343,18 +343,13 @@ public class BaseStepDefinition {
      * @param key           the key
      */
     @Given("^add the (.*) value of the key as (.*)$")
-    public void addVariable(String responseValue, String key) {
+    public void addVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
-            if (responseValue.startsWith("[") && responseValue.endsWith("]")) {
-                ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
-                                Helper.getActualValueForAll(responseValue, ScenarioContext
-                                        .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
-            } else {
-                ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key, responseValue);
+            ScenarioContext
+                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariableType(
+                            responseValue, ScenarioContext
+                                    .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
 
-            }
         }
     }
 

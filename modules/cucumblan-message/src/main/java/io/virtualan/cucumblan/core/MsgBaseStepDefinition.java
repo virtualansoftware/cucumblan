@@ -578,7 +578,7 @@ public class MsgBaseStepDefinition {
                 }
             } else {
                 assertTrue(
-                        " Unable to read event name (" + eventName + ") with identifier : " + id, false);
+                        " Unable to read event name (" + eventName + ") with identifier : " + idInput, false);
             }
         }
     }
