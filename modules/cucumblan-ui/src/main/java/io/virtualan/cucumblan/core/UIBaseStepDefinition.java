@@ -396,11 +396,13 @@ public class UIBaseStepDefinition {
             }
 
             java.util.Set<String> findParams = data.keySet();
-            findParams.stream().filter(x -> !dataElements.contains(x)).forEach(x -> {
-                io.virtualan.cucumblan.props.util.ScenarioContext.setContext(
-                        String.valueOf(Thread.currentThread().getId()), x, tmpData.get(x));
-            });
 
+            for (String x :findParams) {
+                if(!dataElements.contains(x)){
+                    io.virtualan.cucumblan.props.util.ScenarioContext.setContext(
+                            String.valueOf(Thread.currentThread().getId()), x, tmpData.get(x));
+                }
+            }
             org.json.JSONObject object = new org.json.JSONObject();
             object.put("Context", new org.json.JSONObject(io.virtualan.cucumblan.props.util.ScenarioContext
                     .getPrintableContextObject(String.valueOf(Thread.currentThread().getId()))));
@@ -463,7 +465,7 @@ public class UIBaseStepDefinition {
      * @param name the name
      */
     @Then("store-ui's (.*) contains data in the screen on (.*)$")
-    public void store(String name, String resource, Map<String, String> xpathWithValue) {
+    public void store(String name, String resource, Map<String, String> xpathWithValue) throws Exception {
         resourceId = resource;
         for (Map.Entry<String, String> xpathMaps : xpathWithValue.entrySet()) {
             WebElement webelement = UIDriverManager.getDriver(resource).findElement(By.xpath(xpathMaps.getKey()));

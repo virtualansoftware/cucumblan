@@ -78,8 +78,12 @@ public class ScenarioContext {
      * @param key   the key
      * @param value the value
      */
-    public static void setContext(String id, String key, String value) {
-        getScenarioContext(id).put(key, value);
+    public static void setContext(String id, String key, String value) throws Exception {
+        if (parentScenarioContext.get(id) != null){
+            getScenarioContext(id).put(key, value);
+        } else {
+            throw new Exception("Context not found");
+        }
     }
 
     /**

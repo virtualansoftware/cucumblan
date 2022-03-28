@@ -289,7 +289,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^provided all the feature level parameters from file$")
-    public void loadGlobalParamFromFile() throws IOException {
+    public void loadGlobalParamFromFile() throws Exception {
         Map<String, String> env = System.getenv();
         if (env != null && !env.isEmpty()) {
             for (String envName : env.keySet()) {
@@ -508,7 +508,7 @@ public class BaseStepDefinition {
     }
 
     @Given("^modify key as (.*) and (.*) as value$")
-    public void modifyStringVariableSwap(String responseValue, String key) throws IOException {
+    public void modifyStringVariableSwap(String responseValue, String key) throws Exception {
         modifyStringVariable(responseValue, key);
     }
 
@@ -520,7 +520,7 @@ public class BaseStepDefinition {
      * @throws IOException the io exception
      */
     @Given("^modify the (.*) value of the key as (.*)$")
-    public void modifyStringVariable(String responseValue, String key) throws IOException {
+    public void modifyStringVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), key,
@@ -530,12 +530,12 @@ public class BaseStepDefinition {
     }
 
     @Given("^store (.*) as key and api's (.*) as value$")
-    public void storeResponseAskeySwap(String key, String responseKey) {
+    public void storeResponseAskeySwap(String key, String responseKey) throws Exception {
         storeResponseAskey(null, responseKey, key);
     }
 
     @Given("^store-standard type's (.*) with (.*) as key and api's (.*) as value$")
-    public void storeStandarReposne(String type, String key, String responseKey) {
+    public void storeStandarReposne(String type, String key, String responseKey) throws Exception {
         storeResponseAskey(type, responseKey, key);
     }
 
@@ -547,11 +547,11 @@ public class BaseStepDefinition {
      * @param key         the key
      */
     @Given("^store the (.*) value of the key as (.*)$")
-    public void storeResponseAskey(String responseKey, String key) {
+    public void storeResponseAskey(String responseKey, String key) throws Exception {
         storeResponseAskey(null, responseKey, key);
     }
 
-    public void storeResponseAskey(String type, String responseKey, String key) {
+    public void storeResponseAskey(String type, String responseKey, String key) throws Exception {
         if (!this.skipScenario) {
             if (".".equalsIgnoreCase(responseKey)) {
                 ScenarioContext
@@ -1085,7 +1085,7 @@ public class BaseStepDefinition {
      */
     @Then("^verify the status code is (\\d+)")
     @Then("^the status code is (\\d+)")
-    public void verifyStatusCode(int statusCode) {
+    public void verifyStatusCode(int statusCode) throws Exception {
         if (!this.skipScenario) {
             ScenarioContext
                     .setContext(String.valueOf(Thread.currentThread().getId()), "STATUS_CODE", String.valueOf(response.getStatusCode()));

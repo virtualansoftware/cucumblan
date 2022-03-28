@@ -203,12 +203,12 @@ public class DBBaseStepDefinition {
     }
 
     @Given("^store (.*) as key and query's (.*) as value")
-    public void storeSqlResponseAskeySwap(String key, String responseKey) throws JSONException {
+    public void storeSqlResponseAskeySwap(String key, String responseKey) throws Exception {
         storeSqlResponseAskey(responseKey, key);
     }
 
     @Given("^store-sql's (.*) value of the key as (.*)")
-    public void storeSqlResponseAskey(String responseKey, String key) throws JSONException {
+    public void storeSqlResponseAskey(String responseKey, String key) throws Exception {
         if (!this.skipScenario) {
             if (sqlJson != null) {
                 Map<String, String> mapson = Mapson.buildMAPsonFromJson(sqlJson);
