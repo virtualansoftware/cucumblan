@@ -632,12 +632,12 @@ public class MsgBaseStepDefinition {
     }
 
     @Given("^store (.*) as key and message's (.*) as value")
-    public void storeMessageResponseAskeySwap(String key, String responseKey) throws JSONException {
+    public void storeMessageResponseAskeySwap(String key, String responseKey) throws Exception {
         storeMessageResponseAskey(responseKey, key);
     }
 
     @Given("^store-message's (.*) value of the key as (.*)")
-    public void storeMessageResponseAskey(String responseKey, String key) throws JSONException {
+    public void storeMessageResponseAskey(String responseKey, String key) throws Exception {
         if (!this.skipScenario) {
             if (msgJson != null) {
                 Map<String, String> mapson = Mapson.buildMAPsonFromJson(msgJson);
