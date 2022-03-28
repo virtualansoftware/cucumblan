@@ -102,13 +102,13 @@ public class JSONMessageType implements io.virtualan.cucumblan.message.type.Mess
                         try {
                             if(contextParam.get("EVENT_NAME") != null
                                     && x.getKey().toString().equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
-                                String identifier = com.jayway.jsonpath.JsonPath.read(body, x.getValue().toString());
+                                Object identifier = com.jayway.jsonpath.JsonPath.read(body, x.getValue().toString());
                                 if (identifier != null) return true;
                             }
                         } catch (Exception e) {
                         }
                         return false;
-                    }).map(x -> new JSONMessageType(com.jayway.jsonpath.JsonPath.read(body, x.getValue().toString()), body)).collect(java.util.stream.Collectors.toList());
+                    }).map(x -> new JSONMessageType(com.jayway.jsonpath.JsonPath.read(body, x.getValue().toString()).toString(), body)).collect(java.util.stream.Collectors.toList());
             if (messageTypeList != null && !messageTypeList.isEmpty()) return messageTypeList.get(0);
         }
         throw new io.virtualan.cucumblan.message.exception.SkipMessageException(body);
