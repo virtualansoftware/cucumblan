@@ -346,15 +346,22 @@ public class BaseStepDefinition {
     public void addVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
 
-            Object value = ExcelAndMathHelper.evaluateWithVariableType(
-                    responseValue, ScenarioContext
-                            .getContext(String.valueOf(Thread.currentThread().getId())));
-            if(value  != null) {
+            if (responseValue.startsWith("[") && responseValue.endsWith("]")) {
                 ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key,value.toString());
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key,
+                                Helper.getActualValueForAll(responseValue, ScenarioContext
+                                        .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
             } else {
-                ScenarioContext
-                        .setContext(String.valueOf(Thread.currentThread().getId()), key, responseValue);
+                Object value = ExcelAndMathHelper.evaluateWithVariableType(
+                        responseValue, ScenarioContext
+                                .getContext(String.valueOf(Thread.currentThread().getId())));
+                if (value != null) {
+                    ScenarioContext
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key, value.toString());
+                } else {
+                    ScenarioContext
+                            .setContext(String.valueOf(Thread.currentThread().getId()), key, responseValue);
+                }
             }
         }
     }
