@@ -43,7 +43,7 @@ public class ExcelAndMathHelper {
             }
         }
         workbook.close();
-        throw new Exception(formula + "is not resolved for type > ");
+        throw new Exception(formula + " is not resolved for type > ");
     }
 
     public static Object evaluate(Class type, String formula) throws Exception {
@@ -72,6 +72,6 @@ public class ExcelAndMathHelper {
             }
         }
         workbook.close();
-        throw new Exception(formula + "is not resolved for type > " + type.getName());
+        throw new Exception(formula + " is not resolved for type > " + type.getName());
     }
 }
