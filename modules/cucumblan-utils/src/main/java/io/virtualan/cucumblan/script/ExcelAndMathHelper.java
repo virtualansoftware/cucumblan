@@ -18,28 +18,25 @@ public class ExcelAndMathHelper {
     }
 
     public static Object evaluateType(String formula) throws Exception {
-        Object cellValue = new Object();
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
         FormulaEvaluator evaluator = workbook.getCreationHelper()
                 .createFormulaEvaluator();
         Row row = sheet.createRow(new Random().nextInt(100));
         Cell cell = row.createCell(new Random().nextInt(100));
-        cell.setCellFormula(formula);
+        try {
+            cell.setCellFormula(formula);
+        }catch (org.apache.poi.ss.formula.FormulaParseException e){
+            return formula;
+        }
         if (cell.getCellType() == CellType.FORMULA) {
             CellType cellType = evaluator.evaluateFormulaCell(cell);
             if (cellType == CellType.BOOLEAN) {
-                cellValue = cell.getBooleanCellValue();
-                return cellValue;
+                return cell.getBooleanCellValue();
             } else if (cellType == CellType.NUMERIC) {
-                cellValue = (int) cell.getNumericCellValue();
-                return cellValue;
-            } else if (cellType == CellType.NUMERIC) {
-                cellValue = cell.getNumericCellValue();
-                return cellValue;
+                return (int) cell.getNumericCellValue();
             } else if (cellType == CellType.STRING) {
-                cellValue = cell.getStringCellValue();
-                return cellValue;
+                return cell.getStringCellValue();
             }
         }
         workbook.close();
@@ -47,28 +44,27 @@ public class ExcelAndMathHelper {
     }
 
     public static Object evaluate(Class type, String formula) throws Exception {
-        Object cellValue = new Object();
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
         FormulaEvaluator evaluator = workbook.getCreationHelper()
                 .createFormulaEvaluator();
         Row row = sheet.createRow(new Random().nextInt(100));
         Cell cell = row.createCell(new Random().nextInt(100));
-        cell.setCellFormula(formula);
+        try {
+            cell.setCellFormula(formula);
+        }catch (org.apache.poi.ss.formula.FormulaParseException e){
+            return formula;
+        }
         if (cell.getCellType() == CellType.FORMULA) {
             CellType cellType = evaluator.evaluateFormulaCell(cell);
             if (type.getName().equals("java.lang.Boolean") && cellType == CellType.BOOLEAN) {
-                cellValue = cell.getBooleanCellValue();
-                return cellValue;
+                return cell.getBooleanCellValue();
             } else if (type.getName().equals("java.lang.Integer") && cellType == CellType.NUMERIC) {
-                cellValue = (int) cell.getNumericCellValue();
-                return cellValue;
+                return (int) cell.getNumericCellValue();
             } else if (type.getName().equals("java.lang.Double") && cellType == CellType.NUMERIC) {
-                cellValue = cell.getNumericCellValue();
-                return cellValue;
+                return cell.getNumericCellValue();
             } else if (type.getName().equals("java.lang.String") && cellType == CellType.STRING) {
-                cellValue = cell.getStringCellValue();
-                return cellValue;
+                return cell.getStringCellValue();
             }
         }
         workbook.close();
