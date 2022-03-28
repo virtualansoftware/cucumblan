@@ -78,11 +78,13 @@ public class ScenarioContext {
      * @param key   the key
      * @param value the value
      */
-    public static void setContext(String id, String key, String value) throws Exception {
+    public static void setContext(String id, String key, String value) {
         if (parentScenarioContext.get(id) != null){
             getScenarioContext(id).put(key, value);
         } else {
-            throw new Exception("Context not found");
+            Map<String, String> map = new java.util.HashMap<>();
+            map.put(key, value);
+            parentScenarioContext.put(id, map);
         }
     }
 
