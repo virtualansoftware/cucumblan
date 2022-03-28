@@ -345,11 +345,17 @@ public class BaseStepDefinition {
     @Given("^add the (.*) value of the key as (.*)$")
     public void addVariable(String responseValue, String key) throws Exception {
         if (!this.skipScenario) {
-            ScenarioContext
-                    .setContext(String.valueOf(Thread.currentThread().getId()), key, ExcelAndMathHelper.evaluateWithVariableType(
-                            responseValue, ScenarioContext
-                                    .getContext(String.valueOf(Thread.currentThread().getId()))).toString());
 
+            Object value = ExcelAndMathHelper.evaluateWithVariableType(
+                    responseValue, ScenarioContext
+                            .getContext(String.valueOf(Thread.currentThread().getId())));
+            if(value  != null) {
+                ScenarioContext
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key,value.toString());
+            } else {
+                ScenarioContext
+                        .setContext(String.valueOf(Thread.currentThread().getId()), key, responseValue);
+            }
         }
     }
 
