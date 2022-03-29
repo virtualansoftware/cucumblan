@@ -1,6 +1,7 @@
 package io.virtualan.cucumblan.message.typeimpl;
 
 
+import com.jayway.jsonpath.JsonPath;
 import java.util.Map.Entry;
 
 public class ProtoBuffMessageType implements
@@ -158,13 +159,12 @@ public class ProtoBuffMessageType implements
           if (contextParam.get("EVENT_NAME") != null
               && protoMessageTypeEntry.getKey().toString()
               .equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
-            String[] messageTypeAndJsonPath = protoMessageTypeEntry.getValue().toString().split(";");
+            String[] messageTypeAndJsonPath = protoMessageTypeEntry.getValue().toString().split("(?<!\\\\);");
             if(messageTypeAndJsonPath.length ==2) {
               String bodyJson = deserialize(
                       messageTypeAndJsonPath[0], body);
               if (bodyJson != null) {
-                Object identifier = com.jayway.jsonpath.JsonPath.read(bodyJson,
-                        messageTypeAndJsonPath[1]);
+                String identifier = buildkey(messageTypeAndJsonPath[1]);
                 if (identifier != null) {
                   return new io.virtualan.cucumblan.message.typeimpl.ProtoBuffMessageType(
                           String.valueOf(identifier),bodyJson, body);
@@ -210,4 +210,20 @@ public class ProtoBuffMessageType implements
       throw new RuntimeException("Error creating read stream for JSON message", e);
     }
   }
+
+  private String buildkey(String paths){
+    StringBuilder key = new StringBuilder();
+    for(String path : paths.split("(?<!\\\\),")) {
+      String pathId = path.replace("\\\\,",",");
+      Object identifier = JsonPath.read(body, path);
+      if(identifier != null) {
+        if (key.length() != 0) {
+          key.append("_");
+        }
+        key.append(identifier.toString());
+      }
+    }
+    return key.toString();
+  }
+
 }
