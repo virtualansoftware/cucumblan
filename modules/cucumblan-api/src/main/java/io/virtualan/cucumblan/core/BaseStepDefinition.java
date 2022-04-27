@@ -1092,12 +1092,12 @@ public class BaseStepDefinition {
             validatableResponse = response.then().log().ifValidationFails().statusCode(statusCode);
             LOGGER.info(ScenarioContext
                     .getContext(String.valueOf(Thread.currentThread().getId())).toString());
-            LOGGER.info(validatableResponse.extract().body().asString());
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
+            //LOGGER.info(validatableResponse.extract().body().asString());
             scenario.attach(
                     new JSONObject(ScenarioContext.getPrintableContextObject(
                             String.valueOf(Thread.currentThread().getId()))).toString(4), "application/json",
                     "Contextual-Dataset:");
-            attachResponse(validatableResponse);
         }
     }
 
@@ -1117,28 +1117,26 @@ public class BaseStepDefinition {
         });
     }
 
-
-    private void attachResponse(ValidatableResponse validatableResponse) {
-        if (validatableResponse != null && validatableResponse.extract().body() != null) {
-            attachResponse(validatableResponse, "Actual-Response:");
-        }
+    
+    public void attachResponse(String body, byte[] bodyArray) {
+            attachResponse(body,  bodyArray, "Actual-Response:");
     }
 
-    private void attachResponse(ValidatableResponse actual, String category) {
+    public void attachResponse( String body, byte[] bodyArray, String category) {
         try {
             String xmlType =
                     response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
             if (io.restassured.http.ContentType.JSON.matches(response.getContentType())
-                    && actual.extract().body().asString() != null) {
-                if (StepDefinitionHelper.getJSON(actual.extract().body().asString()) instanceof JSONArray) {
+                    && body != null) {
+                if (StepDefinitionHelper.getJSON(body) instanceof JSONArray) {
                     scenario
-                            .attach(new JSONArray(actual.extract().body().asPrettyString()).toString(4), xmlType, category);
-                } else if (StepDefinitionHelper.getJSON(actual.extract().body().toString()) instanceof JSONObject) {
+                            .attach(new JSONArray(body).toString(4), xmlType, category);
+                } else if (StepDefinitionHelper.getJSON(body) instanceof JSONObject) {
                     scenario
-                            .attach(new JSONObject(actual.extract().body().asString()).toString(4), xmlType, category);
+                            .attach(new JSONObject(body).toString(4), xmlType, category);
                 } else {
                     scenario
-                            .attach(actual.extract().body().asPrettyString(), "text/plain", category);
+                            .attach(body, "text/plain", category);
                 }
             } else {
                 if (response.contentType().contains("pdf") ||
@@ -1147,15 +1145,13 @@ public class BaseStepDefinition {
                         UtilHelper.isBinaryFile(response.contentType())
                 ) {
                     scenario
-                            .attach(actual.extract().asByteArray(), xmlType, category);
+                            .attach(body, xmlType, category);
                 } else {
-                    scenario.attach(actual.extract().body().asString(), "text/plain", category);
+                    scenario.attach(body, "text/plain", category);
                 }
             }
         } catch (Exception e) {
-            if (actual.extract().body().asString() != null) {
-                scenario.attach(actual.extract().body().asString(), "text/plain", category);
-            }
+                scenario.attach(body, "text/plain", category);
         }
     }
 
@@ -1199,7 +1195,7 @@ public class BaseStepDefinition {
     public void verifyFormatedMapson(String type, String resource, List<String> readData)
             throws Throwable {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             StandardProcessing processing = stdProcessorMap.get(type);
             if (processing != null) {
                 if (validatableResponse != null
@@ -1285,7 +1281,7 @@ public class BaseStepDefinition {
     public void verifyFormatedMapson(String type, String file, String resource)
             throws Throwable {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             StandardProcessing processing = stdProcessorMap.get(type);
             if (processing != null) {
                 if (validatableResponse != null
@@ -1332,7 +1328,7 @@ public class BaseStepDefinition {
     @And("^verify-all (.*) api includes following in the response$")
     public void verifyResponseMapson(String resource, DataTable data) throws Throwable {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             Map<String, String> mapson = Mapson.buildMAPsonFromJson(
                     validatableResponse.extract().body().asString());
             if (areEqualKeyValues(resource,
@@ -1397,7 +1393,7 @@ public class BaseStepDefinition {
     @And("^verify (.*) response inline includes in the response$")
     public void verifyFileResponse(String resource, List<String> xmlString) throws Throwable {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             String listString = xmlString.stream().map(Object::toString)
                     .collect(Collectors.joining());
             HelperApiUtil.assertXMLEquals(listString, response.asString());
@@ -1415,7 +1411,7 @@ public class BaseStepDefinition {
     public void verifyXMLResponse(String resource, String fileBody)
             throws Throwable {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             String body = HelperApiUtil.readFileAsString(fileBody);
             if (body != null) {
                 HelperApiUtil.assertXMLEquals(body, response.asString());
@@ -1441,7 +1437,7 @@ public class BaseStepDefinition {
         if (!this.skipScenario) {
             String body = HelperApiUtil.readFileAsString(fileBody);
             attachActualResponse(body);
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             if (body != null) {
                 if (contentType.contains("xml")) {
                     HelperApiUtil.assertXpathsEqual(xpaths, body, response.asString());
@@ -1463,7 +1459,7 @@ public class BaseStepDefinition {
     @And("^verify (.*) response with (.*) includes in the response$")
     public void verifySingleResponse(String resource, String context) {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             String output =
                     validatableResponse.extract().body().asString() != null ? validatableResponse.extract()
                             .body().asString().trim() : null;
@@ -1523,7 +1519,7 @@ public class BaseStepDefinition {
     @And("^verify (.*) includes following in the response$")
     public void verifyResponse(String dummyString, DataTable data) throws Throwable {
         if (!this.skipScenario) {
-            attachResponse(validatableResponse);
+            attachResponse(validatableResponse.extract().body().asString(), validatableResponse.extract().asByteArray());
             data.asMap(String.class, String.class).forEach((k, v) -> {
                 LOGGER
                         .info(
