@@ -2,6 +2,7 @@ package io.virtualan.cucumblan.message.typeimpl;
 
 
 import com.jayway.jsonpath.JsonPath;
+
 import java.util.Map.Entry;
 
 public class JSONMessageType implements
@@ -30,10 +31,10 @@ public class JSONMessageType implements
   public static void reload() {
     try {
       java.io.InputStream stream = Thread.currentThread().getContextClassLoader()
-          .getResourceAsStream("json-messagetype.properties");
+          .getResourceAsStream("message-type/json-messagetype.properties");
       if (stream == null) {
         stream = io.virtualan.cucumblan.props.ApplicationConfiguration.class.getClassLoader()
-            .getResourceAsStream("json-messagetype.properties");
+            .getResourceAsStream("message-type/json-messagetype.properties");
       }
       if (stream != null) {
         jsonMessageTypeMapper.load(stream);
@@ -116,7 +117,7 @@ public class JSONMessageType implements
           if (contextParam.get("EVENT_NAME") != null
               && entry.getKey().toString()
               .equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
-              String identifier = buildkey(entry.getValue().toString());
+              String identifier = buildkey(body, entry.getValue().toString());
               if (identifier != null) {
                   return new JSONMessageType(identifier, body);
               }
@@ -128,11 +129,11 @@ public class JSONMessageType implements
     throw new io.virtualan.cucumblan.message.exception.SkipMessageException(body);
   }
 
-    private String buildkey(String paths){
+    private String buildkey(String body, String paths){
       StringBuilder key = new StringBuilder();
       for(String path : paths.split("(?<!\\\\),")) {
           String pathId = path.replace("\\\\,",",");
-            Object identifier = JsonPath.read(body, path);
+            Object identifier = JsonPath.read(body, pathId);
             if(identifier != null) {
                 if (key.length() != 0) {
                    key.append("_");

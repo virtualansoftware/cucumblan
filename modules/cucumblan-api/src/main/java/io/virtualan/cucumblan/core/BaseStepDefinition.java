@@ -39,10 +39,7 @@ import io.virtualan.cucumblan.parser.OpenAPIParser;
 import io.virtualan.cucumblan.props.ApplicationConfiguration;
 import io.virtualan.cucumblan.props.EndpointConfiguration;
 import io.virtualan.cucumblan.props.ExcludeConfiguration;
-import io.virtualan.cucumblan.props.util.ApiHelper;
-import io.virtualan.cucumblan.props.util.HelperApiUtil;
-import io.virtualan.cucumblan.props.util.ScenarioContext;
-import io.virtualan.cucumblan.props.util.StepDefinitionHelper;
+import io.virtualan.cucumblan.props.util.*;
 import io.virtualan.cucumblan.script.ExcelAndMathHelper;
 import io.virtualan.cucumblan.standard.StandardProcessing;
 import io.virtualan.mapson.Mapson;
@@ -1123,7 +1120,42 @@ public class BaseStepDefinition {
 
     private void attachResponse(ValidatableResponse validatableResponse) {
         if (validatableResponse != null && validatableResponse.extract().body() != null) {
-            attachResponse(validatableResponse.extract().body().asString(), "Actual-Response:");
+            attachResponse(validatableResponse, "Actual-Response:");
+        }
+    }
+
+    private void attachResponse(ValidatableResponse actual, String category) {
+        try {
+            String xmlType =
+                    response.getContentType().contains("xml") ? "text/xml" : response.getContentType();
+            if (io.restassured.http.ContentType.JSON.matches(response.getContentType())
+                    && actual.extract().body().asString() != null) {
+                if (StepDefinitionHelper.getJSON(actual.extract().body().asString()) instanceof JSONArray) {
+                    scenario
+                            .attach(new JSONArray(actual.extract().body().asPrettyString()).toString(4), xmlType, category);
+                } else if (StepDefinitionHelper.getJSON(actual.extract().body().toString()) instanceof JSONObject) {
+                    scenario
+                            .attach(new JSONObject(actual.extract().body().asString()).toString(4), xmlType, category);
+                } else {
+                    scenario
+                            .attach(actual.extract().body().asPrettyString(), "text/plain", category);
+                }
+            } else {
+                if (response.contentType().contains("pdf") ||
+                        response.contentType().contains("png") ||
+                        response.contentType().contains("octet-stream") ||
+                        UtilHelper.isBinaryFile(response.contentType())
+                ) {
+                    scenario
+                            .attach(actual.extract().asByteArray(), xmlType, category);
+                } else {
+                    scenario.attach(actual.extract().body().asString(), "text/plain", category);
+                }
+            }
+        } catch (Exception e) {
+            if (actual.extract().body().asString() != null) {
+                scenario.attach(actual.extract().body().asString(), "text/plain", category);
+            }
         }
     }
 
@@ -1171,22 +1203,24 @@ public class BaseStepDefinition {
             StandardProcessing processing = stdProcessorMap.get(type);
             if (processing != null) {
                 if (validatableResponse != null
-                        && validatableResponse.extract().body().asString() != null) {
-                    String readXML = readData.stream().map(Object::toString)
-                            .collect(Collectors.joining());
+                        && validatableResponse != null) {
+                    String body = StepDefinitionHelper.getActualValue(readData.stream().map(Object::toString)
+                            .collect(Collectors.joining()));
+
                     String jsonRequestActual = processing
-                            .postResponseProcessing(validatableResponse.extract().body().asString());
-                    String jsonRequestExpected = processing.postResponseProcessing(readXML);
-
+                            .postResponseProcessing(validatableResponse);
+                    if (jsonRequestActual == null && validatableResponse.extract().body().asString() != null) {
+                        jsonRequestActual = processing
+                                .postResponseProcessing(validatableResponse.extract().body().asString());
+                    }
+                    String jsonRequestExpected = processing.actualResponseProcessing(body);
+                    if (jsonRequestExpected == null) {
+                        jsonRequestExpected = processing.postResponseProcessing(body);
+                    }
                     if (jsonRequestExpected != null && jsonRequestActual != null) {
-                        Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
-                        Map<String, String> mapsonActual = Mapson.buildMAPsonFromJson(jsonRequestActual);
-                        if (areEqualKeyValues(resource, mapsonActual, mapson, true)) {
-                            Assert.assertTrue("Comparison success", true);
-                        } else {
-                            Assert.assertTrue("Comparison failed refer Comparison Failure", false);
-                        }
-
+                        Object jsonExpectedObject = StepDefinitionHelper.getJSON(jsonRequestExpected);
+                        Object jsonActualObject = StepDefinitionHelper.getJSON(jsonRequestActual);
+                        HelperApiUtil.verifyJSONToJSON(jsonExpectedObject, jsonActualObject, JSONCompareMode.LENIENT, scenario);
                     } else {
                         assertTrue("Standard " + type + " has no response validation ", false);
                     }
@@ -1256,15 +1290,23 @@ public class BaseStepDefinition {
             if (processing != null) {
                 if (validatableResponse != null
                         && validatableResponse.extract().body().asString() != null) {
-                    String body = HelperApiUtil.readFileAsString(file);
-                    String jsonRequestActual = processing
-                            .postResponseProcessing(validatableResponse.extract().body().asString());
-                    String jsonRequestExpected = processing.postResponseProcessing(body);
-                    if (jsonRequestExpected != null && jsonRequestActual != null) {
-                        Map<String, String> mapson = Mapson.buildMAPsonFromJson(jsonRequestExpected);
-                        Map<String, String> mapsonExpected = Mapson.buildMAPsonFromJson(jsonRequestActual);
-                        if (areEqualKeyValues(resource, mapson, mapsonExpected, true)) {
-                            Assert.assertTrue("Comparison success", true);
+                    if (validatableResponse != null
+                            && validatableResponse != null) {
+                        String body = StepDefinitionHelper.getActualValue(HelperApiUtil.readFileAsString(file));
+                        String jsonRequestActual = processing
+                                .postResponseProcessing(validatableResponse);
+                        if (jsonRequestActual == null && validatableResponse.extract().body().asString() != null) {
+                            jsonRequestActual = processing
+                                    .postResponseProcessing(validatableResponse.extract().body().asString());
+                        }
+                        String jsonRequestExpected = processing.actualResponseProcessing(body);
+                        if (jsonRequestExpected == null) {
+                            jsonRequestExpected = processing.postResponseProcessing(body);
+                        }
+                        if (jsonRequestExpected != null && jsonRequestActual != null) {
+                            Object jsonExpectedObject = StepDefinitionHelper.getJSON(jsonRequestExpected);
+                            Object jsonActualObject = StepDefinitionHelper.getJSON(jsonRequestActual);
+                            HelperApiUtil.verifyJSONToJSON(jsonExpectedObject, jsonActualObject, JSONCompareMode.LENIENT, scenario);
                         } else {
                             Assert.assertTrue("Comparison failed refer Comparison Failure", false);
                         }
