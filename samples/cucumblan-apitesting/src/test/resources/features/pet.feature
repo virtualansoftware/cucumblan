@@ -191,3 +191,21 @@ Feature: Test Pet API
     Then the status code is 201
     And verify across response includes following in the response
       | testExecuted | true |
+
+  @idai
+  Scenario: Attach file with multipart - api call
+    Given a user perform a api action
+    And add request with given header params
+      | contentType | multipart/form-data |
+      | Accept      | */*                 |
+    And add request with multipart/form-data given multipart-form params
+      | filestream  | sample.json                        |
+      | serverUrls  | https://live.virtualandemo.com/api |
+      | dataload    | APITEST.json                       |
+      | execute     | true                               |
+      | type        | VIRTUALAN                          |
+      | reportTitle | DemoTestReport                     |
+    When a user post multipart/form-data in /test resource on idai
+    Then the status code is 201
+    And verify across response includes following in the response
+      | testExecuted | true |
