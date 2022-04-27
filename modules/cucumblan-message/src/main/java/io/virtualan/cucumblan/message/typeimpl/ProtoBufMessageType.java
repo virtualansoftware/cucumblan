@@ -1,15 +1,17 @@
 package io.virtualan.cucumblan.message.typeimpl;
 
 
+import com.jayway.jsonpath.JsonPath;
+
 import java.util.Map.Entry;
 
-public class ProtoBuffMessageType implements
-    io.virtualan.cucumblan.message.type.MessageType<String, byte[]> {
+public class ProtoBufMessageType implements
+        io.virtualan.cucumblan.message.type.MessageType<String, byte[]> {
 
   private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-      .getLogger(io.virtualan.cucumblan.message.typeimpl.ProtoBuffMessageType.class.getName());
+          .getLogger(ProtoBufMessageType.class.getName());
   private static final com.google.protobuf.util.JsonFormat.Parser jsonParser = com.google.protobuf.util.JsonFormat
-      .parser().ignoringUnknownFields();
+          .parser().ignoringUnknownFields();
   private static java.util.Properties protoMessageTypeMapper = new java.util.Properties();
 
   static {
@@ -21,10 +23,10 @@ public class ProtoBuffMessageType implements
   private String body;
   private byte[] originalBody;
 
-  public ProtoBuffMessageType() {
+  public ProtoBufMessageType() {
   }
 
-  public ProtoBuffMessageType(String id, String body, byte[] originalBody) {
+  public ProtoBufMessageType(String id, String body, byte[] originalBody) {
     this.body = body;
     this.originalBody = originalBody;
     this.id = id;
@@ -33,10 +35,10 @@ public class ProtoBuffMessageType implements
   public static void reload() {
     try {
       java.io.InputStream stream = Thread.currentThread().getContextClassLoader()
-          .getResourceAsStream("proto-messagetype.properties");
+              .getResourceAsStream("message-type/proto-messagetype.properties");
       if (stream == null) {
         stream = io.virtualan.cucumblan.props.ApplicationConfiguration.class.getClassLoader()
-            .getResourceAsStream("proto-messagetype.properties");
+                .getResourceAsStream("message-type/proto-messagetype.properties");
       }
       if (stream != null) {
         protoMessageTypeMapper.load(stream);
@@ -76,14 +78,14 @@ public class ProtoBuffMessageType implements
   }
 
   public io.virtualan.cucumblan.message.type.MessageType buildProducerMessage(Object messages,
-      java.util.Map<String, Object> contextParam)
-      throws io.virtualan.cucumblan.message.exception.MessageNotDefinedException {
+                                                                              java.util.Map<String, Object> contextParam)
+          throws io.virtualan.cucumblan.message.exception.MessageNotDefinedException {
     String message;
     try {
       org.json.JSONObject body;
       if (messages instanceof java.util.List) {
         message = (String) ((java.util.List) messages).stream()
-            .collect(java.util.stream.Collectors.joining());
+                .collect(java.util.stream.Collectors.joining());
         body = new org.json.JSONObject(message);
         return serialize(body.toString(), contextParam);
       } else {
@@ -94,15 +96,15 @@ public class ProtoBuffMessageType implements
       }
     } catch (io.virtualan.mapson.exception.BadInputDataException | io.virtualan.cucumblan.message.exception.SkipMessageException exception) {
       throw new io.virtualan.cucumblan.message.exception.MessageNotDefinedException(
-          exception.getMessage());
+              exception.getMessage());
     }
   }
 
   //Mandatory
   public io.virtualan.cucumblan.message.type.MessageType buildConsumerMessage(
-      org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]> record,
-      java.util.Map<String, Object> contextParam)
-      throws io.virtualan.cucumblan.message.exception.SkipMessageException {
+          org.apache.kafka.clients.consumer.ConsumerRecord<String, byte[]> record,
+          java.util.Map<String, Object> contextParam)
+          throws io.virtualan.cucumblan.message.exception.SkipMessageException {
     try {
       return deserialize(record.value(), contextParam);
     } catch (Exception e){
@@ -112,93 +114,92 @@ public class ProtoBuffMessageType implements
 
   public String toString() {
     return "ProtoBuffMessageType{type='" + this.type + '\'' + ", id=" + this.id + ", body="
-        + this.body + '}';
+            + this.body + '}';
   }
 
 
-    public io.virtualan.cucumblan.message.typeimpl.ProtoBuffMessageType serialize(String jsonbody,
-        java.util.Map<String, Object> contextParam)
-        throws io.virtualan.cucumblan.message.exception.SkipMessageException {
-        if (protoMessageTypeMapper != null && !protoMessageTypeMapper.isEmpty()) {
-            for (Entry protoMessageTypeEntry : protoMessageTypeMapper.entrySet()) {
-                try {
-                    if (contextParam.get("EVENT_NAME") != null
-                        && protoMessageTypeEntry.getKey().toString()
-                        .equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
-                      String[] messageTypeAndJsonPath = protoMessageTypeEntry.getValue().toString().split(";");
-                      if(messageTypeAndJsonPath.length ==2) {
-                        byte[] body = serialize(messageTypeAndJsonPath[0],
-                                jsonbody);
-                        if (body != null) {
-                          Object identifier = com.jayway.jsonpath.JsonPath.read(jsonbody,
-                                  messageTypeAndJsonPath[1]);
-                          if (identifier != null) {
-                            return new io.virtualan.cucumblan.message.typeimpl.ProtoBuffMessageType(
-                                    String.valueOf(identifier), jsonbody, body);
-                          }
-                        }
-                      }
-                    }
-                } catch (Exception e) {
-                    LOGGER.warning("Unable to process message :" + e.getMessage());
+  public ProtoBufMessageType serialize(String jsonbody,
+                                java.util.Map<String, Object> contextParam)
+          throws io.virtualan.cucumblan.message.exception.SkipMessageException {
+    if (protoMessageTypeMapper != null && !protoMessageTypeMapper.isEmpty()) {
+      for (Entry protoMessageTypeEntry : protoMessageTypeMapper.entrySet()) {
+        try {
+          if (contextParam.get("EVENT_NAME") != null
+                  && protoMessageTypeEntry.getKey().toString()
+                  .equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
+            String[] messageTypeAndJsonPath = protoMessageTypeEntry.getValue().toString().split(";");
+            if(messageTypeAndJsonPath.length ==2) {
+              byte[] body = serialize(messageTypeAndJsonPath[0],
+                      jsonbody);
+              if (body != null) {
+                Object identifier = JsonPath.read(jsonbody,
+                        messageTypeAndJsonPath[1]);
+                if (identifier != null) {
+                  return new ProtoBufMessageType(
+                          String.valueOf(identifier), jsonbody, body);
                 }
+              }
             }
+          }
+        } catch (Exception e) {
+          LOGGER.warning("Unable to process message :" + e.getMessage());
         }
-        throw new io.virtualan.cucumblan.message.exception.SkipMessageException(
-            "Unable to build the message");
+      }
     }
+    throw new io.virtualan.cucumblan.message.exception.SkipMessageException(
+            "Unable to build the message");
+  }
 
-  public io.virtualan.cucumblan.message.typeimpl.ProtoBuffMessageType deserialize(byte[] body,
-      java.util.Map<String, Object> contextParam)
-      throws io.virtualan.cucumblan.message.exception.SkipMessageException {
+  public ProtoBufMessageType deserialize(byte[] body,
+                                  java.util.Map<String, Object> contextParam)
+          throws io.virtualan.cucumblan.message.exception.SkipMessageException {
     if (protoMessageTypeMapper != null && !protoMessageTypeMapper.isEmpty()) {
 
       for (Entry protoMessageTypeEntry : protoMessageTypeMapper.entrySet()) {
         try {
           if (contextParam.get("EVENT_NAME") != null
-              && protoMessageTypeEntry.getKey().toString()
-              .equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
-            String[] messageTypeAndJsonPath = protoMessageTypeEntry.getValue().toString().split(";");
+                  && protoMessageTypeEntry.getKey().toString()
+                  .equalsIgnoreCase(contextParam.get("EVENT_NAME").toString())) {
+            String[] messageTypeAndJsonPath = protoMessageTypeEntry.getValue().toString().split("(?<!\\\\);");
             if(messageTypeAndJsonPath.length ==2) {
               String bodyJson = deserialize(
                       messageTypeAndJsonPath[0], body);
               if (bodyJson != null) {
-                Object identifier = com.jayway.jsonpath.JsonPath.read(bodyJson,
-                        messageTypeAndJsonPath[1]);
+                String identifier = buildkey(bodyJson, messageTypeAndJsonPath[1]);
                 if (identifier != null) {
-                  return new io.virtualan.cucumblan.message.typeimpl.ProtoBuffMessageType(
+                  return new ProtoBufMessageType(
                           String.valueOf(identifier),bodyJson, body);
                 }
               }
             }
           }
         } catch (Exception e) {
-            LOGGER.warning("Unable to process message :" + e.getMessage());
+          LOGGER.warning("Unable to process message :" + e.getMessage());
         }
       }
     }
     throw new io.virtualan.cucumblan.message.exception.SkipMessageException(
-        "Unable to find the message");
+            "Unable to find the message");
   }
 
   public byte[] serialize(String classname, String messages)
-      throws ClassNotFoundException, NoSuchMethodException, java.lang.reflect.InvocationTargetException, IllegalAccessException, java.io.IOException {
+          throws ClassNotFoundException, NoSuchMethodException, java.lang.reflect.InvocationTargetException, IllegalAccessException, java.io.IOException {
     Class clazz = Class.forName(classname);
     java.lang.reflect.Method builderGetter = clazz.getDeclaredMethod("newBuilder");
     com.google.protobuf.GeneratedMessageV3.Builder builder = (com.google.protobuf.GeneratedMessageV3.Builder) builderGetter
-        .invoke(null);
+            .invoke(null);
     jsonParser.merge(new java.io.StringReader(messages), builder);
     return builder.build().toByteArray();
   }
 
   public String deserialize(String classname, byte[] payload)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+          throws com.google.protobuf.InvalidProtocolBufferException {
     try {
       com.google.gson.Gson g = new com.google.gson.Gson();
       Class clazz = Class.forName(classname);
       java.lang.reflect.Method builderGetter = clazz.getDeclaredMethod("newBuilder");
       com.google.protobuf.GeneratedMessageV3.Builder builder = (com.google.protobuf.GeneratedMessageV3.Builder) builderGetter
-          .invoke(null);
+              .invoke(null);
       builder.mergeFrom(payload);
       String body = g.toJson(builder);
       return body;
@@ -210,4 +211,20 @@ public class ProtoBuffMessageType implements
       throw new RuntimeException("Error creating read stream for JSON message", e);
     }
   }
+
+  private String buildkey(String body, String paths){
+    StringBuilder key = new StringBuilder();
+    for(String path : paths.split("(?<!\\\\),")) {
+      String pathId = path.replace("\\\\,",",");
+      Object identifier = JsonPath.read(body, pathId);
+      if(identifier != null) {
+        if (key.length() != 0) {
+          key.append("_");
+        }
+        key.append(identifier.toString());
+      }
+    }
+    return key.toString();
+  }
+
 }

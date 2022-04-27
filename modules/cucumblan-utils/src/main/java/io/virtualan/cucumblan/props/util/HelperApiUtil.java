@@ -273,6 +273,46 @@ public class HelperApiUtil {
         }
     }
 
+
+    /**
+     * Verify csvson.
+     *
+     * @param expected            the json
+     * @param actual            the json
+     * @param mode                the mode
+     * @param scenario            the scenario
+     * @throws Exception the exception
+     */
+    public static void verifyJSONToJSON(Object expected, Object actual, JSONCompareMode mode, Scenario scenario)
+            throws Exception {
+        JSONCompareResult result = null;
+        JSONArray notFoundArray = null;
+        if (expected instanceof JSONArray) {
+            scenario.attach(((JSONArray)expected).toString(4), "application/json", "Expected");
+            scenario.attach(((JSONArray)actual).toString(4), "application/json", "Actual");
+            if (((JSONArray)expected).length() == ((JSONArray)expected).length()) {
+                result = JSONCompare.compareJSON(((JSONArray)expected), ((JSONArray)actual), mode);
+            } else {
+                notFoundArray = getUnmatchedElement(mode, ((JSONArray)expected), ((JSONArray)actual));
+            }
+        } else if (expected instanceof JSONObject) {
+            scenario.attach(((JSONObject)expected).toString(4), "application/json", "Expected:");
+            scenario.attach(((JSONObject)actual).toString(4), "application/json", "Actual:");
+            result = JSONCompare.compareJSON(((JSONObject)expected), ((JSONObject)actual), mode);
+        }
+        if (result == null && notFoundArray == null) {
+            Assert.assertTrue("Actual input is not a valid JSON Object", false);
+        } else if (result != null && result.failed()) {
+            scenario.attach(result.getMessage(), "text/plain", "Unmatched csvson");
+            assertTrue("JSON does not match", result.passed());
+        } else if (notFoundArray != null && notFoundArray.length() > 0) {
+            scenario.attach(notFoundArray.toString(2), "application/json", "Unmatched:");
+            assertTrue("JSON not match and see unmatched records", false);
+        } else {
+            assertTrue("Macthes:", true);
+        }
+    }
+
     private static boolean isMatchNotFound(JSONObject actual, JSONArray expectedArray, JSONCompareMode mode) {
         for (int j = 0; j < expectedArray.length(); j++) {
             JSONCompareResult result = JSONCompare.compareJSON(actual, expectedArray.getJSONObject(j), mode);
