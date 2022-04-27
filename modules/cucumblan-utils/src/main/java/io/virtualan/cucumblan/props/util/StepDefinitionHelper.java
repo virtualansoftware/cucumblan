@@ -61,7 +61,16 @@ public class StepDefinitionHelper {
         String returnValue = (String) object;
         String key = "";
         if (returnValue.contains("[") && returnValue.contains("]")) {
-            key = returnValue.substring(returnValue.indexOf("[") + 1, returnValue.indexOf("]"));
+            int start = returnValue.indexOf("[");
+            int end = returnValue.indexOf("]");
+            String iskey = returnValue.substring(start + 1, end);
+            boolean check = iskey.contains("[");
+            if(check){
+                start = iskey.indexOf("[");
+                key = iskey.substring(start + 1);
+            } else {
+                key = returnValue.substring(start + 1, end);
+            }
             if (key.contains(",")) {
                 StringBuffer keys = new StringBuffer();
                 for (String token : key.split(",")) {
