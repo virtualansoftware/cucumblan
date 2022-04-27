@@ -4,10 +4,10 @@
     <artifactId>cucumblan-api</artifactId>
     <packaging>jar</packaging>
     <name>cucumblan-api</name>
-    <version>1.4.3-SNAPSHOT</version>
+    <version>1.4.4-SNAPSHOT</version>
     <properties>
         <json-schema-validator>4.5.1</json-schema-validator>
-        <cucumblan-utils.version>1.1.6-SNAPSHOT</cucumblan-utils.version>
+        <cucumblan-utils.version>1.1.7-SNAPSHOT</cucumblan-utils.version>
     </properties>
     <description>
         Cucumblan is a test automation framework that supports Behavior Driven Development (BDD),
@@ -100,6 +100,25 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.2</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -141,7 +160,7 @@
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser-v3</artifactId>
-            <version>2.0.30</version>
+            <version>2.0.31</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-io</groupId>

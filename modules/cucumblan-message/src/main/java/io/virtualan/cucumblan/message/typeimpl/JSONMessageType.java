@@ -1,6 +1,5 @@
 package io.virtualan.cucumblan.message.typeimpl;
 
-
 public class JSONMessageType implements io.virtualan.cucumblan.message.type.MessageType<String, String> {
     private String type = "JSONMessageType";
     private String id;
