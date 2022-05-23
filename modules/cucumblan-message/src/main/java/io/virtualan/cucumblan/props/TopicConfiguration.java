@@ -73,6 +73,7 @@ public class TopicConfiguration {
      * @return the properties
      */
     public static Map<String, String> getProperties() {
+        TopicConfiguration.reload();
         return (Map) properties;
     }
 
@@ -83,6 +84,7 @@ public class TopicConfiguration {
      * @return the property
      */
     public static String getProperty(String keyName) {
+        TopicConfiguration.reload();
         return properties.getProperty(keyName);
     }
 

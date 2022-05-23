@@ -209,3 +209,18 @@ Feature: Test Pet API
     Then the status code is 201
     And verify across response includes following in the response
       | testExecuted | true |
+
+  Scenario: User calls service to READ a pet by its id
+    Given create a pdf file  to perform this api action
+    And create variable AddressLine1 as key and TC01-01-API as value
+    And create variable AddressLine2 as key and APRIL CSR 2022 as value
+    And create variable AddressLine3 as key and 100000 FedExGndDrivefourthfloo as value
+    And create variable AddressLine4 as key and West Wing as value
+    And create variable City as key and Pittsburgh, PA 15108 as value
+    And add request with given header params
+      | contentType | application/pdf |
+    When a user get application/json in /api/pdf-validation.pdf resource on pdf
+    Then verify the status code is 200
+    And verify-standard PDF_PARSER all inline pdf api includes following in the response
+      | {"from":["FROM:","[AddressLine1]","[AddressLine2]","[AddressLine3]","[AddressLine4]","[City]"],"to":["TO:","FEDEX ECONOMY LABEL VALIDATION","MICHAEL WESTEN","ourthfloo 528 NW 7TH AVENUE","APT. #2","MIAMI, FL 33136"] } |
+
