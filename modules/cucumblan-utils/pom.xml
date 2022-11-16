@@ -11,7 +11,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <cucumber.version>7.0.0</cucumber.version>
-        <jackson.verion>2.12.6.1</jackson.verion>
+        <jackson.verion>2.12.7.1</jackson.verion>
         <log4j.version>2.17.1</log4j.version>
     </properties>
     <description>
